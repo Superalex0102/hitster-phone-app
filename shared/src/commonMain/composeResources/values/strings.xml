@@ -1,0 +1,8 @@
+<resources>
+    <string name="local_game">Local</string>
+    <string name="online_game">Online</string>
+    <string name="powered_by">powered by </string>
+    <string name="bottom_app_name">ChronoBeat</string>
+    <string name="title">CHRONOBEAT</string>
+    <string name="settings">Settings</string>
+</resources>
