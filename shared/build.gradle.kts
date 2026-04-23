@@ -3,6 +3,8 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 kotlin {
@@ -24,6 +26,9 @@ kotlin {
     
     sourceSets {
         commonMain.dependencies {
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.components.resources)
             implementation(libs.kotlinx.coroutines.core)
         }
         commonTest.dependencies {
@@ -42,4 +47,9 @@ android {
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
     }
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "com.rdisoftware.chronobeat.shared.resources"
 }
