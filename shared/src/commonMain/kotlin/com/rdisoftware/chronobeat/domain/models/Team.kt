@@ -5,7 +5,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalUuidApi::class)
-data class Team(
+data class Team (
     val id: Uuid,
     val name: String,
     val color: TeamColor
