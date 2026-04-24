@@ -1,11 +1,11 @@
 package com.rdisoftware.chronobeat.data.mappers
 
 import com.rdisoftware.chronobeat.data.remote.dto.ChronoBeatPlaylistResponseDto
-import com.rdisoftware.chronobeat.data.remote.dto.MusicCardDto
+import com.rdisoftware.chronobeat.data.remote.dto.TrackDto
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.models.Playlist
 
-fun MusicCardDto.toDomain(): Track {
+fun TrackDto.toDomain(): Track {
     return Track(
         id = this.id,
         title = this.name,

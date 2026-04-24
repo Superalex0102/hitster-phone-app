@@ -1,10 +1,9 @@
-package com.rdisoftware.chronobeat.data.remote.api
+package com.rdisoftware.chronobeat.data.auth
 
 import com.rdisoftware.chronobeat.shared.BuildConfig
 
-class TokenService {
+class TokenManager {
     suspend fun getAccessToken(): String {
-        // For testing, return your temporary Spotify Console token
         return BuildConfig.SPOTIFY_ACCESS_TOKEN_DEBUG
     }
 }
