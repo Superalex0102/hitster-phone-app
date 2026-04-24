@@ -17,11 +17,13 @@ class MusicMapper {
         )
     }
 
-    fun ChronoBeatPlaylistResponseDto.toDomain(): Playlist {
-        return Playlist(
-            id = this.playlists[0].id,
-            name = this.playlists[0].name,
-            trackIds = this.playlists[0].trackIds
-        )
+    fun ChronoBeatPlaylistResponseDto.toDomain(): List<Playlist> {
+        return this.playlists.map { playlist ->
+            Playlist(
+                id = playlist.id,
+                name = playlist.name,
+                trackIds = playlist.trackIds
+            )
+        }
     }
 }
