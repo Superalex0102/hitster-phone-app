@@ -30,8 +30,8 @@ data class ButtonDimensions(
 fun ButtonSize.toDimensions(): ButtonDimensions =
     when (this) {
         ButtonSize.SMALL -> ButtonDimensions(
-            widthFraction = 0.4f,
-            ratio = 3f,
+            widthFraction = 0.5f,
+            ratio = 2.9f,
             fontSize = 24.sp
         )
 
@@ -73,7 +73,7 @@ fun GradientButton(
             onClick()
         },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        border = BorderStroke(width = 1.dp, color = Color.White)
+        border = BorderStroke(width = 2.dp, color = Color.White)
     ) {
         Text(
             text = text,
