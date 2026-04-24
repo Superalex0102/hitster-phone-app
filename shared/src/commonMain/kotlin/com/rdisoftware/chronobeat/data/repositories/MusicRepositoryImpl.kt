@@ -2,8 +2,12 @@ package com.rdisoftware.chronobeat.data.repositories
 
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
+import com.rdisoftware.chronobeat.domain.repositories.TokenRepository
 
-class MusicRepositoryImpl : MusicRepository {
+class MusicRepositoryImpl(
+    // TODO: private val apiService: MusicApiService,
+    private val tokenRepository: TokenRepository
+) : MusicRepository {
     override suspend fun getUserPlaylists() {
         TODO("Not yet implemented")
     }
@@ -13,7 +17,9 @@ class MusicRepositoryImpl : MusicRepository {
     }
 
     override suspend fun getTrackInfo(trackId: String): Track {
-        TODO("Not yet implemented")
+        val token = tokenRepository.getAccessToken()
+        // TODO: val response = apiService.fetchMusic(token)
+       //return response.map { it.toDomain() }
     }
 
     override suspend fun playMusic() {
