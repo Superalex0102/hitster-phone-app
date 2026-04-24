@@ -1,6 +1,6 @@
 package com.rdisoftware.chronobeat.domain.models
 
-data class MusicCard(
+data class Track(
     val id: String,
     val title: String,
     val mainArtist: String,
