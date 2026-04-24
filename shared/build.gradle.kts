@@ -1,4 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
+val localProps = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -6,6 +14,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.buildConfig)
 }
 
 kotlin {
@@ -63,4 +72,11 @@ android {
 compose.resources {
     publicResClass = true
     packageOfResClass = "com.rdisoftware.chronobeat.shared.resources"
+}
+
+buildConfig {
+    packageName("com.rdisoftware.chronobeat.shared")
+
+    val spotifyToken = localProps.getProperty("SPOTIFY_ACCESS_TOKEN_DEBUG") ?: ""
+    buildConfigField("String", "SPOTIFY_ACCESS_TOKEN_DEBUG", "\"$spotifyToken\"")
 }
