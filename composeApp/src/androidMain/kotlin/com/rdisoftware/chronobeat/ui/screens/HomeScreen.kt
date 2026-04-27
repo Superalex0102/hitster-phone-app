@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -95,11 +94,11 @@ fun BoxScope.SettingsButton(
         },
         modifier = Modifier
             .align(Alignment.TopEnd)
-            .padding(top = 16.dp, end = 8.dp)
+            .padding(16.dp)
             .testTag(HomeScreen.SETTINGS_BUTTON)
     ) {
         Icon(
-            imageVector = Icons.Outlined.Settings,
+            imageVector = Icons.Filled.Settings,
             contentDescription = stringResource(Res.string.settings),
             tint = Color.White,
             modifier = Modifier
