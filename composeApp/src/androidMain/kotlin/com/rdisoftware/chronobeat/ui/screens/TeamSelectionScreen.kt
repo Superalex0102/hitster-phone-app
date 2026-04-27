@@ -43,20 +43,21 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.TextStyle
 
-object TeamColorList{
+object TeamColorList {
     val teamColors = listOf(
         Color(0xFF48A0B7),
         Color(0xFFDA9F36),
         Color(0xFFD42D59),
-        Color(0xFF6E1667))
+        Color(0xFF6E1667)
+    )
 }
+
 @Composable
 @Preview
 fun TeamSelectionScreen() {
 
     val nameState = rememberTextFieldState()
     val teams = remember { mutableStateListOf<String>() }
-
 
     GradientBackground()
     TopLeftLogoText()
@@ -73,16 +74,20 @@ fun TeamSelectionScreen() {
         ) {
             TeamInputField(
                 state = nameState,
-                onAddTeam = {handleAddTeam(nameState,teams)} , // TODO: Change "Add team" click action
+                onAddTeam = {
+                    handleAddTeam(nameState, teams)
+                            }, // TODO: Change "Add team" click action
             )
         }
-         InfoText()
+        InfoText()
 
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .weight(1f)){
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
 
-        TeamList(teams, modifier = Modifier.fillMaxSize(),TeamColorList.teamColors)
+            TeamList(teams, modifier = Modifier.fillMaxSize(), TeamColorList.teamColors)
         }
 
         GradientButton(
@@ -97,6 +102,7 @@ fun TeamSelectionScreen() {
         BottomText(stringResource(Res.string.powered_by), stringResource(Res.string.bottom_app_name))
     }
 }
+
 @Composable
 fun MainTitle() {
     Text(
@@ -137,77 +143,82 @@ fun InfoText() {
 }
 
 @Composable
-fun TeamList(teams: MutableList<String>, modifier: Modifier,colors: List<Color>) {
-        LazyColumn(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(vertical = 16.dp)
-        ) {
-            itemsIndexed(teams) { index,team ->
-                val color = colors[index % colors.size]
-                TeamRow(teamName = team,color = color)
-            }
+fun TeamList(teams: MutableList<String>, modifier: Modifier, colors: List<Color>) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(vertical = 16.dp)
+    ) {
+        itemsIndexed(teams) { index, team ->
+            val color = colors[index % colors.size]
+            TeamRow(teamName = team, color = color)
         }
     }
+}
 
 @Composable
-fun TeamRow(teamName : String,color: Color){ // TODO: Add unique test tag for each team
+fun TeamRow(teamName: String, color: Color) { // TODO: Add unique test tag for each team
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(modifier = Modifier
-            .fillMaxWidth().padding(bottom = 8.dp)
-            .height(40.dp)
-            .clip(RoundedCornerShape(30))
-            .border(1.5.dp, Color.White, RoundedCornerShape(30))
-            .background(color.copy(alpha = 1f))
-            .innerShadow(
-            shape = RoundedCornerShape(30),
-            shadow = Shadow(
-                radius = 10.dp,
-                spread =2.dp,
-                color = Color.White.copy(0.8f),
-                offset = DpOffset.Zero
-            )
-        ),
-            contentAlignment = Alignment.CenterStart){
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+                .height(40.dp)
+                .clip(RoundedCornerShape(30))
+                .border(1.5.dp, Color.White, RoundedCornerShape(30))
+                .background(color.copy(alpha = 1f))
+                .innerShadow(
+                    shape = RoundedCornerShape(30),
+                    shadow = Shadow(
+                        radius = 10.dp,
+                        spread = 2.dp,
+                        color = Color.White.copy(0.8f),
+                        offset = DpOffset.Zero
+                    )
+                ),
+            contentAlignment = Alignment.CenterStart
+        ) {
             DisplayTeamNames(teamName)
         }
     }
 }
 
-
-
-fun handleAddTeam(nameState: TextFieldState, teams: MutableList<String>){
+fun handleAddTeam(nameState: TextFieldState, teams: MutableList<String>) {
 
     val text = nameState.text.toString()
     if (text.isNotBlank()) {
         teams.add(text)
         nameState.edit {
-            replace(0, length,"")
+            replace(0, length, "")
         }
 
     }
 }
+
 @Composable
-fun DisplayTeamNames(teamName: String){
-    Row(modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically){
+fun DisplayTeamNames(teamName: String) {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             text = teamName,
             fontSize = 24.sp,
             textAlign = TextAlign.Start,
             color = Color.White,
             fontFamily = robotoMonoRegular,
-            modifier = Modifier.padding(start = 16.dp).weight(1f)
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .weight(1f)
         )
 
-
         Row {
-            IconButton(onClick = { }) { // TODO:  Create "Edit team name" on click action
+            IconButton(onClick = {}) { // TODO:  Create "Edit team name" on click action
                 Icon(
                     Icons.Outlined.Edit,
                     contentDescription = "Edit",
@@ -216,7 +227,7 @@ fun DisplayTeamNames(teamName: String){
                 )
             }
 
-            IconButton(onClick = { }) { // TODO:  Create "Delete team name" on click action
+            IconButton(onClick = {}) { // TODO:  Create "Delete team name" on click action
                 Icon(
                     Icons.Outlined.Delete,
                     contentDescription = "Delete",
@@ -234,7 +245,13 @@ fun TeamInputField(
     onAddTeam: () -> Unit,
 ) {
 
-    val gradientBrush = Brush.horizontalGradient(colors = listOf(Color.Gray, Color.DarkGray,Color.DarkGray,Color.Black))
+    val gradientBrush =
+        Brush.horizontalGradient(colors = listOf(
+            Color.Gray,
+            Color.DarkGray,
+            Color.DarkGray,
+            Color.Black
+        ))
     BasicTextField(
         state = state,
         modifier = Modifier
@@ -253,8 +270,10 @@ fun TeamInputField(
                     .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier.weight(1f).padding(start = 30.dp)){
-                    if(state.text.isEmpty()){
+                Box(modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 30.dp)) {
+                    if (state.text.isEmpty()) {
                         Text(
                             text = stringResource(Res.string.ts_input_placeholder),
                             fontFamily = robotoMonoRegular,
@@ -269,20 +288,25 @@ fun TeamInputField(
                 IconButton(
                     enabled = state.text.isNotBlank(),
                     onClick = onAddTeam,
-                    modifier = Modifier.testTag(TeamSelectionScreen.ADD_ICON_BUTTON).size(64.dp)
+                    modifier = Modifier
+                        .testTag(TeamSelectionScreen.ADD_ICON_BUTTON)
+                        .size(64.dp)
                 ) {
-                    Box(modifier = Modifier
-                        .fillMaxSize()
-                        .border(
-                            width = 3.dp,
-                            color = Color.White,
-                            shape = RoundedCornerShape(30.dp)
-                        )
-                        .background(Color.Black.copy( alpha = 0.2f),
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .border(
+                                width = 3.dp,
+                                color = Color.White,
+                                shape = RoundedCornerShape(30.dp)
+                            )
+                            .background(
+                                Color.Transparent,
 
-                            shape = CircleShape
-                        ),
-                        contentAlignment = Alignment.Center)
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    )
                     {
                         Icon(
                             imageVector = Icons.Outlined.Add,

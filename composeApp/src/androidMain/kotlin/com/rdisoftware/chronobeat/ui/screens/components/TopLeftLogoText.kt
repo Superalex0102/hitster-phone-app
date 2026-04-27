@@ -1,4 +1,5 @@
 package com.rdisoftware.chronobeat.ui.screens.components
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,19 +18,24 @@ import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common
 import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
 
 @Composable
-fun TopLeftLogoText(){
-    Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp)) {
-        Text(text = stringResource(Res.string.title),
+fun TopLeftLogoText() {
+    Column(
+        modifier = Modifier
+        .padding(start = 16.dp, top = 16.dp)
+    ) {
+        Text(
+            text = stringResource(Res.string.title),
             fontSize = 24.sp,
             color = Color.White,
             fontFamily = kdamThmorProRegular,
-            modifier = Modifier.testTag(TOP_LEFT_LOGO_TEXT))
+            modifier = Modifier.testTag(TOP_LEFT_LOGO_TEXT)
+        )
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(0.44f),
             thickness = 2.dp,
             color = Color.Gray,
 
-        )
+            )
         Spacer(modifier = Modifier.weight(0.95f))
     }
 
