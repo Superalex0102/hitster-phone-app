@@ -1,11 +1,14 @@
 package com.rdisoftware.chronobeat.data.mappers
 
 import com.rdisoftware.chronobeat.data.remote.dto.ChronoBeatPlaylistResponseDto
-import com.rdisoftware.chronobeat.data.remote.dto.TrackDto
+import com.rdisoftware.chronobeat.data.remote.dto.PlaylistWithTracksResponseDto
+import com.rdisoftware.chronobeat.data.remote.dto.TrackDetailDto
+import com.rdisoftware.chronobeat.data.remote.dto.UserPlaylistsResponseDto
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.models.Playlist
+import com.rdisoftware.chronobeat.domain.models.PlaylistSummary
 
-fun TrackDto.toDomain(): Track {
+fun TrackDetailDto.toDomain(): Track {
     return Track(
         id = this.id,
         title = this.name,
@@ -24,4 +27,22 @@ fun ChronoBeatPlaylistResponseDto.toDomain(): List<Playlist> {
             trackIds = playlist.trackIds
         )
     }
+}
+
+fun UserPlaylistsResponseDto.toDomain(): List<PlaylistSummary> {
+    return this.playlists.map { playlist ->
+        PlaylistSummary(
+            id = playlist.id,
+            name = playlist.name,
+            trackCount = playlist.trackCount
+        )
+    }
+}
+
+fun PlaylistWithTracksResponseDto.toDomain(): Playlist {
+    return Playlist(
+        id = this.id,
+        name = this.name,
+        trackIds = this.tracks.items.map { it.track.id }
+    )
 }
