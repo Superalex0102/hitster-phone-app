@@ -81,4 +81,10 @@ buildConfig {
 
     val spotifyToken = localProps.getProperty("SPOTIFY_ACCESS_TOKEN_DEBUG") ?: ""
     buildConfigField("String", "SPOTIFY_ACCESS_TOKEN_DEBUG", "\"$spotifyToken\"")
+
+    val spotifyBaseUrl = localProps.getProperty("SPOTIFY_BASE_URL") ?: ""
+    buildConfigField("String", "SPOTIFY_BASE_URL", "\"$spotifyBaseUrl\"")
+
+    val chronobeatBaseUrl = localProps.getProperty("CHRONOBEAT_BASE_URL") ?: ""
+    buildConfigField("String", "CHRONOBEAT_BASE_URL", "\"$chronobeatBaseUrl\"")
 }

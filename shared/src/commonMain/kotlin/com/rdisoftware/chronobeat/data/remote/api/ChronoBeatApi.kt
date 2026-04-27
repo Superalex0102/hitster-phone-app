@@ -5,6 +5,7 @@ import com.rdisoftware.chronobeat.data.remote.dto.ChronoBeatPlaylistResponseDto
 import com.rdisoftware.chronobeat.data.remote.dto.PlaylistWithTracksResponseDto
 import com.rdisoftware.chronobeat.data.remote.dto.TrackDetailDto
 import com.rdisoftware.chronobeat.data.remote.dto.UserPlaylistsResponseDto
+import com.rdisoftware.chronobeat.shared.BuildConfig
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -16,12 +17,12 @@ class ChronoBeatApi(
     private val httpClient: HttpClient
 ) {
     suspend fun fetchChronoBeatPlaylists() : ChronoBeatPlaylistResponseDto {
-        return httpClient.get("https://superalex0102.github.io/spotify-playlist-data/database.json").body()
+        return httpClient.get(BuildConfig.CHRONOBEAT_BASE_URL + "database.json").body()
     }
 
     suspend fun fetchUserPlaylists(limit: Int = 15, offset: Int = 0): UserPlaylistsResponseDto {
         val accessToken = tokenManager.getAccessToken()
-        return httpClient.get("https://api.spotify.com/v1/me/playlists") {
+        return httpClient.get(BuildConfig.SPOTIFY_BASE_URL + "me/playlists") {
             header("Authorization", "Bearer $accessToken")
             parameter("limit", limit)
             parameter("offset", offset)
@@ -30,14 +31,14 @@ class ChronoBeatApi(
 
     suspend fun fetchTracksFromPlaylist(playlistId: String): PlaylistWithTracksResponseDto {
         val accessToken = tokenManager.getAccessToken()
-        return httpClient.get("https://api.spotify.com/v1/playlists/$playlistId") {
+        return httpClient.get(BuildConfig.SPOTIFY_BASE_URL + "playlists/$playlistId") {
             header("Authorization", "Bearer $accessToken")
             parameter("fiels", "id,name,tracks.total,tracks.items(track.id)")
         }.body()
     }
     suspend fun fetchTrack(trackId: String): TrackDetailDto {
         val accessToken = tokenManager.getAccessToken()
-        return httpClient.get("https://api.spotify.com/v1/tracks/$trackId") {
+        return httpClient.get(BuildConfig.SPOTIFY_BASE_URL + "tracks/$trackId") {
             header("Authorization", "Bearer $accessToken")
         }.body()
     }
