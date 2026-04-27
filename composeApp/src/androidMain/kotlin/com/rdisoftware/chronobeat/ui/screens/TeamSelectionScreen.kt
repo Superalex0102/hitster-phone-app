@@ -73,8 +73,7 @@ fun TeamSelectionScreen() {
         ) {
             TeamInputField(
                 state = nameState,
-                onAddTeam = {handleAddTeam(nameState,teams)},
-                modifier = Modifier.weight(1.20f)
+                onAddTeam = {handleAddTeam(nameState,teams)} , // TODO: Change "Add team" click action
             )
         }
          InfoText()
@@ -91,7 +90,7 @@ fun TeamSelectionScreen() {
             enabled = true,
             size = ButtonSize.SMALL,
             testTag = TeamSelectionScreen.START_GAME_BUTTON,
-            onClick = {} //TODO: Local game mode on click action
+            onClick = {} //TODO: Create "Start game" on click action
         )
         Spacer(modifier = Modifier.weight(0.15f))
 
@@ -152,7 +151,7 @@ fun TeamList(teams: MutableList<String>, modifier: Modifier,colors: List<Color>)
     }
 
 @Composable
-fun TeamRow(teamName : String,color: Color){
+fun TeamRow(teamName : String,color: Color){ // TODO: Add unique test tag for each team
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,7 +174,7 @@ fun TeamRow(teamName : String,color: Color){
             )
         ),
             contentAlignment = Alignment.CenterStart){
-            displayTeamNames(teamName)
+            DisplayTeamNames(teamName)
         }
     }
 }
@@ -194,7 +193,7 @@ fun handleAddTeam(nameState: TextFieldState, teams: MutableList<String>){
     }
 }
 @Composable
-fun displayTeamNames(teamName: String){
+fun DisplayTeamNames(teamName: String){
     Row(modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically){
         Text(
@@ -208,7 +207,7 @@ fun displayTeamNames(teamName: String){
 
 
         Row {
-            IconButton(onClick = { /* action */ }) {
+            IconButton(onClick = { }) { // TODO:  Create "Edit team name" on click action
                 Icon(
                     Icons.Outlined.Edit,
                     contentDescription = "Edit",
@@ -217,7 +216,7 @@ fun displayTeamNames(teamName: String){
                 )
             }
 
-            IconButton(onClick = { /* action */ }) {
+            IconButton(onClick = { }) { // TODO:  Create "Delete team name" on click action
                 Icon(
                     Icons.Outlined.Delete,
                     contentDescription = "Delete",
@@ -233,18 +232,18 @@ fun displayTeamNames(teamName: String){
 fun TeamInputField(
     state: TextFieldState,
     onAddTeam: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
 
     val gradientBrush = Brush.horizontalGradient(colors = listOf(Color.Gray, Color.DarkGray,Color.DarkGray,Color.Black))
     BasicTextField(
         state = state,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(brush = gradientBrush)
-            .border(3.dp, Color.White.copy(alpha = 1f), RoundedCornerShape(30.dp)),
+            .border(3.dp, Color.White.copy(alpha = 1f), RoundedCornerShape(30.dp))
+            .testTag(TeamSelectionScreen.TEAM_INPUT_FIELD),
         textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
         lineLimits = TextFieldLineLimits.SingleLine,
         cursorBrush = SolidColor(Color.White),
@@ -273,7 +272,7 @@ fun TeamInputField(
                     onClick = onAddTeam,
                     modifier = Modifier.testTag(TeamSelectionScreen.ADD_ICON_BUTTON)
                 ) {
-                    Box(modifier
+                    Box(modifier = Modifier
                         .fillMaxSize()
                         .border(
                             width = 3.dp,
@@ -290,7 +289,7 @@ fun TeamInputField(
                             imageVector = Icons.Outlined.Add,
                             tint = Color.White,
                             contentDescription = "Add team",
-                            modifier = modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize()
 
                         )
                     }
