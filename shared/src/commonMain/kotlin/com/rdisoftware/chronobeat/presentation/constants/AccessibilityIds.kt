@@ -3,7 +3,7 @@ package com.rdisoftware.chronobeat.presentation.constants
 object AccessibilityIds {
     object Common {
         const val BOTTOM_TEXT = "bottom_text"
-        const val TOP_LEFT_LOGO_TEXT = "top_left_logo_text"
+        const val LOGO_TEXT = "logo_text"
     }
 
     object HomeScreen {
