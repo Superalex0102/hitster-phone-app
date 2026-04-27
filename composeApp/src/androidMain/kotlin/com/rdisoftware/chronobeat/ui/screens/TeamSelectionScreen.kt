@@ -250,11 +250,10 @@ fun TeamInputField(
         decorator = {
             Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 30.dp),
+                    .fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier.weight(1f)){
+                Box(modifier = Modifier.weight(1f).padding(start = 30.dp)){
                     if(state.text.isEmpty()){
                         Text(
                             text = stringResource(Res.string.ts_input_placeholder),
@@ -270,14 +269,14 @@ fun TeamInputField(
                 IconButton(
                     enabled = state.text.isNotBlank(),
                     onClick = onAddTeam,
-                    modifier = Modifier.testTag(TeamSelectionScreen.ADD_ICON_BUTTON)
+                    modifier = Modifier.testTag(TeamSelectionScreen.ADD_ICON_BUTTON).size(64.dp)
                 ) {
                     Box(modifier = Modifier
                         .fillMaxSize()
                         .border(
                             width = 3.dp,
                             color = Color.White,
-                            shape = RoundedCornerShape(20.dp)
+                            shape = RoundedCornerShape(30.dp)
                         )
                         .background(Color.Black.copy( alpha = 0.2f),
 
