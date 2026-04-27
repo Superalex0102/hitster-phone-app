@@ -36,35 +36,26 @@ import com.rdisoftware.chronobeat.shared.resources.*
 import com.rdisoftware.chronobeat.ui.enums.ButtonSize
 import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
 import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
-import com.rdisoftware.chronobeat.ui.screens.components.TopLeftLogoText
 import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.TextStyle
-import com.rdisoftware.chronobeat.ui.theme.Crimson
-import com.rdisoftware.chronobeat.ui.theme.Teal
-import com.rdisoftware.chronobeat.ui.theme.Amber
-import com.rdisoftware.chronobeat.ui.theme.Plum
-
-object TeamColorList {
-    val teamColors = listOf(
-        Teal,
-        Amber,
-        Crimson,
-        Plum
-    )
-}
+import com.rdisoftware.chronobeat.ui.screens.components.LogoText
+import com.rdisoftware.chronobeat.domain.enums.TeamColor
 
 @Composable
 @Preview
 fun TeamSelectionScreen() {
 
+    // TODO Refactor: Observe data stream from Viewmodel instead of hardcoded values
     val nameState = rememberTextFieldState()
     val teams = remember { mutableStateListOf<String>() }
 
     GradientBackground()
-    TopLeftLogoText()
+
+    LogoText()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,6 +63,7 @@ fun TeamSelectionScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         MainTitle()
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -80,9 +72,10 @@ fun TeamSelectionScreen() {
                 state = nameState,
                 onAddTeam = {
                     handleAddTeam(nameState, teams)
-                            }, // TODO: Change "Add team" click action
+                }, // TODO: Change "Add team" click action
             )
         }
+
         InfoText()
 
         Box(
@@ -90,8 +83,10 @@ fun TeamSelectionScreen() {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-
-            TeamList(teams, modifier = Modifier.fillMaxSize(), TeamColorList.teamColors)
+            TeamList(
+                teams,
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         GradientButton(
@@ -101,12 +96,12 @@ fun TeamSelectionScreen() {
             testTag = TeamSelectionScreen.START_GAME_BUTTON,
             onClick = {} //TODO: Create "Start game" on click action
         )
+
         Spacer(modifier = Modifier.weight(0.15f))
 
         BottomText(stringResource(Res.string.powered_by), stringResource(Res.string.bottom_app_name))
     }
 }
-
 @Composable
 fun MainTitle() {
     Text(
@@ -120,48 +115,57 @@ fun MainTitle() {
             .padding(top = 80.dp, bottom = 24.dp)
             .testTag(TeamSelectionScreen.TEAM_SELECTION_TITLE)
     )
-
 }
 
 @Composable
 fun InfoText() {
-
     Row(
-        modifier = Modifier.padding(top = 8.dp, bottom = 28.dp),
+        modifier = Modifier
+            .padding(top = 8.dp, bottom = 28.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             Icons.Outlined.Info,
-            contentDescription = "Info",
+            contentDescription = stringResource(Res.string.content_disc_info),
             tint = Color.White
         )
+
         Spacer(modifier = Modifier.width(8.dp))
+
         Text(
-            text = stringResource(Res.string.ts_info_text),
+            text = stringResource(Res.string.ts_info_text), // TODO: Create dynamic text
             color = Color.White,
             fontFamily = robotoMonoRegular,
             fontSize = 12.sp,
-            modifier = Modifier.testTag(TeamSelectionScreen.INFO_TEXT)
+            modifier = Modifier
+                .testTag(TeamSelectionScreen.INFO_TEXT)
         )
     }
 }
 
 @Composable
-fun TeamList(teams: MutableList<String>, modifier: Modifier, colors: List<Color>) {
+fun TeamList(
+    teams: MutableList<String>,
+    modifier: Modifier
+) {
+    val colorEntries = TeamColor.entries
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
         itemsIndexed(teams) { index, team ->
-            val color = colors[index % colors.size]
-            TeamRow(teamName = team, color = color)
+            val color = colorEntries[index % colorEntries.size]
+            TeamRow(teamName = team, teamColor = color)
         }
     }
 }
 
 @Composable
-fun TeamRow(teamName: String, color: Color) { // TODO: Add unique test tag for each team
+fun TeamRow(
+    teamName: String,
+    teamColor: TeamColor
+) { // TODO: Add unique test tag for each team
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,7 +179,7 @@ fun TeamRow(teamName: String, color: Color) { // TODO: Add unique test tag for e
                 .height(40.dp)
                 .clip(RoundedCornerShape(30))
                 .border(1.5.dp, Color.White, RoundedCornerShape(30))
-                .background(color.copy(alpha = 1f))
+                .background(color = teamColor.color.copy(alpha = 1f))
                 .innerShadow(
                     shape = RoundedCornerShape(30),
                     shadow = Shadow(
@@ -192,15 +196,15 @@ fun TeamRow(teamName: String, color: Color) { // TODO: Add unique test tag for e
     }
 }
 
-fun handleAddTeam(nameState: TextFieldState, teams: MutableList<String>) {
-
+fun handleAddTeam(
+    nameState: TextFieldState,
+                  teams: MutableList<String>) {
     val text = nameState.text.toString()
     if (text.isNotBlank()) {
         teams.add(text)
         nameState.edit {
             replace(0, length, "")
         }
-
     }
 }
 
@@ -225,18 +229,20 @@ fun DisplayTeamNames(teamName: String) {
             IconButton(onClick = {}) { // TODO:  Create "Edit team name" on click action
                 Icon(
                     Icons.Outlined.Edit,
-                    contentDescription = "Edit",
+                    contentDescription = stringResource(Res.string.content_disc_edit),
                     tint = Color.White,
-                    modifier = Modifier.testTag(TeamSelectionScreen.EDIT_ICON_BUTTON)
+                    modifier = Modifier
+                        .testTag(TeamSelectionScreen.EDIT_ICON_BUTTON)
                 )
             }
 
             IconButton(onClick = {}) { // TODO:  Create "Delete team name" on click action
                 Icon(
                     Icons.Outlined.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(Res.string.content_disc_delete),
                     tint = Color.White,
-                    modifier = Modifier.testTag(TeamSelectionScreen.DELETE_ICON_BUTTON)
+                    modifier = Modifier
+                        .testTag(TeamSelectionScreen.DELETE_ICON_BUTTON)
                 )
             }
         }
@@ -246,7 +252,7 @@ fun DisplayTeamNames(teamName: String) {
 @Composable
 fun TeamInputField(
     state: TextFieldState,
-    onAddTeam: () -> Unit,
+    onAddTeam: () -> Unit
 ) {
 
     val gradientBrush =
@@ -263,7 +269,11 @@ fun TeamInputField(
             .height(64.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(brush = gradientBrush)
-            .border(3.dp, Color.White.copy(alpha = 1f), RoundedCornerShape(30.dp))
+            .border(
+                width = 3.dp,
+                Color.White.copy(alpha = 1f),
+                RoundedCornerShape(30.dp)
+            )
             .testTag(TeamSelectionScreen.TEAM_INPUT_FIELD),
         textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
         lineLimits = TextFieldLineLimits.SingleLine,
@@ -283,7 +293,8 @@ fun TeamInputField(
                             fontFamily = robotoMonoRegular,
                             color = Color.White.copy(alpha = 0.7f),
                             fontSize = 24.sp,
-                            modifier = Modifier.testTag(TeamSelectionScreen.TEAM_INPUT_PLACEHOLDER_TEXT)
+                            modifier = Modifier
+                                .testTag(TeamSelectionScreen.TEAM_INPUT_PLACEHOLDER_TEXT)
                         )
                     }
                     it()
@@ -306,7 +317,6 @@ fun TeamInputField(
                             )
                             .background(
                                 Color.Transparent,
-
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
@@ -317,12 +327,10 @@ fun TeamInputField(
                             tint = Color.White,
                             contentDescription = "Add team",
                             modifier = Modifier.fillMaxSize()
-
                         )
                     }
                 }
             }
-
         }
     )
 }
