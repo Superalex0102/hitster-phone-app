@@ -42,13 +42,17 @@ import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.TextStyle
+import com.rdisoftware.chronobeat.ui.theme.Crimson
+import com.rdisoftware.chronobeat.ui.theme.Teal
+import com.rdisoftware.chronobeat.ui.theme.Amber
+import com.rdisoftware.chronobeat.ui.theme.Plum
 
 object TeamColorList {
     val teamColors = listOf(
-        Color(0xFF48A0B7),
-        Color(0xFFDA9F36),
-        Color(0xFFD42D59),
-        Color(0xFF6E1667)
+        Teal,
+        Amber,
+        Crimson,
+        Plum
     )
 }
 
