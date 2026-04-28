@@ -11,7 +11,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.ui.enums.ButtonSize
+import com.rdisoftware.chronobeat.ui.theme.horizontalGradientBrush
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoBold
 
 data class ButtonDimensions(
@@ -34,8 +34,8 @@ data class ButtonDimensions(
 fun ButtonSize.toDimensions(): ButtonDimensions =
     when (this) {
         ButtonSize.SMALL -> ButtonDimensions(
-            widthFraction = 0.4f,
-            ratio = 3f,
+            widthFraction = 0.5f,
+            ratio = 2.9f,
             fontSize = 24.sp
         )
 
@@ -68,13 +68,7 @@ fun GradientButton(
                 role = Role.Button
             }
             .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Gray,
-                        Color.DarkGray,
-                        Color.Black
-                    )
-                ),
+                brush = horizontalGradientBrush,
                 shape = ButtonDefaults.shape
             ),
         enabled = enabled,
@@ -82,7 +76,7 @@ fun GradientButton(
             onClick()
         },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        border = BorderStroke(width = 1.dp, color = Color.White)
+        border = BorderStroke(width = 2.dp, color = Color.White)
     ) {
         Text(
             text = text,

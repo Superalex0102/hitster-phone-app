@@ -5,4 +5,13 @@
     <string name="bottom_app_name">ChronoBeat</string>
     <string name="title">CHRONOBEAT</string>
     <string name="settings">Settings</string>
+    <string name="team_selection_title">Team\nSelection</string>
+    <string name="ts_input_placeholder">Enter team name</string>
+    <string name="ts_info_text">Game requires 2-4 teams to start</string>
+    <string name="start">Start</string>
+    <string name="content_disc_info">Info</string>
+    <string name="content_disc_edit">Edit</string>
+    <string name="content_disc_delete">Delete</string>
+    <string name="content_disc_add_team">Add team</string>
+
 </resources>
