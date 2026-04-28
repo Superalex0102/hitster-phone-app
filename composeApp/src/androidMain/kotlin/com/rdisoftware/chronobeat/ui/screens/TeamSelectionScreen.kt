@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.innerShadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.testTag
@@ -40,9 +39,14 @@ import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
 import com.rdisoftware.chronobeat.ui.screens.components.LogoText
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.ui.theme.horizontalGradientBrush
 
 @Composable
 @Preview
@@ -94,12 +98,16 @@ fun TeamSelectionScreen() {
             enabled = true,
             size = ButtonSize.SMALL,
             testTag = TeamSelectionScreen.START_GAME_BUTTON,
+            resourceId = true,
             onClick = {} //TODO: Create "Start game" on click action
         )
 
         Spacer(modifier = Modifier.weight(0.15f))
 
-        BottomText(stringResource(Res.string.powered_by), stringResource(Res.string.bottom_app_name))
+        BottomText(
+            stringResource(Res.string.powered_by),
+            stringResource(Res.string.bottom_app_name)
+        )
     }
 }
 @Composable
@@ -114,6 +122,9 @@ fun MainTitle() {
         modifier = Modifier
             .padding(top = 80.dp, bottom = 24.dp)
             .testTag(TeamSelectionScreen.TEAM_SELECTION_TITLE)
+            .semantics{
+                testTagsAsResourceId = true
+            }
     )
 }
 
@@ -125,9 +136,13 @@ fun InfoText() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            Icons.Outlined.Info,
+            imageVector = Icons.Outlined.Info,
             contentDescription = stringResource(Res.string.content_disc_info),
-            tint = Color.White
+            tint = Color.White,
+            modifier = Modifier.testTag(TeamSelectionScreen.INFO_ICON)
+                .semantics{
+                testTagsAsResourceId = true
+            }
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -139,6 +154,9 @@ fun InfoText() {
             fontSize = 12.sp,
             modifier = Modifier
                 .testTag(TeamSelectionScreen.INFO_TEXT)
+                .semantics{
+                    testTagsAsResourceId = true
+                }
         )
     }
 }
@@ -178,7 +196,11 @@ fun TeamRow(
                 .padding(bottom = 8.dp)
                 .height(40.dp)
                 .clip(RoundedCornerShape(30))
-                .border(1.5.dp, Color.White, RoundedCornerShape(30))
+                .border(
+                    width = 1.5.dp,
+                    Color.White,
+                    shape = RoundedCornerShape(30)
+                )
                 .background(color = teamColor.color.copy(alpha = 1f))
                 .innerShadow(
                     shape = RoundedCornerShape(30),
@@ -198,7 +220,7 @@ fun TeamRow(
 
 fun handleAddTeam(
     nameState: TextFieldState,
-                  teams: MutableList<String>) {
+    teams: MutableList<String>) {
     val text = nameState.text.toString()
     if (text.isNotBlank()) {
         teams.add(text)
@@ -233,6 +255,10 @@ fun DisplayTeamNames(teamName: String) {
                     tint = Color.White,
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.EDIT_ICON_BUTTON)
+                        .semantics{
+                            testTagsAsResourceId = true
+                            role = Role.Button
+                        }
                 )
             }
 
@@ -243,6 +269,10 @@ fun DisplayTeamNames(teamName: String) {
                     tint = Color.White,
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.DELETE_ICON_BUTTON)
+                        .semantics{
+                            testTagsAsResourceId = true
+                            role = Role.Button
+                        }
                 )
             }
         }
@@ -255,26 +285,22 @@ fun TeamInputField(
     onAddTeam: () -> Unit
 ) {
 
-    val gradientBrush =
-        Brush.horizontalGradient(colors = listOf(
-            Color.Gray,
-            Color.DarkGray,
-            Color.DarkGray,
-            Color.Black
-        ))
     BasicTextField(
         state = state,
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
             .clip(RoundedCornerShape(30.dp))
-            .background(brush = gradientBrush)
+            .background(brush = horizontalGradientBrush)
             .border(
                 width = 3.dp,
                 Color.White.copy(alpha = 1f),
                 RoundedCornerShape(30.dp)
             )
-            .testTag(TeamSelectionScreen.TEAM_INPUT_FIELD),
+            .testTag(TeamSelectionScreen.TEAM_INPUT_FIELD)
+            .semantics{
+                testTagsAsResourceId = true
+            },
         textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
         lineLimits = TextFieldLineLimits.SingleLine,
         cursorBrush = SolidColor(Color.White),
@@ -295,6 +321,9 @@ fun TeamInputField(
                             fontSize = 24.sp,
                             modifier = Modifier
                                 .testTag(TeamSelectionScreen.TEAM_INPUT_PLACEHOLDER_TEXT)
+                                .semantics{
+                                    testTagsAsResourceId = true
+                                }
                         )
                     }
                     it()
@@ -305,6 +334,10 @@ fun TeamInputField(
                     onClick = onAddTeam,
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.ADD_ICON_BUTTON)
+                        .semantics{
+                            testTagsAsResourceId = true
+                            role = Role.Button
+                        }
                         .size(64.dp)
                 ) {
                     Box(
@@ -325,7 +358,7 @@ fun TeamInputField(
                         Icon(
                             imageVector = Icons.Outlined.Add,
                             tint = Color.White,
-                            contentDescription = "Add team",
+                            contentDescription = stringResource(Res.string.content_disc_add_team),
                             modifier = Modifier.fillMaxSize()
                         )
                     }
