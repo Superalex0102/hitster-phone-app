@@ -7,6 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +37,10 @@ fun BottomText(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .testTag(BOTTOM_TEXT),
+            .testTag(BOTTOM_TEXT)
+            .semantics {
+                testTagsAsResourceId = true
+            },
         textAlign = TextAlign.Center
     )
 }
