@@ -1,5 +1,7 @@
 package com.rdisoftware.chronobeat.ui.theme
 
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.rdisoftware.chronobeat.R
@@ -23,3 +25,10 @@ val robotoMonoLight = FontFamily(
     Font(R.font.roboto_mono_light)
 )
 
+val horizontalGradientBrush = Brush.horizontalGradient(
+    colors = listOf(
+    Color.Gray,
+    Color.DarkGray,
+    Color.DarkGray,
+    Color.Black
+))

@@ -12,5 +12,6 @@
     <string name="content_disc_info">Info</string>
     <string name="content_disc_edit">Edit</string>
     <string name="content_disc_delete">Delete</string>
+    <string name="content_disc_add_team">Add team</string>
 
 </resources>

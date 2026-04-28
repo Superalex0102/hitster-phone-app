@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common.LOGO_TEXT
@@ -29,6 +31,9 @@ fun LogoText() {
             color = Color.White,
             fontFamily = kdamThmorProRegular,
             modifier = Modifier.testTag(LOGO_TEXT)
+                .semantics{
+                testTagsAsResourceId = true
+            }
         )
 
         HorizontalDivider(

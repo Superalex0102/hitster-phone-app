@@ -22,5 +22,6 @@ object AccessibilityIds {
         const val TEAM_INPUT_PLACEHOLDER_TEXT = "team_input_placeholder_text"
         const val ADD_ICON_BUTTON = "add_icon_button"
         const val TEAM_INPUT_FIELD = "team_input_field"
+        const val INFO_ICON = "info_icon"
     }
 }
