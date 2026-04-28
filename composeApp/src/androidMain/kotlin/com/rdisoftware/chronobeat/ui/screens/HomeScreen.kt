@@ -18,6 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.HomeScreen
@@ -62,6 +66,7 @@ fun HomeScreen() {
                     enabled = true,
                     size = ButtonSize.LARGE,
                     testTag = HomeScreen.LOCAL_GAME_BUTTON,
+                    resourceId = true,
                     onClick = {} //TODO: Local game mode on click action
                 )
 
@@ -70,6 +75,7 @@ fun HomeScreen() {
                     enabled = false,
                     size = ButtonSize.LARGE,
                     testTag = HomeScreen.ONLINE_GAME_BUTTON,
+                    resourceId = true,
                     onClick = {} //TODO: Online game mode on click action - not in current scope
                 )
             }
@@ -96,6 +102,10 @@ fun BoxScope.SettingsButton(
             .align(Alignment.TopEnd)
             .padding(16.dp)
             .testTag(HomeScreen.SETTINGS_BUTTON)
+            .semantics{
+                testTagsAsResourceId = true
+                role = Role.Button
+            }
     ) {
         Icon(
             imageVector = Icons.Filled.Settings,
@@ -117,5 +127,8 @@ fun MainTitle() {
         modifier = Modifier
             .padding(top = 24.dp)
             .testTag(HomeScreen.CHRONOBEAT_TITLE)
+            .semantics{
+                testTagsAsResourceId = true
+            }
     )
 }

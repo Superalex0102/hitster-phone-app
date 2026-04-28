@@ -14,6 +14,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -48,6 +52,7 @@ fun GradientButton(
     enabled: Boolean,
     size: ButtonSize,
     testTag: String,
+    resourceId: Boolean,
     onClick: () -> Unit
 ) {
     val dimensions = size.toDimensions()
@@ -58,6 +63,10 @@ fun GradientButton(
             .heightIn(min = 64.dp)
             .alpha(if (enabled) 1f else 0.4f)
             .testTag(testTag)
+            .semantics {
+                testTagsAsResourceId = resourceId
+                role = Role.Button
+            }
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
