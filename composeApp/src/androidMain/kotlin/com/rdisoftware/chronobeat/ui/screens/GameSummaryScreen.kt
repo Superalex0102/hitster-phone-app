@@ -52,11 +52,13 @@ fun GameSummaryScreen() {
             text = stringResource(Res.string.game_summary_title),
             testTag = GameSummaryScreen.GAME_SUMMARY_TITLE,
             resourceId = true
-            )
+        )
 
         TrophyImage()
 
-        DisplayWinner()
+        DisplayWinner(
+            winnerTeam = stringResource(Res.string.team_name)
+        )
 
         GradientButton(
             text = stringResource(Res.string.home),
@@ -66,6 +68,7 @@ fun GameSummaryScreen() {
             resourceId = true,
             onClick = {} //TODO: Create "Start game" on click action
         )
+
         Spacer(modifier = Modifier.padding(12.dp))
 
         GradientButton(
@@ -76,7 +79,6 @@ fun GameSummaryScreen() {
             resourceId = true,
             onClick = {} //TODO: Create "Start game" on click action
         )
-
     }
 }
 
@@ -93,8 +95,9 @@ fun TrophyImage(){
         contentDescription = stringResource(Res.string.content_disc_trophy_logo)
     )
 }
+
 @Composable
-fun DisplayWinner(){
+fun DisplayWinner(winnerTeam: String){
     Text(
         modifier = Modifier
             .padding(bottom = 6.dp)
@@ -102,11 +105,12 @@ fun DisplayWinner(){
             .semantics{
             testTagsAsResourceId = true
         },
-        text = stringResource(Res.string.team_name),
+        text = winnerTeam,
         fontSize = 36.sp,
         color = Color.White,
         fontFamily = kdamThmorProRegular
     )
+
     Text(
         modifier = Modifier
             .padding(bottom = 24.dp)

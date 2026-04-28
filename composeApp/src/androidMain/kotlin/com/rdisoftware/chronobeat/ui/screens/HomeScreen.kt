@@ -100,7 +100,7 @@ fun BoxScope.SettingsButton(
         },
         modifier = Modifier
             .align(Alignment.TopEnd)
-            .padding(top= 16.dp, end = 8.dp)
+            .padding(top = 16.dp, end = 8.dp)
             .testTag(HomeScreen.SETTINGS_BUTTON)
             .semantics{
                 testTagsAsResourceId = true
