@@ -29,6 +29,5 @@ val horizontalGradientBrush = Brush.horizontalGradient(
     colors = listOf(
     Color.Gray,
     Color.DarkGray,
-    Color.DarkGray,
     Color.Black
 ))
