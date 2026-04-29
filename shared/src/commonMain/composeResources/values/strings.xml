@@ -13,6 +13,8 @@
     <string name="content_disc_edit">Edit</string>
     <string name="content_disc_delete">Delete</string>
     <string name="content_disc_add_team">Add team</string>
+    <string name="arrow_oldest_text">Oldest</string>
+    <string name="arrow_latest_text">Latest</string>
     <string name="game_summary_title">Congratulations!</string>
     <string name="content_disc_trophy_logo">Trophy logo</string>
     <string name="home">Home</string>
