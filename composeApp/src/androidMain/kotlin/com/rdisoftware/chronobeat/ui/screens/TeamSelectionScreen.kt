@@ -35,7 +35,6 @@ import com.rdisoftware.chronobeat.shared.resources.*
 import com.rdisoftware.chronobeat.ui.enums.ButtonSize
 import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
 import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
-import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.shadow.Shadow
@@ -46,6 +45,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
 import com.rdisoftware.chronobeat.ui.screens.components.LogoText
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.ui.theme.horizontalGradientBrush
 
 @Composable
@@ -66,7 +66,11 @@ fun TeamSelectionScreen() {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        MainTitle()
+        ScreenTitle(
+            text = stringResource(Res.string.team_selection_title),
+            testTag = TeamSelectionScreen.TEAM_SELECTION_TITLE,
+            resourceId = true
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -109,23 +113,6 @@ fun TeamSelectionScreen() {
             stringResource(Res.string.bottom_app_name)
         )
     }
-}
-@Composable
-fun MainTitle() {
-    Text(
-        text = stringResource(Res.string.team_selection_title),
-        fontSize = 48.sp,
-        lineHeight = 70.sp,
-        textAlign = TextAlign.Center,
-        color = Color.White,
-        fontFamily = kdamThmorProRegular,
-        modifier = Modifier
-            .padding(top = 80.dp, bottom = 24.dp)
-            .testTag(TeamSelectionScreen.TEAM_SELECTION_TITLE)
-            .semantics{
-                testTagsAsResourceId = true
-            }
-    )
 }
 
 @Composable

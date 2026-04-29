@@ -39,5 +39,13 @@ object AccessibilityIds {
         const val TIME_LINE_ARROW = "time_line_arrow"
         const val ARROW_OLDEST_TEXT = "arrow_oldest_text"
         const val ARROW_LATEST_TEXT = "arrow_latest_text"
+      
+    object GameSummaryScreen {
+        const val GAME_SUMMARY_TITLE = "game_summary_title_text"
+        const val TEAM_NAME_TEXT = "team_name_text"
+        const val WIN_TEXT = "won_the_game"
+        const val HOME_BUTTON = "home_button"
+        const val PLAY_AGAIN_BUTTON = "play_again_button"
+        const val WIN_IMAGE = "win_image"
     }
 }
