@@ -1,8 +1,5 @@
 package com.rdisoftware.chronobeat.ui.screens
 
-import android.R.attr.maxHeight
-import android.R.attr.maxWidth
-import androidx.compose.animation.Animatable
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -13,32 +10,22 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -46,12 +33,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rdisoftware.chronobeat.ui.model.HeaderModel
+import com.rdisoftware.chronobeat.ui.model.SongModel
+import com.rdisoftware.chronobeat.ui.preview.MockHeaderData
+import com.rdisoftware.chronobeat.ui.preview.MockMusicData.songs
 import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoBold
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoLightItalic
@@ -61,56 +53,23 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlin.random.Random
 
-private val teamName = "Team 1"
-private val cardCount = 5
-data class Song(
-    val artist: String,
-    val year: String,
-    val title: String
-)
-
-private val song1 = Song(
-    artist = "Guns N' Roses",
-    year = "1987",
-    title = "Sweet Child O' Mine"
-)
-
-private val song2 = Song(
-    artist = "Dzsudló",
-    year = "2021",
-    title = "Para"
-)
-
-private val song3 = Song(
-    artist = "RÜFÜS DU SOL",
-    year = "2021",
-    title = "Make It Happen"
-)
-val songs = listOf(song1, song2, song3)
-
-
-
 @Preview
 @Composable
 fun GameScreen() {
-    Box() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
         GradientBackground()
 
-        Column(
-
+        Box(
+            modifier = Modifier
+                .fillMaxHeight(0.8f)
+                .width(80.dp)
+                .align(Alignment.CenterStart),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Oldest",
-                color = Color.White,
-                modifier = Modifier
-                    .rotate(90f)
-            )
-
-            Icon(
-                imageVector = Icons.Filled.ArrowDownward,
-                contentDescription = "Arrow",
-                tint = Color.White
-            )
+            TimeLineArrow()
         }
 
         Column(
@@ -127,10 +86,10 @@ fun GameScreen() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                TeamHeader()
+                TeamHeader(MockHeaderData.data.first()) //Mock data for testing
 
                 AnimatedSoundWaves(
-                    isAnimating = true
+                    isAnimating = MockHeaderData.data.first().isMusicOn //Mock data for testing
                 )
             }
 
@@ -160,10 +119,12 @@ fun GameScreen() {
 }
 
 @Composable
-fun TeamHeader() {
+fun TeamHeader(
+    model: HeaderModel
+) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(0.85f)
+            .fillMaxWidth(0.87f)
             .fillMaxHeight(0.07f)
             .border(
                 width = 2.dp,
@@ -173,28 +134,45 @@ fun TeamHeader() {
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        Color(0xFF48A0B7),
+                        Color(0xFF48A0B7), //placeholder - viewModel function will compute this color value
                         Color.Black
                     )
                 ),
                 shape = RoundedCornerShape(30)
             )
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = teamName,
+            text = model.teamName,
             fontSize = 32.sp,
             fontFamily = robotoMonoBold,
             color = Color.White
         )
 
+        NumberCard(cardCount = "5")
+    }
+}
+
+@Composable
+fun NumberCard(
+    cardCount: String
+) {
+    Box(
+        modifier = Modifier
+            .width(52.dp)
+            .fillMaxHeight(1f)
+            .clip(RoundedCornerShape(30))
+            .background(Color.Transparent)
+            .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(30)),
+        contentAlignment = Alignment.Center
+    ) {
         Text(
-            text = "A $cardCount",
+            text = cardCount,
+            color = Color.White,
             fontSize = 24.sp,
-            fontFamily = robotoMonoRegular,
-            color = Color.White
+            fontFamily = robotoMonoRegular
         )
     }
 }
@@ -272,7 +250,8 @@ fun GuessButton(
                 .matchParentSize()
                 .background(
                     shape = CircleShape,
-                    color = Color(0xFFD9D9D9).copy(alpha = 0.6f))
+                    color = Color(0xFFD9D9D9).copy(alpha = 0.6f)
+                )
         )
 
         Box(
@@ -280,22 +259,23 @@ fun GuessButton(
                 .size(32.dp)
                 .background(
                     shape = CircleShape,
-                    color = Color(0xFFD9D9D9))
+                    color = Color(0xFFD9D9D9)
+                )
         )
     }
 }
 
 @Composable
 fun GameCard(
-    song: Song
+    song: SongModel
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(32.dp)
+            .padding(horizontal = 46.dp, vertical = 32.dp)
             .border(
                 width = 3.dp,
-                color = Color(0xFF48A0B7),
+                color = Color(0xFF48A0B7), //placeholder - viewModel function will compute this color value
                 shape = RoundedCornerShape(12)
             ),
         backgroundColor = Color(0xFFD9D9D9),
@@ -310,41 +290,89 @@ fun GameCard(
             Text(
                 text = song.artist,
                 fontSize = 28.sp,
-                fontFamily = robotoMonoMedium
+                fontFamily = robotoMonoMedium,
+                textAlign = TextAlign.Center
             )
+
+            song.contributor?.let {
+                Text(
+                    text = it,
+                    fontSize = 12.sp,
+                    fontFamily = robotoMonoLightItalic,
+                    textAlign = TextAlign.Center
+                )
+            }
 
             Text(
                 text = song.year,
                 fontSize = 64.sp,
-                fontFamily = robotoMonoBold
+                fontFamily = robotoMonoBold,
+                modifier = Modifier
             )
             Text(
                 text = song.title,
                 fontSize = 20.sp,
-                fontFamily = robotoMonoLightItalic
+                fontFamily = robotoMonoLightItalic,
+                textAlign = TextAlign.Center
             )
-
         }
     }
 }
 
-//@Composable
-//fun GuessButton(
-//    onClick: () -> Unit
-//) {
-//    Canvas(
-//        modifier = Modifier
-//            .size(64.dp)
-//            .clickable(onClick = onClick)
-//    ) {
-//        drawCircle(
-//            color = Color(0xFFD9D9D9).copy(alpha = 0.6f),
-//            radius = size.minDimension / 2
-//        )
-//
-//        drawCircle(
-//            color = Color(0xFFD9D9D9),
-//            radius = size.minDimension / 4
-//        )
-//    }
-//}
+@Composable
+fun BoxScope.TimeLineArrow() {
+    val arrowHeadSize = 10.dp
+    Canvas(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = 34.dp)
+    ) {
+        val strokeWidth = 2.dp.toPx()
+        val headPx = arrowHeadSize.toPx()
+
+        drawLine(
+            color = Color.White.copy(alpha = 0.7f),
+            start = Offset(size.width / 2, size.width / 2),
+            end = Offset(size.width / 2, size.height),
+            strokeWidth = strokeWidth
+        )
+
+        drawLine(
+            color = Color.White.copy(alpha = 0.7f),
+            start = Offset(size.width / 2, size.height),
+            end = Offset(size.width / 2 - headPx, size.height - headPx),
+            strokeWidth = strokeWidth
+        )
+
+        drawLine(
+            color = Color.White.copy(alpha = 0.7f),
+            start = Offset(size.width / 2, size.height),
+            end = Offset(size.width / 2 + headPx, size.height - headPx),
+            strokeWidth = strokeWidth
+        )
+    }
+
+    Text(
+        text = "Oldest",
+        fontSize = 14.sp,
+        fontFamily = robotoMonoBold,
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .offset(y = 32.dp)
+            .rotate(90f)
+            .padding(top = 16.dp),
+        color = Color.White.copy(alpha = 0.7f)
+    )
+
+    Text(
+        text = "Newest",
+        fontSize = 14.sp,
+        fontFamily = robotoMonoBold,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .offset(y = (-32).dp)
+            .rotate(90f)
+            .padding(top = 16.dp),
+        color = Color.White.copy(alpha = 0.7f)
+    )
+}
