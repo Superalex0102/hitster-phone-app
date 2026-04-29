@@ -38,6 +38,6 @@ object AccessibilityIds {
         const val GAME_CARD_TITLE = "game_card_title"
         const val TIME_LINE_ARROW = "time_line_arrow"
         const val ARROW_OLDEST_TEXT = "arrow_oldest_text"
-        const val ARROW_NEWEST_TEXT = "arrow_newest_text"
+        const val ARROW_LATEST_TEXT = "arrow_latest_text"
     }
 }

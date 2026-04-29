@@ -41,11 +41,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.ARROW_NEWEST_TEXT
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.ARROW_LATEST_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.ARROW_OLDEST_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.CARD_COUNT_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GAME_CARD
@@ -59,9 +62,8 @@ import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameSc
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TEAM_NAME_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TIME_LINE_ARROW
 import com.rdisoftware.chronobeat.shared.resources.Res
-import com.rdisoftware.chronobeat.shared.resources.arrow_newest_text
+import com.rdisoftware.chronobeat.shared.resources.arrow_latest_text
 import com.rdisoftware.chronobeat.shared.resources.arrow_oldest_text
-import com.rdisoftware.chronobeat.shared.resources.local_game
 import com.rdisoftware.chronobeat.theme.AppColors
 import com.rdisoftware.chronobeat.ui.model.HeaderModel
 import com.rdisoftware.chronobeat.ui.model.SongModel
@@ -74,6 +76,7 @@ import com.rdisoftware.chronobeat.ui.theme.robotoMonoMedium
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.random.Random
 
@@ -86,15 +89,7 @@ fun GameScreen() {
     ) {
         GradientBackground()
 
-        Box(
-            modifier = Modifier
-                .fillMaxHeight(0.8f)
-                .width(80.dp)
-                .align(Alignment.CenterStart),
-            contentAlignment = Alignment.Center
-        ) {
-            TimeLineArrow()
-        }
+        TimeLineArrow()
 
         Column(
             modifier = Modifier
@@ -104,46 +99,31 @@ fun GameScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                TeamHeader(MockHeaderData.data.first()) //Mock data for testing
+            GameHeader()
 
-                AnimatedSoundWaves(
-                    isAnimating = MockHeaderData.data.first().isMusicOn //Mock data for testing
-                )
-            }
-
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                //TEMPORARY TEST SOLUTION
-                for (i in 0..songs.size) {
-
-                    item {
-                        GuessButton {
-                            //TODO: OnClick action
-                        }
-                    }
-
-                    if (i < songs.size) {
-                        item {
-                            GameCard(song = songs[i])
-                        }
-                    }
-                }
-            }
+            GameSurface()
         }
     }
 }
 
 @Composable
-fun TeamHeader(
+fun GameHeader() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        TeamInformation(MockHeaderData.data.first()) //Mock data for testing
+
+        AnimatedSoundWaves(
+            isAnimating = MockHeaderData.data.first().isMusicOn //Mock data for testing
+        )
+    }
+}
+
+@Composable
+fun TeamInformation(
     model: HeaderModel
 ) {
     Row(
@@ -172,16 +152,12 @@ fun TeamHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        GameText(
             text = model.teamName,
             fontSize = 32.sp,
             fontFamily = robotoMonoBold,
             color = Color.White,
-            modifier = Modifier
-                .testTag(TEAM_NAME_TEXT)
-                .semantics{
-                    testTagsAsResourceId = true
-                }
+            testTag = TEAM_NAME_TEXT
         )
 
         NumberCard(cardCount = "5") //Temporary constant value
@@ -201,16 +177,12 @@ fun NumberCard(
             .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(30)),
         contentAlignment = Alignment.Center
     ) {
-        Text(
+        GameText(
             text = cardCount,
-            color = Color.White,
             fontSize = 24.sp,
             fontFamily = robotoMonoRegular,
-            modifier = Modifier
-                .testTag(CARD_COUNT_TEXT)
-                .semantics{
-                    testTagsAsResourceId = true
-                }
+            color = Color.White,
+            testTag = CARD_COUNT_TEXT
         )
     }
 }
@@ -278,6 +250,31 @@ fun AnimatedSoundWaves(
 }
 
 @Composable
+fun GameSurface() {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        //TEMPORARY TEST SOLUTION
+        for (i in 0..songs.size) {
+
+            item {
+                GuessButton {
+                    //TODO: OnClick action
+                }
+            }
+
+            if (i < songs.size) {
+                item {
+                    GameCard(model = songs[i])
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun GuessButton(
     onClick: () -> Unit
 ) {
@@ -315,7 +312,7 @@ fun GuessButton(
 
 @Composable
 fun GameCard(
-    song: SongModel
+    model: SongModel
 ) {
     Card(
         modifier = Modifier
@@ -333,65 +330,107 @@ fun GameCard(
         backgroundColor = AppColors.GameGray,
         shape = RoundedCornerShape(12)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = song.artist,
-                fontSize = 28.sp,
-                fontFamily = robotoMonoMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .testTag(GAME_CARD_ARTIST)
-                    .semantics{
-                        testTagsAsResourceId = true
-                    }
-            )
-
-            song.contributor?.let {
-                Text(
-                    text = it,
-                    fontSize = 12.sp,
-                    fontFamily = robotoMonoLightItalic,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .testTag(GAME_CARD_CONTRIBUTOR)
-                        .semantics{
-                            testTagsAsResourceId = true
-                        }
-                )
-            }
-
-            Text(
-                text = song.year,
-                fontSize = 64.sp,
-                fontFamily = robotoMonoBold,
-                modifier = Modifier
-                    .testTag(GAME_CARD_YEAR)
-                    .semantics{
-                        testTagsAsResourceId = true
-                    }
-            )
-            Text(
-                text = song.title,
-                fontSize = 20.sp,
-                fontFamily = robotoMonoLightItalic,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .testTag(GAME_CARD_TITLE)
-                    .semantics{
-                        testTagsAsResourceId = true
-                    }
-            )
-        }
+        GameCardContent(model = model)
     }
 }
 
 @Composable
+fun GameCardContent(
+    model: SongModel
+) {
+    Column(
+        modifier = Modifier
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        GameText(
+            text = model.artist,
+            fontSize = 28.sp,
+            fontFamily = robotoMonoMedium,
+            color = Color.Black,
+            testTag = GAME_CARD_ARTIST
+        )
+
+        model.contributor?.let {
+            GameText(
+                text = it,
+                fontSize = 12.sp,
+                fontFamily = robotoMonoLightItalic,
+                color = Color.Black,
+                testTag = GAME_CARD_CONTRIBUTOR
+            )
+        }
+
+        GameText(
+            text = model.year,
+            fontSize = 64.sp,
+            fontFamily = robotoMonoBold,
+            color = Color.Black,
+            testTag = GAME_CARD_YEAR
+        )
+
+        GameText(
+            text = model.title,
+            fontSize = 20.sp,
+            fontFamily = robotoMonoLightItalic,
+            color = Color.Black,
+            testTag = GAME_CARD_TITLE
+        )
+    }
+}
+
+@Composable
+fun GameText(
+    text: String,
+    fontSize: TextUnit,
+    fontFamily: FontFamily,
+    color: Color,
+    testTag: String
+) {
+    Text(
+        text = text,
+        fontSize = fontSize,
+        fontFamily = fontFamily,
+        color = color,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .testTag(testTag)
+            .semantics{
+                testTagsAsResourceId = true
+            }
+    )
+}
+
+@Composable
 fun BoxScope.TimeLineArrow() {
+    Box(
+        modifier = Modifier
+            .fillMaxHeight(0.8f)
+            .width(80.dp)
+            .align(Alignment.CenterStart),
+        contentAlignment = Alignment.Center
+    ) {
+        DownwardArrow()
+
+        ArrowText(
+            text = Res.string.arrow_oldest_text,
+            alignment = Alignment.TopCenter,
+            offset = 32.dp,
+            testTag = ARROW_OLDEST_TEXT
+        )
+
+        ArrowText(
+            text = Res.string.arrow_latest_text,
+            alignment = Alignment.BottomCenter,
+            offset = (-32).dp,
+            testTag = ARROW_LATEST_TEXT
+        )
+    }
+}
+
+@Composable
+fun DownwardArrow() {
     val arrowHeadSize = 10.dp
     Canvas(
         modifier = Modifier
@@ -426,33 +465,25 @@ fun BoxScope.TimeLineArrow() {
             strokeWidth = strokeWidth
         )
     }
+}
 
+@Composable
+fun BoxScope.ArrowText(
+    text: StringResource,
+    alignment: Alignment,
+    offset: Dp,
+    testTag: String
+) {
     Text(
-        text = stringResource(Res.string.arrow_oldest_text),
+        text = stringResource(text),
         fontSize = 14.sp,
         fontFamily = robotoMonoBold,
         modifier = Modifier
-            .align(Alignment.TopCenter)
-            .offset(y = 32.dp)
+            .align(alignment)
+            .offset(y = offset)
             .rotate(90f)
             .padding(top = 16.dp)
-            .testTag(ARROW_OLDEST_TEXT)
-            .semantics{
-                testTagsAsResourceId = true
-            },
-        color = Color.White.copy(alpha = 0.7f)
-    )
-
-    Text(
-        text = stringResource(Res.string.arrow_newest_text),
-        fontSize = 14.sp,
-        fontFamily = robotoMonoBold,
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .offset(y = (-32).dp)
-            .rotate(90f)
-            .padding(top = 16.dp)
-            .testTag(ARROW_NEWEST_TEXT)
+            .testTag(testTag)
             .semantics{
                 testTagsAsResourceId = true
             },
