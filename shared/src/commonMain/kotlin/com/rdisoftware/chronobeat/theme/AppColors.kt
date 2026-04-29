@@ -7,4 +7,5 @@ object AppColors {
     val Amber = Color(0xFFDA9F36)
     val Crimson = Color(0xFFD42D59)
     val Plum = Color(0xFF6E1667)
+    val GameGray = Color(0xFFD9D9D9)
 }

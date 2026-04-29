@@ -13,5 +13,6 @@
     <string name="content_disc_edit">Edit</string>
     <string name="content_disc_delete">Delete</string>
     <string name="content_disc_add_team">Add team</string>
-
+    <string name="arrow_oldest_text">Oldest</string>
+    <string name="arrow_newest_text">Newest</string>
 </resources>

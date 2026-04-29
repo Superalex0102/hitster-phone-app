@@ -24,4 +24,20 @@ object AccessibilityIds {
         const val TEAM_INPUT_FIELD = "team_input_field"
         const val INFO_ICON = "info_icon"
     }
+
+    object GameScreen {
+        const val GAME_HEADER = "game_header"
+        const val TEAM_NAME_TEXT = "team_name_text"
+        const val CARD_COUNT_TEXT = "card_count_text"
+        const val MUSIC_PLAYER_ICON = "music_player_icon"
+        const val GUESS_BUTTON = "guess_button"
+        const val GAME_CARD = "game_card"
+        const val GAME_CARD_ARTIST = "game_card_artist"
+        const val GAME_CARD_CONTRIBUTOR = "game_card_contributor"
+        const val GAME_CARD_YEAR = "game_card_year"
+        const val GAME_CARD_TITLE = "game_card_title"
+        const val TIME_LINE_ARROW = "time_line_arrow"
+        const val ARROW_OLDEST_TEXT = "arrow_oldest_text"
+        const val ARROW_NEWEST_TEXT = "arrow_newest_text"
+    }
 }

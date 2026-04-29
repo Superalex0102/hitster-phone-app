@@ -36,10 +36,33 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.ARROW_NEWEST_TEXT
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.ARROW_OLDEST_TEXT
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.CARD_COUNT_TEXT
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GAME_CARD
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GAME_CARD_ARTIST
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GAME_CARD_CONTRIBUTOR
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GAME_CARD_TITLE
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GAME_CARD_YEAR
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GAME_HEADER
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.GUESS_BUTTON
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.MUSIC_PLAYER_ICON
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TEAM_NAME_TEXT
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TIME_LINE_ARROW
+import com.rdisoftware.chronobeat.shared.resources.Res
+import com.rdisoftware.chronobeat.shared.resources.arrow_newest_text
+import com.rdisoftware.chronobeat.shared.resources.arrow_oldest_text
+import com.rdisoftware.chronobeat.shared.resources.local_game
+import com.rdisoftware.chronobeat.theme.AppColors
 import com.rdisoftware.chronobeat.ui.model.HeaderModel
 import com.rdisoftware.chronobeat.ui.model.SongModel
 import com.rdisoftware.chronobeat.ui.preview.MockHeaderData
@@ -51,6 +74,7 @@ import com.rdisoftware.chronobeat.ui.theme.robotoMonoMedium
 import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import org.jetbrains.compose.resources.stringResource
 import kotlin.random.Random
 
 @Preview
@@ -140,7 +164,11 @@ fun TeamHeader(
                 ),
                 shape = RoundedCornerShape(30)
             )
-            .padding(start = 16.dp),
+            .padding(start = 16.dp)
+            .testTag(GAME_HEADER)
+            .semantics{
+                testTagsAsResourceId = true
+            },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -148,10 +176,15 @@ fun TeamHeader(
             text = model.teamName,
             fontSize = 32.sp,
             fontFamily = robotoMonoBold,
-            color = Color.White
+            color = Color.White,
+            modifier = Modifier
+                .testTag(TEAM_NAME_TEXT)
+                .semantics{
+                    testTagsAsResourceId = true
+                }
         )
 
-        NumberCard(cardCount = "5")
+        NumberCard(cardCount = "5") //Temporary constant value
     }
 }
 
@@ -172,7 +205,12 @@ fun NumberCard(
             text = cardCount,
             color = Color.White,
             fontSize = 24.sp,
-            fontFamily = robotoMonoRegular
+            fontFamily = robotoMonoRegular,
+            modifier = Modifier
+                .testTag(CARD_COUNT_TEXT)
+                .semantics{
+                    testTagsAsResourceId = true
+                }
         )
     }
 }
@@ -193,7 +231,12 @@ fun AnimatedSoundWaves(
     val maxDelayMs = 300
 
     Row(
-        modifier = modifier.height(30.dp),
+        modifier = modifier
+            .height(30.dp)
+            .testTag(MUSIC_PLAYER_ICON)
+            .semantics{
+                testTagsAsResourceId = true
+            },
         horizontalArrangement = Arrangement.spacedBy(3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -242,7 +285,12 @@ fun GuessButton(
         modifier = Modifier
             .size(64.dp)
             .clip(CircleShape)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag(GUESS_BUTTON)
+            .semantics{
+                testTagsAsResourceId = true
+                role = Role.Button
+            },
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -250,7 +298,7 @@ fun GuessButton(
                 .matchParentSize()
                 .background(
                     shape = CircleShape,
-                    color = Color(0xFFD9D9D9).copy(alpha = 0.6f)
+                    color = AppColors.GameGray.copy(alpha = 0.6f)
                 )
         )
 
@@ -259,7 +307,7 @@ fun GuessButton(
                 .size(32.dp)
                 .background(
                     shape = CircleShape,
-                    color = Color(0xFFD9D9D9)
+                    color = AppColors.GameGray
                 )
         )
     }
@@ -277,8 +325,12 @@ fun GameCard(
                 width = 3.dp,
                 color = Color(0xFF48A0B7), //placeholder - viewModel function will compute this color value
                 shape = RoundedCornerShape(12)
-            ),
-        backgroundColor = Color(0xFFD9D9D9),
+            )
+            .testTag(GAME_CARD)
+            .semantics{
+                testTagsAsResourceId = true
+            },
+        backgroundColor = AppColors.GameGray,
         shape = RoundedCornerShape(12)
     ) {
         Column(
@@ -291,7 +343,12 @@ fun GameCard(
                 text = song.artist,
                 fontSize = 28.sp,
                 fontFamily = robotoMonoMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .testTag(GAME_CARD_ARTIST)
+                    .semantics{
+                        testTagsAsResourceId = true
+                    }
             )
 
             song.contributor?.let {
@@ -299,7 +356,12 @@ fun GameCard(
                     text = it,
                     fontSize = 12.sp,
                     fontFamily = robotoMonoLightItalic,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .testTag(GAME_CARD_CONTRIBUTOR)
+                        .semantics{
+                            testTagsAsResourceId = true
+                        }
                 )
             }
 
@@ -308,12 +370,21 @@ fun GameCard(
                 fontSize = 64.sp,
                 fontFamily = robotoMonoBold,
                 modifier = Modifier
+                    .testTag(GAME_CARD_YEAR)
+                    .semantics{
+                        testTagsAsResourceId = true
+                    }
             )
             Text(
                 text = song.title,
                 fontSize = 20.sp,
                 fontFamily = robotoMonoLightItalic,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .testTag(GAME_CARD_TITLE)
+                    .semantics{
+                        testTagsAsResourceId = true
+                    }
             )
         }
     }
@@ -326,6 +397,10 @@ fun BoxScope.TimeLineArrow() {
         modifier = Modifier
             .fillMaxSize()
             .padding(end = 34.dp)
+            .testTag(TIME_LINE_ARROW)
+            .semantics{
+                testTagsAsResourceId = true
+            }
     ) {
         val strokeWidth = 2.dp.toPx()
         val headPx = arrowHeadSize.toPx()
@@ -353,26 +428,34 @@ fun BoxScope.TimeLineArrow() {
     }
 
     Text(
-        text = "Oldest",
+        text = stringResource(Res.string.arrow_oldest_text),
         fontSize = 14.sp,
         fontFamily = robotoMonoBold,
         modifier = Modifier
             .align(Alignment.TopCenter)
             .offset(y = 32.dp)
             .rotate(90f)
-            .padding(top = 16.dp),
+            .padding(top = 16.dp)
+            .testTag(ARROW_OLDEST_TEXT)
+            .semantics{
+                testTagsAsResourceId = true
+            },
         color = Color.White.copy(alpha = 0.7f)
     )
 
     Text(
-        text = "Newest",
+        text = stringResource(Res.string.arrow_newest_text),
         fontSize = 14.sp,
         fontFamily = robotoMonoBold,
         modifier = Modifier
             .align(Alignment.BottomCenter)
             .offset(y = (-32).dp)
             .rotate(90f)
-            .padding(top = 16.dp),
+            .padding(top = 16.dp)
+            .testTag(ARROW_NEWEST_TEXT)
+            .semantics{
+                testTagsAsResourceId = true
+            },
         color = Color.White.copy(alpha = 0.7f)
     )
 }
