@@ -31,3 +31,9 @@ val horizontalGradientBrush = Brush.horizontalGradient(
     Color.DarkGray,
     Color.Black
 ))
+val verticalGradientBrush = Brush.verticalGradient(
+    colors = listOf(
+        Color.Black,
+        Color.DarkGray,
+        Color.Black
+    ))
