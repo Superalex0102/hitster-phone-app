@@ -111,7 +111,7 @@ fun BoxScope.SettingsButton(
             .align(Alignment.TopEnd)
             .padding(top = 16.dp, end = 8.dp)
             .testTag(HomeScreen.SETTINGS_BUTTON)
-            .semantics {
+            .semantics{
                 testTagsAsResourceId = true
                 role = Role.Button
             }
@@ -136,7 +136,7 @@ fun MainTitle() {
         modifier = Modifier
             .padding(top = 24.dp)
             .testTag(HomeScreen.CHRONOBEAT_TITLE)
-            .semantics {
+            .semantics{
                 testTagsAsResourceId = true
             }
     )
@@ -155,51 +155,52 @@ fun LoginPopup(
     ) {
         Box(
             modifier = Modifier
-            .widthIn(400.dp)
-            .fillMaxWidth(0.80f)
-            .height(IntrinsicSize.Min)
-            .clip(RoundedCornerShape(5))
-            .border(
-                width = 2.dp,
-                color = Color.White,
-                shape = RoundedCornerShape(5)
-            ),
+                .widthIn(400.dp)
+                .fillMaxWidth(0.80f)
+                .height(IntrinsicSize.Min)
+                .clip(RoundedCornerShape(5))
+                .border(
+                    width = 2.dp,
+                    color = Color.White,
+                    shape = RoundedCornerShape(5)
+                ),
         ) {
             Box(
                 modifier = Modifier
-                .clip(RoundedCornerShape(5))){
+                    .clip(RoundedCornerShape(5))
+            ) {
 
-            GradientBackground()
+                GradientBackground()
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            PopupTitle(
-                text = stringResource(Res.string.sing_in_to_spotify),
-                testTag = LoginPopup.LOGIN_POPUP_TITLE,
-                true
-            )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    PopupTitle(
+                        text = stringResource(Res.string.sing_in_to_spotify),
+                        testTag = LoginPopup.LOGIN_POPUP_TITLE,
+                        resourceId = true
+                    )
 
-            Spacer(modifier = Modifier.height(48.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
 
-            GradientButton(
-                text = stringResource(Res.string.sign_in),
-                enabled = true,
-                size = ButtonSize.LARGE,
-                testTag = LoginPopup.SIGN_IN_BUTTON,
-                resourceId = true,
-                onClick = {} //TODO: Sign in on click action
-            )
+                    GradientButton(
+                        text = stringResource(Res.string.sign_in),
+                        enabled = true,
+                        size = ButtonSize.LARGE,
+                        testTag = LoginPopup.SIGN_IN_BUTTON,
+                        resourceId = true,
+                        onClick = {} //TODO: Sign in on click action
+                    )
 
-            Spacer(modifier = Modifier.height(48.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
 
-            ErrorText()
-        }
+                    ErrorText()
+                }
             }
-    }
+        }
     }
 }
 
@@ -218,7 +219,7 @@ fun PopupTitle(
         fontFamily = kdamThmorProRegular,
         modifier = Modifier
             .testTag(testTag)
-            .semantics {
+            .semantics{
                 testTagsAsResourceId = resourceId
             }
     )
@@ -235,7 +236,7 @@ fun ErrorText() {
             tint = Color.Red,
             modifier = Modifier
                 .testTag(LoginPopup.ERROR_ICON)
-                .semantics {
+                .semantics{
                     testTagsAsResourceId = true
                 }
         )
@@ -249,7 +250,7 @@ fun ErrorText() {
             fontSize = 14.sp,
             modifier = Modifier
                 .testTag(LoginPopup.ERROR_TEXT)
-                .semantics {
+                .semantics{
                     testTagsAsResourceId = true
                 }
         )
