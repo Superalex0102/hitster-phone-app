@@ -39,6 +39,7 @@ object AccessibilityIds {
         const val TIME_LINE_ARROW = "time_line_arrow"
         const val ARROW_OLDEST_TEXT = "arrow_oldest_text"
         const val ARROW_LATEST_TEXT = "arrow_latest_text"
+    }
       
     object GameSummaryScreen {
         const val GAME_SUMMARY_TITLE = "game_summary_title_text"
