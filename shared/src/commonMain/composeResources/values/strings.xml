@@ -21,4 +21,8 @@
     <string name="play_again">Play Again</string>
     <string name="team_name">Team 1</string>
     <string name="won_the_game">won the game</string>
+    <string name="sing_in_to_spotify">Sign in to Spotify to continue</string>
+    <string name="error_message">Sign-in failed. Please try again.</string>
+    <string name="sign_in">Sign in</string>
+    <string name="content_disc_error">Error</string>
 </resources>

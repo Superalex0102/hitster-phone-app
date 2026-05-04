@@ -49,4 +49,11 @@ object AccessibilityIds {
         const val PLAY_AGAIN_BUTTON = "play_again_button"
         const val WIN_IMAGE = "win_image"
     }
+
+    object LoginPopup {
+        const val LOGIN_POPUP_TITLE = "login_popup_title"
+        const val SIGN_IN_BUTTON = "sign_in_button"
+        const val ERROR_ICON = "error_icon"
+        const val ERROR_TEXT = "error_text"
+    }
 }
