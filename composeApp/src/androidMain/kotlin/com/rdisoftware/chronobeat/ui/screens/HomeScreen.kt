@@ -27,6 +27,8 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.HomeScreen
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.LoginPopup
+import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
+import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.shared.resources.*
 import com.rdisoftware.chronobeat.ui.enums.ButtonSize
 import com.rdisoftware.chronobeat.ui.screens.components.BottomText
@@ -37,8 +39,8 @@ import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun HomeScreen() {
-    var showPopup by remember { mutableStateOf(value = true) }
+fun HomeScreen(viewModel: HomeViewModel) {
+    val state by viewModel.state.collectAsState()
 
     Box(
         modifier = Modifier
@@ -46,13 +48,19 @@ fun HomeScreen() {
     ) {
         GradientBackground()
 
-        if (showPopup) {
+        if (state.showLoginPopup) {
             LoginPopup(
-                onDismissRequest = { showPopup = false } //TODO: Move popup visibility to VM
+                onDismissRequest = {
+                    viewModel.onEvent(event = HomeEvent.OnLoginPopupDismiss)
+                }
             )
         }
 
-        SettingsButton(onClick = {}) //TODO: Settings on click action
+        SettingsButton(
+            onClick = {
+                viewModel.onEvent(event = HomeEvent.OnSettingsClick)
+            }
+        ) //TODO: Settings on click action
 
         Column(
             modifier = Modifier
@@ -73,20 +81,26 @@ fun HomeScreen() {
             ) {
                 GradientButton(
                     text = stringResource(Res.string.local_game),
-                    enabled = true,
+                    enabled = state.isLocalEnabled,
                     size = ButtonSize.LARGE,
                     testTag = HomeScreen.LOCAL_GAME_BUTTON,
                     resourceId = true,
-                    onClick = {} //TODO: Local game mode on click action
+                    onClick = {
+                        viewModel.onEvent(event = HomeEvent.OnLocalGameClick)
+                    }
+                    //TODO: Local game mode on click action
                 )
 
                 GradientButton(
                     text = stringResource(Res.string.online_game),
-                    enabled = false,
+                    enabled = state.isOnlineEnabled,
                     size = ButtonSize.LARGE,
                     testTag = HomeScreen.ONLINE_GAME_BUTTON,
                     resourceId = true,
-                    onClick = {} //TODO: Online game mode on click action - not in current scope
+                    onClick = {
+                        viewModel.onEvent(event = HomeEvent.OnOnlineGameClick)
+                    }
+                    //TODO: Online game mode on click action - not in current scope
                 )
             }
 
