@@ -17,25 +17,17 @@ data class HomeUiState(
 sealed interface HomeEvent {
     data object OnSettingsClick : HomeEvent
     data object OnSettingsDismiss : HomeEvent
-    data object OnLocalGameClick : HomeEvent
     data object OnOnlineGameClick : HomeEvent
     data object OnLoginPopupDismiss : HomeEvent
 }
 
-class HomeViewModel(
-    val onLocalGame: () -> Unit
-): ViewModel() {
+class HomeViewModel(): ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state
 
     fun onEvent(event: HomeEvent) {
         when (event) {
-            HomeEvent.OnLocalGameClick -> {
-                if (_state.value.isLocalEnabled) {
-                    onLocalGame()
-                }
-            }
             HomeEvent.OnSettingsClick -> {
                 _state.update {
                     it.copy(showSettingsPopup = !it.showSettingsPopup)

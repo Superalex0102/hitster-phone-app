@@ -39,7 +39,10 @@ import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onLocalGameClicked: () -> Unit
+) {
     val state by viewModel.state.collectAsState()
 
     Box(
@@ -86,9 +89,8 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     testTag = HomeScreen.LOCAL_GAME_BUTTON,
                     resourceId = true,
                     onClick = {
-                        viewModel.onEvent(event = HomeEvent.OnLocalGameClick)
+                        onLocalGameClicked()
                     }
-                    //TODO: Local game mode on click action
                 )
 
                 GradientButton(

@@ -19,42 +19,38 @@ fun AppNavHost() {
         startDestination = HomeRoute
     ) {
         composable<HomeRoute> {
-            val onLocalGame = {
-                navController.navigate(TeamSelectionRoute)
-            }
-
             HomeScreen(
-                viewModel = HomeViewModel(onLocalGame)
+                viewModel = HomeViewModel(),
+                onLocalGameClicked = {
+                    navController.navigate(TeamSelectionRoute)
+                }
             )
         }
 
         composable<TeamSelectionRoute> {
-            //TODO: Implement navigation according to the HomeScreen solution - dependency on TeamSelectionViewModel
             TeamSelectionScreen(
-                onTeamsSelected = {
+                onTeamsSelectedClicked = {
                     navController.navigate(GameRoute)
                 }
             )
         }
 
         composable<GameRoute> {
-            //TODO: Implement navigation according to the HomeScreen solution - dependency on GameViewModel
             GameScreen(
-                onGameFinished = {
+                onGameFinishedClicked = {
                     navController.navigate(GameSummaryRoute)
                 }
             )
         }
 
         composable<GameSummaryRoute> {
-            //TODO: Implement navigation according to the HomeScreen solution - dependency on GameSummaryViewModel
             GameSummaryScreen(
-                onBackToHome = {
+                onHomeClicked = {
                     navController.navigate(HomeRoute) {
                         popUpTo(0) { inclusive = true }
                     }
                 },
-                onPlayAgain = {
+                onPlayAgainClicked = {
                     navController.navigate(TeamSelectionRoute) {
                         popUpTo(0) { inclusive = true }
                     }

@@ -14,31 +14,30 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameSummaryScreen
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.content_disc_trophy_logo
 import com.rdisoftware.chronobeat.shared.resources.game_summary_title
 import com.rdisoftware.chronobeat.shared.resources.home
 import com.rdisoftware.chronobeat.shared.resources.play_again
+import com.rdisoftware.chronobeat.shared.resources.team_name
 import com.rdisoftware.chronobeat.shared.resources.trophy
+import com.rdisoftware.chronobeat.shared.resources.won_the_game
 import com.rdisoftware.chronobeat.ui.enums.ButtonSize
 import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
 import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
 import com.rdisoftware.chronobeat.ui.screens.components.LogoText
+import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameSummaryScreen
-import com.rdisoftware.chronobeat.shared.resources.team_name
-import com.rdisoftware.chronobeat.shared.resources.won_the_game
-import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
 
 @Composable
 fun GameSummaryScreen(
-    onBackToHome: () -> Unit,
-    onPlayAgain: () -> Unit
+    onHomeClicked: () -> Unit,
+    onPlayAgainClicked: () -> Unit
 ) {
 
     GradientBackground()
@@ -69,7 +68,7 @@ fun GameSummaryScreen(
             testTag = GameSummaryScreen.HOME_BUTTON,
             resourceId = true,
             onClick = {
-                onBackToHome()
+                onHomeClicked()
             } //TODO: Create "Start game" on click action
         )
 
@@ -82,7 +81,7 @@ fun GameSummaryScreen(
             testTag = GameSummaryScreen.PLAY_AGAIN_BUTTON,
             resourceId = true,
             onClick = {
-                onPlayAgain()
+                onPlayAgainClicked()
             } //TODO: Create "Start game" on click action
         )
     }
