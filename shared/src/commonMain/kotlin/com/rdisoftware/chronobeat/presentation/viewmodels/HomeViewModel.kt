@@ -17,7 +17,6 @@ data class HomeUiState(
 sealed interface HomeEvent {
     data object OnSettingsClick : HomeEvent
     data object OnSettingsDismiss : HomeEvent
-    data object OnLocalGameClick : HomeEvent
     data object OnOnlineGameClick : HomeEvent
     data object OnLoginPopupDismiss : HomeEvent
 }
@@ -29,11 +28,6 @@ class HomeViewModel(): ViewModel() {
 
     fun onEvent(event: HomeEvent) {
         when (event) {
-            HomeEvent.OnLocalGameClick -> {
-                if(_state.value.isLocalEnabled) {
-                    // TODO: Navigation implementation goes here
-                }
-            }
             HomeEvent.OnSettingsClick -> {
                 _state.update {
                     it.copy(showSettingsPopup = !it.showSettingsPopup)
@@ -45,7 +39,7 @@ class HomeViewModel(): ViewModel() {
                 }
             }
             HomeEvent.OnOnlineGameClick -> {
-                if(_state.value.isOnlineEnabled) {
+                if (_state.value.isOnlineEnabled) {
                     // TODO: Navigation implementation goes here, future plan
                 }
             }

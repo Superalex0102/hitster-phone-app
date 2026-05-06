@@ -25,7 +25,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -43,7 +44,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -80,9 +80,10 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.random.Random
 
-@Preview
 @Composable
-fun GameScreen() {
+fun GameScreen(
+    onGameFinishedClicked: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -100,6 +101,14 @@ fun GameScreen() {
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
             GameHeader()
+
+            Button(
+                onClick = {
+                    onGameFinishedClicked() //TODO: Temporary button to be able to test navigation
+                }
+            ) {
+                Text("Summary")
+            }
 
             GameSurface()
         }

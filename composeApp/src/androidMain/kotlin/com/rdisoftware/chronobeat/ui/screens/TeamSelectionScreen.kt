@@ -1,7 +1,17 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -15,42 +25,56 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.TeamSelectionScreen
-import com.rdisoftware.chronobeat.ui.screens.components.BottomText
-import com.rdisoftware.chronobeat.shared.resources.*
-import com.rdisoftware.chronobeat.ui.enums.ButtonSize
-import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
-import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
-import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
-import com.rdisoftware.chronobeat.ui.screens.components.LogoText
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.TeamSelectionScreen
+import com.rdisoftware.chronobeat.shared.resources.Res
+import com.rdisoftware.chronobeat.shared.resources.bottom_app_name
+import com.rdisoftware.chronobeat.shared.resources.content_disc_add_team
+import com.rdisoftware.chronobeat.shared.resources.content_disc_delete
+import com.rdisoftware.chronobeat.shared.resources.content_disc_edit
+import com.rdisoftware.chronobeat.shared.resources.content_disc_info
+import com.rdisoftware.chronobeat.shared.resources.powered_by
+import com.rdisoftware.chronobeat.shared.resources.start
+import com.rdisoftware.chronobeat.shared.resources.team_selection_title
+import com.rdisoftware.chronobeat.shared.resources.ts_info_text
+import com.rdisoftware.chronobeat.shared.resources.ts_input_placeholder
+import com.rdisoftware.chronobeat.ui.enums.ButtonSize
+import com.rdisoftware.chronobeat.ui.screens.components.BottomText
+import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
+import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
+import com.rdisoftware.chronobeat.ui.screens.components.LogoText
 import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.ui.theme.horizontalGradientBrush
+import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
-@Preview
-fun TeamSelectionScreen() {
+fun TeamSelectionScreen(
+    onTeamsSelectedClicked: () -> Unit
+) {
 
     // TODO Refactor: Observe data stream from Viewmodel instead of hardcoded values
     val nameState = rememberTextFieldState()
@@ -103,7 +127,7 @@ fun TeamSelectionScreen() {
             size = ButtonSize.SMALL,
             testTag = TeamSelectionScreen.START_GAME_BUTTON,
             resourceId = true,
-            onClick = {} //TODO: Create "Start game" on click action
+            onClick = { onTeamsSelectedClicked() }
         )
 
         Spacer(modifier = Modifier.weight(0.15f))
