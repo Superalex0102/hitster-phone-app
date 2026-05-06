@@ -25,7 +25,6 @@ fun App() {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                //Screen
                 AppNavHost()
             }
         }

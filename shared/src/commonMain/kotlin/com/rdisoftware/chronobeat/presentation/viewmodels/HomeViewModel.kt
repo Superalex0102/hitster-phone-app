@@ -22,7 +22,9 @@ sealed interface HomeEvent {
     data object OnLoginPopupDismiss : HomeEvent
 }
 
-class HomeViewModel(): ViewModel() {
+class HomeViewModel(
+    val onLocalGame: () -> Unit
+): ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state
@@ -30,8 +32,8 @@ class HomeViewModel(): ViewModel() {
     fun onEvent(event: HomeEvent) {
         when (event) {
             HomeEvent.OnLocalGameClick -> {
-                if(_state.value.isLocalEnabled) {
-                    // TODO: Navigation implementation goes here
+                if (_state.value.isLocalEnabled) {
+                    onLocalGame()
                 }
             }
             HomeEvent.OnSettingsClick -> {
@@ -45,7 +47,7 @@ class HomeViewModel(): ViewModel() {
                 }
             }
             HomeEvent.OnOnlineGameClick -> {
-                if(_state.value.isOnlineEnabled) {
+                if (_state.value.isOnlineEnabled) {
                     // TODO: Navigation implementation goes here, future plan
                 }
             }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.ui.screens.GameScreen
 import com.rdisoftware.chronobeat.ui.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.ui.screens.HomeScreen
@@ -17,16 +18,18 @@ fun AppNavHost() {
         navController = navController,
         startDestination = HomeRoute
     ) {
-
         composable<HomeRoute> {
+            val onLocalGame = {
+                navController.navigate(TeamSelectionRoute)
+            }
+
             HomeScreen(
-                onLocalGame = {
-                    navController.navigate(TeamSelectionRoute)
-                }
+                viewModel = HomeViewModel(onLocalGame)
             )
         }
 
         composable<TeamSelectionRoute> {
+            //TODO: Implement navigation according to the HomeScreen solution - dependency on TeamSelectionViewModel
             TeamSelectionScreen(
                 onTeamsSelected = {
                     navController.navigate(GameRoute)
@@ -35,6 +38,7 @@ fun AppNavHost() {
         }
 
         composable<GameRoute> {
+            //TODO: Implement navigation according to the HomeScreen solution - dependency on GameViewModel
             GameScreen(
                 onGameFinished = {
                     navController.navigate(GameSummaryRoute)
@@ -43,6 +47,7 @@ fun AppNavHost() {
         }
 
         composable<GameSummaryRoute> {
+            //TODO: Implement navigation according to the HomeScreen solution - dependency on GameSummaryViewModel
             GameSummaryScreen(
                 onBackToHome = {
                     navController.navigate(HomeRoute) {
