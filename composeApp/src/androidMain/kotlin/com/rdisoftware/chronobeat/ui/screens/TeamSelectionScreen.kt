@@ -49,8 +49,9 @@ import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.ui.theme.horizontalGradientBrush
 
 @Composable
-@Preview
-fun TeamSelectionScreen() {
+fun TeamSelectionScreen(
+    onTeamsSelected: () -> Unit
+) {
 
     // TODO Refactor: Observe data stream from Viewmodel instead of hardcoded values
     val nameState = rememberTextFieldState()
@@ -103,7 +104,7 @@ fun TeamSelectionScreen() {
             size = ButtonSize.SMALL,
             testTag = TeamSelectionScreen.START_GAME_BUTTON,
             resourceId = true,
-            onClick = {} //TODO: Create "Start game" on click action
+            onClick = { onTeamsSelected() } //TODO: Create "Start game" on click action
         )
 
         Spacer(modifier = Modifier.weight(0.15f))

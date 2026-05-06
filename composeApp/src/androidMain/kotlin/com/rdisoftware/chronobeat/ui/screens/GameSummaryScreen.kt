@@ -36,8 +36,10 @@ import com.rdisoftware.chronobeat.shared.resources.won_the_game
 import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
 
 @Composable
-@Preview
-fun GameSummaryScreen() {
+fun GameSummaryScreen(
+    onBackToHome: () -> Unit,
+    onPlayAgain: () -> Unit
+) {
 
     GradientBackground()
 
@@ -66,7 +68,9 @@ fun GameSummaryScreen() {
             size = ButtonSize.SMALL,
             testTag = GameSummaryScreen.HOME_BUTTON,
             resourceId = true,
-            onClick = {} //TODO: Create "Start game" on click action
+            onClick = {
+                onBackToHome()
+            } //TODO: Create "Start game" on click action
         )
 
         Spacer(modifier = Modifier.padding(12.dp))
@@ -77,7 +81,9 @@ fun GameSummaryScreen() {
             size = ButtonSize.SMALL,
             testTag = GameSummaryScreen.PLAY_AGAIN_BUTTON,
             resourceId = true,
-            onClick = {} //TODO: Create "Start game" on click action
+            onClick = {
+                onPlayAgain()
+            } //TODO: Create "Start game" on click action
         )
     }
 }
