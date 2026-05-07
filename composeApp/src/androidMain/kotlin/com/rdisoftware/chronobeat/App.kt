@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.rdisoftware.chronobeat.navigation.AppNavHost
+import com.rdisoftware.chronobeat.presentation.navigation.AppNavHost
 
 @Composable
 @Preview
