@@ -8,15 +8,15 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
-import com.rdisoftware.chronobeat.presentation.screens.SpotifyPlayerScreen
+import com.rdisoftware.chronobeat.navigation.AppNavHost
 
 @Composable
-fun App(musicRepository: MusicRepository) {
+@Preview
+fun App() {
     MaterialTheme {
         Scaffold(
             modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
@@ -26,8 +26,7 @@ fun App(musicRepository: MusicRepository) {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                //HomeScreen()
-                SpotifyPlayerScreen(musicRepository = musicRepository)
+                AppNavHost()
             }
         }
     }
