@@ -62,8 +62,12 @@ class TeamSelectionViewModel(
         viewModelScope.launch {
             // TODO: Replace with deleteTeamUseCase(teamId)
             _state.update { oldState ->
+                val updatedTeams = oldState.teams.filterNot { it.id == teamId }
                 oldState.copy(
-                    teams = oldState.teams.filterNot { it.id == teamId }
+                    teams = updatedTeams,
+                    selectedColor = TeamColor.entries.firstOrNull { color ->
+                        updatedTeams.none { it.color == color }
+                    } ?: TeamColor.entries.first()
                 )
             }
         }
