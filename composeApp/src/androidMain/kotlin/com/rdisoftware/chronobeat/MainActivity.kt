@@ -17,11 +17,11 @@ class MainActivity : ComponentActivity() {
         spotifyController = AndroidSpotifyController(this, TokenManager)
 
         setContent {
-            // TODO (Architektúra - Spotify & MusicRepository):
-            // Később, amikor a képernyőknek szüksége lesz a zenelejátszóra, NE az App()-nak adjuk át paraméterként!
-            // A tiszta UI (Prop Drilling elkerülése) érdekében Dependency Injection-t (pl. Koin) fogunk használni.
-            // A DI modul fogja meghívni a 'RepositoryFactory.createMusicRepository(spotifyController)'-t,
-            // és a kész repót közvetlenül az adott Screen ViewModel-jébe fogja injektálni.
+            // TODO (Architecture - Spotify & MusicRepository):
+            // In the future, when screens need the music player, DO NOT pass it as a parameter to App()!
+            // To keep the UI layer clean and avoid prop drilling, we will use Dependency Injection (e.g., Koin).
+            // The DI module will call 'RepositoryFactory.createMusicRepository(spotifyController)'
+            // and inject the ready-to-use repository directly into the target Screen's ViewModel.
             App()
         }
     }
