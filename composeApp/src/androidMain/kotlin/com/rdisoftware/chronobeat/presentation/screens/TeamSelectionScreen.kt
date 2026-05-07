@@ -191,7 +191,10 @@ fun TeamList(
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
         itemsIndexed(teams) { _, team ->
-            TeamRow(team = team, onDelete = onDelete, onEdit = onEdit)
+            TeamRow(
+                team = team,
+                onDelete = onDelete,
+                onEdit = onEdit)
         }
     }
 }
@@ -347,7 +350,7 @@ fun TeamInputField(
                 }
 
                 IconButton(
-                    enabled = value.isNotBlank(),
+                    enabled = value.isNotBlank(), // TODO: Error handling: add an error message
                     onClick = onAddTeam,
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.ADD_ICON_BUTTON)

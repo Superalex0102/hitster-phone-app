@@ -4,13 +4,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
-import com.rdisoftware.chronobeat.presentation.team_selection.TeamSelectionState
+import com.rdisoftware.chronobeat.presentation.constants.TeamSelectionConstants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+
+data class TeamSelectionState(
+    val teams: List<Team> = emptyList(),
+    val inputName: String = "",
+    val selectedColor: TeamColor = TeamColor.entries.first(),
+    val editingTeam: Team? = null
+) {
+    val canStartGame: Boolean = teams.size >= TeamSelectionConstants.MIN_TEAMS
+
+    val canAddTeam: Boolean = teams.size < TeamSelectionConstants.MAX_TEAMS && inputName.isNotBlank() && inputName.length <= TeamSelectionConstants.MAX_NAME_LENGTH
+
+    val isMaxReached: Boolean = teams.size >= TeamSelectionConstants.MAX_TEAMS
+    val isEditing: Boolean = editingTeam != null
+}
 
 @OptIn(ExperimentalUuidApi::class)
 class TeamSelectionViewModel(
@@ -25,7 +39,7 @@ class TeamSelectionViewModel(
     val state = _state.asStateFlow()
 
     fun onNameChanged(newName: String) {
-        if (newName.length <= 16) {
+        if (newName.length <= TeamSelectionConstants.MAX_NAME_LENGTH) {
             _state.update { it.copy(inputName = newName) }
         }
     }
@@ -96,7 +110,7 @@ class TeamSelectionViewModel(
     fun confirmEdit() {
         val currentState = _state.value
         val editing = currentState.editingTeam ?: return
-        updateTeam(editing.copy(name = currentState.inputName))
+        updateTeam(editing.copy(name = currentState.inputName.trim()))
         _state.update { it.copy(editingTeam = null, inputName = "") }
     }
 }
