@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.theme
+package com.rdisoftware.chronobeat.presentation.theme
 
 
 import androidx.compose.ui.graphics.Color

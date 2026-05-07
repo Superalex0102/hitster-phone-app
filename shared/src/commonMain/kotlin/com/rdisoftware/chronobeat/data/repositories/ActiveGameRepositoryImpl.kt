@@ -25,5 +25,4 @@ class ActiveGameRepositoryImpl : ActiveGameRepository {
     override fun observeGame(): Flow<Game?> {
         return _game.asStateFlow()
     }
-
 }

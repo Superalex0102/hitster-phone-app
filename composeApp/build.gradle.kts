@@ -19,6 +19,14 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
+            implementation(files("libs/spotify-app-remote-release-0.8.0.aar"))
+            implementation(libs.google.gson)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.spotify.android.auth)
+            implementation(libs.androidx.browser)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -49,6 +57,9 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        manifestPlaceholders["redirectSchemeName"] = "chronobeat"
+        manifestPlaceholders["redirectHostName"] = "callback"
+        manifestPlaceholders["redirectPathPattern"] = ""
     }
     packaging {
         resources {

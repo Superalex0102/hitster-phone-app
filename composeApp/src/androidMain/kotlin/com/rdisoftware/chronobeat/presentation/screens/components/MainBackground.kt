@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.screens.components
+package com.rdisoftware.chronobeat.presentation.screens.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

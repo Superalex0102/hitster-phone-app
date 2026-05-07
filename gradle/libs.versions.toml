@@ -19,6 +19,7 @@ serialization = "1.11.0"
 ktor = "3.4.3"
 gmazzo-buildconfig = "5.3.5"
 junitVersion = "4.12"
+gson = "2.14.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -49,6 +50,10 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+spotify-android-auth = { module = "com.spotify.android:auth", version = "4.0.1" }
+androidx-browser = { module = "androidx.browser:browser", version = "1.10.0" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

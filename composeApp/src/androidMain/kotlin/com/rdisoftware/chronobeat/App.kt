@@ -11,11 +11,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.rdisoftware.chronobeat.ui.screens.HomeScreen
+import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
+import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
+import com.rdisoftware.chronobeat.presentation.screens.SpotifyPlayerScreen
 
 @Composable
-@Preview
-fun App() {
+fun App(musicRepository: MusicRepository) {
     MaterialTheme {
         Scaffold(
             modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars)
@@ -25,8 +26,8 @@ fun App() {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                //Screen
-                HomeScreen()
+                //HomeScreen()
+                SpotifyPlayerScreen(musicRepository = musicRepository)
             }
         }
     }

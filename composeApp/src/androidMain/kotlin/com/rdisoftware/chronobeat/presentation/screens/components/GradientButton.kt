@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.screens.components
+package com.rdisoftware.chronobeat.presentation.screens.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -18,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rdisoftware.chronobeat.ui.enums.ButtonSize
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoBold
+import com.rdisoftware.chronobeat.presentation.enums.ButtonSize
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
 
 data class ButtonDimensions(
     val widthFraction: Float,

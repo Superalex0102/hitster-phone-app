@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.screens.components
+package com.rdisoftware.chronobeat.presentation.screens.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,8 +14,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common.BOTTOM_TEXT
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoBold
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoLight
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLight
 
 @Composable
 fun BottomText(

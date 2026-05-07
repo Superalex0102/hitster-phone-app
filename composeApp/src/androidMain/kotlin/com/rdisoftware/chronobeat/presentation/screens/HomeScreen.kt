@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.screens
+package com.rdisoftware.chronobeat.presentation.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,11 +21,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.HomeScreen
-import com.rdisoftware.chronobeat.ui.enums.ButtonSize
-import com.rdisoftware.chronobeat.ui.screens.components.BottomText
-import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
-import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
-import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
+import com.rdisoftware.chronobeat.presentation.enums.ButtonSize
+import com.rdisoftware.chronobeat.presentation.screens.components.BottomText
+import com.rdisoftware.chronobeat.presentation.screens.components.GradientBackground
+import com.rdisoftware.chronobeat.presentation.screens.components.GradientButton
+import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.*
 import org.jetbrains.compose.resources.stringResource

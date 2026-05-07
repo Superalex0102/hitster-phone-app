@@ -9,6 +9,7 @@ interface MusicRepository {
     suspend fun getUserPlaylistDetails(playlistId: String): Playlist
     suspend fun getChronobeatPlaylists(): List<Playlist>
     suspend fun getTrackInfo(trackId: String): Track
-    suspend fun playMusic()
+    suspend fun playMusic(trackId: String)
+    suspend fun resumeMusic()
     suspend fun pauseMusic()
 }
