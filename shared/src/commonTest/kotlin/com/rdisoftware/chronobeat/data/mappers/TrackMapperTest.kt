@@ -1,6 +1,5 @@
-package com.rdisoftware.chronobeat
+package com.rdisoftware.chronobeat.data.mappers
 
-import com.rdisoftware.chronobeat.data.mappers.toDomain
 import com.rdisoftware.chronobeat.data.remote.dto.AlbumDto
 import com.rdisoftware.chronobeat.data.remote.dto.ArtistDto
 import com.rdisoftware.chronobeat.data.remote.dto.TrackDetailDto
@@ -36,7 +35,11 @@ class TrackMapperTest {
 
     @Test
     fun `toDomain remaining artists become featArtists`() {
-        val dto = makeTrackDto(artists = listOf(ArtistDto("Rick Astley"), ArtistDto("DJ Bob"), ArtistDto("MC Jane")))
+        val dto = makeTrackDto(artists = listOf(
+            ArtistDto("Rick Astley"),
+            ArtistDto("DJ Bob"),
+            ArtistDto("MC Jane")
+        ))
         assertEquals(listOf("DJ Bob", "MC Jane"), dto.toDomain().featArtists)
     }
 
