@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.model
+package com.rdisoftware.chronobeat.presentation.model
 
 data class SongModel(
     val artist: String,

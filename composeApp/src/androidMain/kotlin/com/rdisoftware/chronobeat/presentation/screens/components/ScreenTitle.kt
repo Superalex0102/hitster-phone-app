@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.screens.components
+package com.rdisoftware.chronobeat.presentation.screens.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -11,7 +11,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
+import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 
 @Composable
 fun ScreenTitle(

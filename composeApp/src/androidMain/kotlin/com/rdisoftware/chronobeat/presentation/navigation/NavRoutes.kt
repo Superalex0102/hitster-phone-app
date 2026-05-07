@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.navigation
+package com.rdisoftware.chronobeat.presentation.navigation
 
 import kotlinx.serialization.Serializable
 

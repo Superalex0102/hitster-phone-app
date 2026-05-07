@@ -40,7 +40,7 @@ class IOSSpotifyController: NSObject, SpotifyPlayerController, SPTAppRemoteDeleg
             TokenManager.shared.accessToken = token
 
         } else if let error = parameters[SPTAppRemoteErrorDescriptionKey] as? String {
-            print("Spotify engedélyezési hiba: \(error)")
+            print("Spotify error: \(error)")
         }
     }
 
@@ -62,14 +62,14 @@ class IOSSpotifyController: NSObject, SpotifyPlayerController, SPTAppRemoteDeleg
     
     
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
-        print("Sikeresen csatlakozva a Spotify iOS-hez!")
+        print("Successfully connected to Spotify iOS!")
     }
     
     func appRemote(_ appRemote: SPTAppRemote, didDisconnectWithError error: Error?) {
-        print("Lecsatlakozva.")
+        print("Disconnected.")
     }
     
     func appRemote(_ appRemote: SPTAppRemote, didFailConnectionAttemptWithError error: Error?) {
-        print("Sikertelen csatlakozás: \(String(describing: error))")
+        print("Failed connection: \(String(describing: error))")
     }
 }

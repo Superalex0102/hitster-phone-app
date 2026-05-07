@@ -34,9 +34,9 @@ import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.*
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.LoginPopup
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
-import com.rdisoftware.chronobeat.shared.resources.*
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

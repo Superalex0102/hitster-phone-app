@@ -1,6 +1,6 @@
 package com.rdisoftware.chronobeat.data.remote.api
 
-import com.rdisoftware.chronobeat.data.auth.TokenManager // Az object importálása
+import com.rdisoftware.chronobeat.data.auth.TokenManager
 import com.rdisoftware.chronobeat.data.remote.dto.ChronoBeatPlaylistResponseDto
 import com.rdisoftware.chronobeat.data.remote.dto.PlaylistWithTracksResponseDto
 import com.rdisoftware.chronobeat.data.remote.dto.TrackDetailDto
@@ -34,7 +34,7 @@ class ChronoBeatApi(
 
         return httpClient.get(BuildConfig.SPOTIFY_BASE_URL + "playlists/$playlistId") {
             header("Authorization", "Bearer $accessToken")
-            parameter("fields", "id,name,tracks.total,tracks.items(track.id)") // "fields" javítva!
+            parameter("fields", "id,name,tracks.total,tracks.items(track.id)")
         }.body()
     }
 

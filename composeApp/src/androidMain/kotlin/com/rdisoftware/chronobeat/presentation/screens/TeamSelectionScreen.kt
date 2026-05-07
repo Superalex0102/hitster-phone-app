@@ -1,3 +1,5 @@
+package com.rdisoftware.chronobeat.presentation.screens
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -61,14 +63,14 @@ import com.rdisoftware.chronobeat.shared.resources.start
 import com.rdisoftware.chronobeat.shared.resources.team_selection_title
 import com.rdisoftware.chronobeat.shared.resources.ts_info_text
 import com.rdisoftware.chronobeat.shared.resources.ts_input_placeholder
-import com.rdisoftware.chronobeat.ui.enums.ButtonSize
-import com.rdisoftware.chronobeat.ui.screens.components.BottomText
-import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
-import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
-import com.rdisoftware.chronobeat.ui.screens.components.LogoText
-import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
-import com.rdisoftware.chronobeat.ui.theme.horizontalGradientBrush
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
+import com.rdisoftware.chronobeat.presentation.enums.ButtonSize
+import com.rdisoftware.chronobeat.presentation.screens.components.BottomText
+import com.rdisoftware.chronobeat.presentation.screens.components.GradientBackground
+import com.rdisoftware.chronobeat.presentation.screens.components.GradientButton
+import com.rdisoftware.chronobeat.presentation.screens.components.LogoText
+import com.rdisoftware.chronobeat.presentation.screens.components.ScreenTitle
+import com.rdisoftware.chronobeat.presentation.theme.horizontalGradientBrush
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import org.jetbrains.compose.resources.stringResource
 
 @Composable

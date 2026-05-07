@@ -1,6 +1,6 @@
-package com.rdisoftware.chronobeat.ui.preview
+package com.rdisoftware.chronobeat.presentation.preview
 
-import com.rdisoftware.chronobeat.ui.model.SongModel
+import com.rdisoftware.chronobeat.presentation.model.SongModel
 
 object MockMusicData {
 

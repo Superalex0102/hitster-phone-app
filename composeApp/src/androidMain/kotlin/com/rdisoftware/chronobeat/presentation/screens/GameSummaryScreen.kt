@@ -1,4 +1,5 @@
-package com.rdisoftware.chronobeat.ui.screens
+package com.rdisoftware.chronobeat.presentation.screens
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,12 +26,12 @@ import com.rdisoftware.chronobeat.shared.resources.play_again
 import com.rdisoftware.chronobeat.shared.resources.team_name
 import com.rdisoftware.chronobeat.shared.resources.trophy
 import com.rdisoftware.chronobeat.shared.resources.won_the_game
-import com.rdisoftware.chronobeat.ui.enums.ButtonSize
-import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
-import com.rdisoftware.chronobeat.ui.screens.components.GradientButton
-import com.rdisoftware.chronobeat.ui.screens.components.LogoText
-import com.rdisoftware.chronobeat.ui.screens.components.ScreenTitle
-import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
+import com.rdisoftware.chronobeat.presentation.enums.ButtonSize
+import com.rdisoftware.chronobeat.presentation.screens.components.GradientBackground
+import com.rdisoftware.chronobeat.presentation.screens.components.GradientButton
+import com.rdisoftware.chronobeat.presentation.screens.components.LogoText
+import com.rdisoftware.chronobeat.presentation.screens.components.ScreenTitle
+import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

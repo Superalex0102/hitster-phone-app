@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.screens
+package com.rdisoftware.chronobeat.presentation.screens
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -65,15 +65,15 @@ import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.arrow_latest_text
 import com.rdisoftware.chronobeat.shared.resources.arrow_oldest_text
 import com.rdisoftware.chronobeat.theme.AppColors
-import com.rdisoftware.chronobeat.ui.model.HeaderModel
-import com.rdisoftware.chronobeat.ui.model.SongModel
-import com.rdisoftware.chronobeat.ui.preview.MockHeaderData
-import com.rdisoftware.chronobeat.ui.preview.MockMusicData.songs
-import com.rdisoftware.chronobeat.ui.screens.components.GradientBackground
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoBold
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoLightItalic
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoMedium
-import com.rdisoftware.chronobeat.ui.theme.robotoMonoRegular
+import com.rdisoftware.chronobeat.presentation.model.HeaderModel
+import com.rdisoftware.chronobeat.presentation.model.SongModel
+import com.rdisoftware.chronobeat.presentation.preview.MockHeaderData
+import com.rdisoftware.chronobeat.presentation.preview.MockMusicData.songs
+import com.rdisoftware.chronobeat.presentation.screens.components.GradientBackground
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLightItalic
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoMedium
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import org.jetbrains.compose.resources.StringResource

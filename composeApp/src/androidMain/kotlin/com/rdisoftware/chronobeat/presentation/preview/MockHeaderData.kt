@@ -1,6 +1,6 @@
-package com.rdisoftware.chronobeat.ui.preview
+package com.rdisoftware.chronobeat.presentation.preview
 
-import com.rdisoftware.chronobeat.ui.model.HeaderModel
+import com.rdisoftware.chronobeat.presentation.model.HeaderModel
 
 object MockHeaderData {
     val data = listOf(

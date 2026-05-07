@@ -28,11 +28,11 @@ struct SpotifyPlayerView: View {
                         }
                         isPlaying.toggle()
                     } catch {
-                        print("Hiba: \(error)")
+                        print("Error: \(error)")
                     }
                 }
             }) {
-                Text(isPlaying ? "⏸ SZÜNET" : (hasStarted ? "▶ FOLYTATÁS" : "▶ LEJÁTSZÁS"))
+                Text(isPlaying ? "PAUSE" : (hasStarted ? "RESUME" : "PLAY"))
                     .font(.headline)
                     .frame(width: 200, height: 60)
                     .background(isPlaying ? Color.red : Color.green)

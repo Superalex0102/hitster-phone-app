@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.ui.screens.components
+package com.rdisoftware.chronobeat.presentation.screens.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,9 +15,9 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common.LOGO_TEXT
+import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.shared.resources.*
 import org.jetbrains.compose.resources.stringResource
-import com.rdisoftware.chronobeat.ui.theme.kdamThmorProRegular
 
 @Composable
 fun LogoText() {
