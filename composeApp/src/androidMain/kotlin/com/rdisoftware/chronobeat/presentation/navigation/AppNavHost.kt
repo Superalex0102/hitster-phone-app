@@ -1,6 +1,5 @@
 package com.rdisoftware.chronobeat.presentation.navigation
 
-import TeamSelectionScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -9,6 +8,7 @@ import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
+import com.rdisoftware.chronobeat.presentation.screens.TeamSelectionScreen
 
 @Composable
 fun AppNavHost() {

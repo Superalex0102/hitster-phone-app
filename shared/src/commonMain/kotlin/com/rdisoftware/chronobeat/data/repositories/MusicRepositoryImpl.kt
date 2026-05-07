@@ -54,7 +54,6 @@ class MusicRepositoryImpl(
         } catch (e: Exception) {
             throw RuntimeException("Couldn't fetch ChronoBeat playlists", e)
         }
-
     }
 
     override suspend fun getTrackInfo(trackId: String): Track {

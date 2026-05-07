@@ -4,7 +4,7 @@ import Shared
 
 class IOSSpotifyController: NSObject, SpotifyPlayerController, SPTAppRemoteDelegate {
 
-    let clientID = BuildConfig.shared.SPOTIFY_CLIENT_ID
+    let clientID = AppConfig.shared.SPOTIFY_CLIENT_ID
 
     let redirectURI = URL(string: "chronobeat://callback")!
     
@@ -60,7 +60,6 @@ class IOSSpotifyController: NSObject, SpotifyPlayerController, SPTAppRemoteDeleg
     func disconnect() {
         self.appRemote?.disconnect()
     }
-    
     
     func appRemoteDidEstablishConnection(_ appRemote: SPTAppRemote) {
         print("Successfully connected to Spotify iOS!")
