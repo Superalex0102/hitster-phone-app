@@ -91,4 +91,7 @@ buildConfig {
 
     val chronobeatBaseUrl = localProps.getProperty("CHRONOBEAT_BASE_URL") ?: ""
     buildConfigField("String", "CHRONOBEAT_BASE_URL", "\"$chronobeatBaseUrl\"")
+
+    val spotifyClientId = localProps.getProperty("SPOTIFY_CLIENT_ID") ?: ""
+    buildConfigField("String", "SPOTIFY_CLIENT_ID", "\"$spotifyClientId\"")
 }

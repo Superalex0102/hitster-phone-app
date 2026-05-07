@@ -10,13 +10,13 @@ import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import com.rdisoftware.chronobeat.data.auth.TokenManager
-
+import com.rdisoftware.chronobeat.shared.BuildConfig
 class AndroidSpotifyController(
     private val activity: Activity,
     private val tokenManager: TokenManager
 ) : SpotifyPlayerController {
 
-    private val clientId = "a339f75684f44d219611845c893d1f6e"
+    private val clientId = BuildConfig.SPOTIFY_CLIENT_ID
     private val redirectUri = "chronobeat://callback"
     private val AUTH_REQUEST_CODE = 1337
 

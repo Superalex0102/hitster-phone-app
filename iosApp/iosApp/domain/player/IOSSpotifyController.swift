@@ -3,8 +3,9 @@ import SpotifyiOS
 import Shared
 
 class IOSSpotifyController: NSObject, SpotifyPlayerController, SPTAppRemoteDelegate {
-    
-    let clientID = "a339f75684f44d219611845c893d1f6e"
+
+    let clientID = BuildConfig.shared.SPOTIFY_CLIENT_ID
+
     let redirectURI = URL(string: "chronobeat://callback")!
     
     var appRemote: SPTAppRemote?
