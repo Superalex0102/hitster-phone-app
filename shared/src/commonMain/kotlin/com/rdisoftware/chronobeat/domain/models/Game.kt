@@ -6,5 +6,6 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 data class Game(
     val id: Uuid,
-    var collectedCardsByTeam: Map<Uuid, List<String>>
+    var collectedCardsByTeam: Map<Uuid, List<String>>,
+    var playlistId: String
 )
