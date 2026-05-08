@@ -19,9 +19,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
@@ -31,8 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,7 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.TeamSelectionScreen
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.bottom_app_name
@@ -71,16 +68,18 @@ import com.rdisoftware.chronobeat.presentation.screens.components.LogoText
 import com.rdisoftware.chronobeat.presentation.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.presentation.theme.horizontalGradientBrush
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
+import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 import org.jetbrains.compose.resources.stringResource
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun TeamSelectionScreen(
+    viewModel: TeamSelectionViewModel,
     onTeamsSelectedClicked: () -> Unit
 ) {
-
-    // TODO Refactor: Observe data stream from Viewmodel instead of hardcoded values
-    val nameState = rememberTextFieldState()
-    val teams = remember { mutableStateListOf<String>() }
+    val state by viewModel.state.collectAsState()
 
     GradientBackground()
 
@@ -103,10 +102,12 @@ fun TeamSelectionScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             TeamInputField(
-                state = nameState,
+                value = state.inputName,
+                onValueChange = { viewModel.onNameChanged(it) },
                 onAddTeam = {
-                    handleAddTeam(nameState, teams)
-                }, // TODO: Change "Add team" click action
+                    if (state.isEditing) viewModel.confirmEdit()
+                    else viewModel.addTeam()
+                }
             )
         }
 
@@ -118,14 +119,16 @@ fun TeamSelectionScreen(
                 .weight(1f)
         ) {
             TeamList(
-                teams,
+                teams = state.teams,
+                onDelete = { viewModel.deleteTeam(it) },
+                onEdit = { viewModel.startEdit(it) },
                 modifier = Modifier.fillMaxSize()
             )
         }
 
         GradientButton(
             text = stringResource(Res.string.start),
-            enabled = true,
+            enabled = state.canStartGame,
             size = ButtonSize.SMALL,
             testTag = TeamSelectionScreen.START_GAME_BUTTON,
             resourceId = true,
@@ -174,29 +177,35 @@ fun InfoText() {
     }
 }
 
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun TeamList(
-    teams: MutableList<String>,
+    teams: List<Team>,
+    onDelete: (Uuid) -> Unit,
+    onEdit: (Team) -> Unit,
     modifier: Modifier
 ) {
-    val colorEntries = TeamColor.entries
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
-        itemsIndexed(teams) { index, team ->
-            val color = colorEntries[index % colorEntries.size]
-            TeamRow(teamName = team, teamColor = color)
+        itemsIndexed(teams) { _, team ->
+            TeamRow(
+                team = team,
+                onDelete = onDelete,
+                onEdit = onEdit)
         }
     }
 }
 
+@OptIn(ExperimentalUuidApi::class)
 @Composable
 fun TeamRow(
-    teamName: String,
-    teamColor: TeamColor
-) { // TODO: Add unique test tag for each team
+    team: Team,
+    onDelete: (Uuid) -> Unit,
+    onEdit: (Team) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -214,7 +223,7 @@ fun TeamRow(
                     Color.White,
                     shape = RoundedCornerShape(30)
                 )
-                .background(color = teamColor.color.copy(alpha = 1f))
+                .background(color = team.color.color.copy(alpha = 1f))
                 .innerShadow(
                     shape = RoundedCornerShape(30),
                     shadow = Shadow(
@@ -226,25 +235,21 @@ fun TeamRow(
                 ),
             contentAlignment = Alignment.CenterStart
         ) {
-            DisplayTeamNames(teamName)
-        }
-    }
-}
-
-fun handleAddTeam(
-    nameState: TextFieldState,
-    teams: MutableList<String>) {
-    val text = nameState.text.toString()
-    if (text.isNotBlank()) {
-        teams.add(text)
-        nameState.edit {
-            replace(0, length, "")
+            DisplayTeamNames(
+                teamName = team.name,
+                onDelete = { onDelete(team.id) },
+                onEdit = { onEdit(team) }
+            )
         }
     }
 }
 
 @Composable
-fun DisplayTeamNames(teamName: String) {
+fun DisplayTeamNames(
+    teamName: String,
+    onDelete: () -> Unit,
+    onEdit: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxSize(),
         verticalAlignment = Alignment.CenterVertically
@@ -261,28 +266,28 @@ fun DisplayTeamNames(teamName: String) {
         )
 
         Row {
-            IconButton(onClick = {}) { // TODO:  Create "Edit team name" on click action
+            IconButton(onClick = onEdit) {
                 Icon(
                     Icons.Outlined.Edit,
                     contentDescription = stringResource(Res.string.content_disc_edit),
                     tint = Color.White,
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.EDIT_ICON_BUTTON)
-                        .semantics{
+                        .semantics {
                             testTagsAsResourceId = true
                             role = Role.Button
                         }
                 )
             }
 
-            IconButton(onClick = {}) { // TODO:  Create "Delete team name" on click action
+            IconButton(onClick = onDelete) {
                 Icon(
                     Icons.Outlined.Delete,
                     contentDescription = stringResource(Res.string.content_disc_delete),
                     tint = Color.White,
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.DELETE_ICON_BUTTON)
-                        .semantics{
+                        .semantics {
                             testTagsAsResourceId = true
                             role = Role.Button
                         }
@@ -294,12 +299,13 @@ fun DisplayTeamNames(teamName: String) {
 
 @Composable
 fun TeamInputField(
-    state: TextFieldState,
-    onAddTeam: () -> Unit
+    value: String,
+    onValueChange: (String) -> Unit,
+    onAddTeam: () -> Unit,
 ) {
-
     BasicTextField(
-        state = state,
+        value = value,
+        onValueChange = onValueChange,
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp)
@@ -311,22 +317,23 @@ fun TeamInputField(
                 RoundedCornerShape(30.dp)
             )
             .testTag(TeamSelectionScreen.TEAM_INPUT_FIELD)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         textStyle = TextStyle(color = Color.White, fontSize = 18.sp),
-        lineLimits = TextFieldLineLimits.SingleLine,
+        singleLine = true,
         cursorBrush = SolidColor(Color.White),
-        decorator = {
+        decorationBox = { innerTextField ->
             Row(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 30.dp)) {
-                    if (state.text.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 30.dp)
+                ) {
+                    if (value.isEmpty()) {
                         Text(
                             text = stringResource(Res.string.ts_input_placeholder),
                             fontFamily = robotoMonoRegular,
@@ -334,20 +341,20 @@ fun TeamInputField(
                             fontSize = 24.sp,
                             modifier = Modifier
                                 .testTag(TeamSelectionScreen.TEAM_INPUT_PLACEHOLDER_TEXT)
-                                .semantics{
+                                .semantics {
                                     testTagsAsResourceId = true
                                 }
                         )
                     }
-                    it()
+                    innerTextField()
                 }
 
                 IconButton(
-                    enabled = state.text.isNotBlank(),
+                    enabled = value.isNotBlank(), // TODO: Error handling: add an error message
                     onClick = onAddTeam,
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.ADD_ICON_BUTTON)
-                        .semantics{
+                        .semantics {
                             testTagsAsResourceId = true
                             role = Role.Button
                         }
@@ -366,8 +373,7 @@ fun TeamInputField(
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
-                    )
-                    {
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Add,
                             tint = Color.White,

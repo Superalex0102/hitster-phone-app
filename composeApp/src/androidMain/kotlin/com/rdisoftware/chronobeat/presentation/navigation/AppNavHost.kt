@@ -9,6 +9,7 @@ import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
 import com.rdisoftware.chronobeat.presentation.screens.TeamSelectionScreen
+import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 
 @Composable
 fun AppNavHost() {
@@ -29,6 +30,7 @@ fun AppNavHost() {
 
         composable<TeamSelectionRoute> {
             TeamSelectionScreen(
+                viewModel = TeamSelectionViewModel(),
                 onTeamsSelectedClicked = {
                     navController.navigate(GameRoute)
                 }
