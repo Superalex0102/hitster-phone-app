@@ -1,14 +1,14 @@
-package com.rdisoftware.chronobeat
+package com.rdisoftware.chronobeat.data.remote.dto
 
 import com.rdisoftware.chronobeat.data.mappers.toDomain
-import com.rdisoftware.chronobeat.data.remote.dto.TrackDetailDto
+import com.rdisoftware.chronobeat.testing.trackDetailResponseJson
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class TrackDetailDtoDeserializationTest {
+class  TrackDetailDtoDeserializationTest {
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -35,6 +35,9 @@ class TrackDetailDtoDeserializationTest {
     fun `real Spotify JSON has correct feat artists`() {
         val track = realTrackDto.toDomain()
         assertEquals(6, track.featArtists.size)
-        assertEquals(listOf("Krúbi", "Ketioz", "bongor", "Lil Frakk", "Ótvar Pestis", "Saiid"), track.featArtists)
+        assertEquals(
+            listOf("Krúbi", "Ketioz", "bongor", "Lil Frakk", "Ótvar Pestis", "Saiid"),
+            track.featArtists
+        )
     }
 }

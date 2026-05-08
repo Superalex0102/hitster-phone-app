@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat
+package com.rdisoftware.chronobeat.testing
 
 val trackDetailResponseJson = """
 {
