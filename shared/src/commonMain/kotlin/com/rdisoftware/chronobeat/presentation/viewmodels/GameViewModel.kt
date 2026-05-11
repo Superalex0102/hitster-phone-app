@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rdisoftware.chronobeat.domain.models.Game
 import com.rdisoftware.chronobeat.domain.models.Track
+import com.rdisoftware.chronobeat.presentation.constants.GameConstants
 import com.rdisoftware.chronobeat.presentation.preview.MockGameData
 import com.rdisoftware.chronobeat.presentation.preview.MockMusicData
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,7 @@ data class GameState(
         ?.get(currentTeam) ?: emptyList()
     val currentCardCount: Int = timeline.size
     val isGameWon: Boolean = game?.collectedCardsByTeam
-        ?.any { (_, tracks) -> tracks.size >= 3 } ?: false
+        ?.any { (_, tracks) -> tracks.size >= GameConstants.CARDS_TO_WIN } ?: false
 }
 
 @OptIn(ExperimentalUuidApi::class)
@@ -107,7 +108,7 @@ class GameViewModel : ViewModel() {
         if (_state.value.isGameWon) {
             // TODO: Navigate to SummaryScreen via navigation event
             _state.update { it.copy(currentTrack = null) }
-            println("GameViewModel: Game over! A team reached 10 cards")
+            println("GameViewModel: Game over! A team reached ${GameConstants.CARDS_TO_WIN} cards")
             return
         }
 

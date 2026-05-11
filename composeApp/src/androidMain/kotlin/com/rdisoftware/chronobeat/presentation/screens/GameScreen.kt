@@ -296,7 +296,7 @@ fun GameSurface(
             if (index % 2 == 0) {
                 val position = index / 2
                 GuessButton(
-                    enabled = currentTrack != null,
+                    isEnabled = currentTrack != null,
                     onClick = { onGuessPressed(position) }
                 )
             } else {
@@ -309,14 +309,14 @@ fun GameSurface(
 
 @Composable
 fun GuessButton(
-    enabled: Boolean = true,
+    isEnabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(64.dp)
             .clip(CircleShape)
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(enabled = isEnabled, onClick = onClick)
             .testTag(GUESS_BUTTON)
             .semantics{
                 testTagsAsResourceId = true
