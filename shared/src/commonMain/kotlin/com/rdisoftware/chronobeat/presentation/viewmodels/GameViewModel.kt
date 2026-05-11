@@ -44,6 +44,16 @@ class GameViewModel : ViewModel() {
         loadFakeData()
     }
 
+    fun onGuessPressed(position: Int) {
+        viewModelScope.launch {
+            // TODO: Add popup trigger here (separate ticket)
+            // TODO: Replace with validateGuessUseCase()
+            validateGuess(position)
+        }
+    }
+
+    // TODO: dismissPopup
+
     private fun loadFakeData() {
         viewModelScope.launch {
             // TODO: Replace with:
@@ -57,12 +67,32 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun onGuessPressed(position: Int) {
-        viewModelScope.launch {
-            // TODO: Add popup trigger here (separate ticket)
-            // TODO: Replace with validateGuessUseCase()
-            validateGuess(position)
+    private fun initGame() {
+        // TODO: Replace with initGameUseCase()
+        // Should assign one unique starter track per team from the playlist
+        // and set the first currentTrack to the next available track
+        val currentState = _state.value
+        val game = currentState.game ?: return
+        val tracks = currentState.tracks.shuffled()
+
+        val updatedMap = game.collectedCardsByTeam.toMutableMap()
+        game.teams.forEachIndexed { index, team ->
+            val starterTrack = tracks.getOrNull(index) ?: return
+            updatedMap[team] = listOf(starterTrack)
         }
+
+        val usedTracks = updatedMap.values.flatten()
+        val firstCurrentTrack = tracks.firstOrNull { it !in usedTracks } ?: return
+
+        _state.update { oldState ->
+            oldState.copy(
+                game = game.copy(collectedCardsByTeam = updatedMap),
+                currentTrack = firstCurrentTrack
+            )
+        }
+
+        println("GameViewModel: Init - each team got a starter track")
+        println("GameViewModel: Current track to guess: ${firstCurrentTrack.mainArtist} - ${firstCurrentTrack.title} (${firstCurrentTrack.releaseYear})")
     }
 
     private fun validateGuess(position: Int) {
@@ -137,7 +167,7 @@ class GameViewModel : ViewModel() {
         return availableTracks.randomOrNull()
     }
 
-    fun nextTeam() {
+    private fun nextTeam() {
         // TODO: Replace with nextTeamUseCase()
         // Should advance currentTeam to the next team in the list, wrapping around
         val currentState = _state.value
@@ -150,33 +180,5 @@ class GameViewModel : ViewModel() {
                 game = oldState.game?.copy(currentTeam = nextTeam)
             )
         }
-    }
-
-    private fun initGame() {
-        // TODO: Replace with initGameUseCase()
-        // Should assign one unique starter track per team from the playlist
-        // and set the first currentTrack to the next available track
-        val currentState = _state.value
-        val game = currentState.game ?: return
-        val tracks = currentState.tracks.shuffled()
-
-        val updatedMap = game.collectedCardsByTeam.toMutableMap()
-        game.teams.forEachIndexed { index, team ->
-            val starterTrack = tracks.getOrNull(index) ?: return
-            updatedMap[team] = listOf(starterTrack)
-        }
-
-        val usedTracks = updatedMap.values.flatten()
-        val firstCurrentTrack = tracks.firstOrNull { it !in usedTracks } ?: return
-
-        _state.update { oldState ->
-            oldState.copy(
-                game = game.copy(collectedCardsByTeam = updatedMap),
-                currentTrack = firstCurrentTrack
-            )
-        }
-
-        println("GameViewModel: Init - each team got a starter track")
-        println("GameViewModel: Current track to guess: ${firstCurrentTrack.mainArtist} - ${firstCurrentTrack.title} (${firstCurrentTrack.releaseYear})")
     }
 }
