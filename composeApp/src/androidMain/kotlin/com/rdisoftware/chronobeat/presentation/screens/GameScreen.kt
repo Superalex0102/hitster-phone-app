@@ -29,6 +29,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +50,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.ARROW_LATEST_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.ARROW_OLDEST_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.CARD_COUNT_TEXT
@@ -65,15 +70,12 @@ import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.arrow_latest_text
 import com.rdisoftware.chronobeat.shared.resources.arrow_oldest_text
 import com.rdisoftware.chronobeat.theme.AppColors
-import com.rdisoftware.chronobeat.presentation.model.HeaderModel
-import com.rdisoftware.chronobeat.presentation.model.SongModel
-import com.rdisoftware.chronobeat.presentation.preview.MockHeaderData
-import com.rdisoftware.chronobeat.presentation.preview.MockMusicData.songs
 import com.rdisoftware.chronobeat.presentation.screens.components.GradientBackground
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLightItalic
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoMedium
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
+import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import org.jetbrains.compose.resources.StringResource
@@ -82,8 +84,11 @@ import kotlin.random.Random
 
 @Composable
 fun GameScreen(
+    viewModel: GameViewModel,
     onGameFinishedClicked: () -> Unit
 ) {
+    val state by viewModel.state.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -100,7 +105,10 @@ fun GameScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
-            GameHeader()
+            GameHeader(
+                state.currentTeam,
+                state.currentCardCount
+            )
 
             Button(
                 onClick = {
@@ -110,30 +118,42 @@ fun GameScreen(
                 Text("Summary")
             }
 
-            GameSurface()
+            GameSurface(
+                timeline = state.timeline,
+                currentTrack = state.currentTrack,
+                teamColor = state.currentTeam?.color,
+                onGuessPressed = { position -> viewModel.onGuessPressed(position) }
+            )
         }
     }
 }
 
 @Composable
-fun GameHeader() {
+fun GameHeader(
+    currentTeam: Team?,
+    cardCount: Int
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        TeamInformation(MockHeaderData.data.first()) //Mock data for testing
+        TeamInformation(
+            currentTeam = currentTeam,
+            cardCount = cardCount
+        )
 
         AnimatedSoundWaves(
-            isAnimating = MockHeaderData.data.first().isMusicOn //Mock data for testing
+            isAnimating = false // TODO: Replace with music playing state
         )
     }
 }
 
 @Composable
 fun TeamInformation(
-    model: HeaderModel
+    currentTeam: Team?,
+    cardCount: Int
 ) {
     Row(
         modifier = Modifier
@@ -147,7 +167,7 @@ fun TeamInformation(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        Color(0xFF48A0B7), //placeholder - viewModel function will compute this color value
+                        currentTeam?.color?.color ?: Color(0xFF48A0B7),
                         Color.Black
                     )
                 ),
@@ -162,14 +182,14 @@ fun TeamInformation(
         verticalAlignment = Alignment.CenterVertically
     ) {
         GameText(
-            text = model.teamName,
+            text = currentTeam?.name ?: "",
             fontSize = 32.sp,
             fontFamily = robotoMonoBold,
             color = Color.White,
             testTag = TEAM_NAME_TEXT
         )
 
-        NumberCard(cardCount = "5") //Temporary constant value
+        NumberCard(cardCount = cardCount.toString())
     }
 }
 
@@ -259,25 +279,29 @@ fun AnimatedSoundWaves(
 }
 
 @Composable
-fun GameSurface() {
+fun GameSurface(
+    timeline: List<Track>,
+    currentTrack: Track?,
+    teamColor: TeamColor?,
+    onGuessPressed: (Int) -> Unit
+) {
+    val itemCount = timeline.size * 2 + 1
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //TEMPORARY TEST SOLUTION
-        for (i in 0..songs.size) {
-
-            item {
-                GuessButton {
-                    //TODO: OnClick action
-                }
-            }
-
-            if (i < songs.size) {
-                item {
-                    GameCard(model = songs[i])
-                }
+        items(itemCount) { index ->
+            if (index % 2 == 0) {
+                val position = index / 2
+                GuessButton(
+                    isEnabled = currentTrack != null,
+                    onClick = { onGuessPressed(position) }
+                )
+            } else {
+                val trackIndex = index / 2
+                GameCard(track = timeline[trackIndex], teamColor = teamColor)
             }
         }
     }
@@ -285,13 +309,14 @@ fun GameSurface() {
 
 @Composable
 fun GuessButton(
+    isEnabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
             .size(64.dp)
             .clip(CircleShape)
-            .clickable(onClick = onClick)
+            .clickable(enabled = isEnabled, onClick = onClick)
             .testTag(GUESS_BUTTON)
             .semantics{
                 testTagsAsResourceId = true
@@ -321,7 +346,8 @@ fun GuessButton(
 
 @Composable
 fun GameCard(
-    model: SongModel
+    track: Track,
+    teamColor: TeamColor?
 ) {
     Card(
         modifier = Modifier
@@ -329,7 +355,7 @@ fun GameCard(
             .padding(horizontal = 46.dp, vertical = 32.dp)
             .border(
                 width = 3.dp,
-                color = Color(0xFF48A0B7), //placeholder - viewModel function will compute this color value
+                color = teamColor?.color ?: Color.Blue,
                 shape = RoundedCornerShape(12)
             )
             .testTag(GAME_CARD)
@@ -339,13 +365,13 @@ fun GameCard(
         backgroundColor = AppColors.GameGray,
         shape = RoundedCornerShape(12)
     ) {
-        GameCardContent(model = model)
+        GameCardContent(track = track)
     }
 }
 
 @Composable
 fun GameCardContent(
-    model: SongModel
+    track: Track
 ) {
     Column(
         modifier = Modifier
@@ -354,16 +380,16 @@ fun GameCardContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GameText(
-            text = model.artist,
+            text = track.mainArtist,
             fontSize = 28.sp,
             fontFamily = robotoMonoMedium,
             color = Color.Black,
             testTag = GAME_CARD_ARTIST
         )
 
-        model.contributor?.let {
+        if (track.featArtists.isNotEmpty()) {
             GameText(
-                text = it,
+                text = track.featArtists.joinToString(", "),
                 fontSize = 12.sp,
                 fontFamily = robotoMonoLightItalic,
                 color = Color.Black,
@@ -372,7 +398,7 @@ fun GameCardContent(
         }
 
         GameText(
-            text = model.year,
+            text = track.releaseYear.toString(),
             fontSize = 64.sp,
             fontFamily = robotoMonoBold,
             color = Color.Black,
@@ -380,7 +406,7 @@ fun GameCardContent(
         )
 
         GameText(
-            text = model.title,
+            text = track.title,
             fontSize = 20.sp,
             fontFamily = robotoMonoLightItalic,
             color = Color.Black,

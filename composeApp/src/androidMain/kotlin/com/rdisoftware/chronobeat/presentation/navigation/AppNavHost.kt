@@ -9,6 +9,7 @@ import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
 import com.rdisoftware.chronobeat.presentation.screens.TeamSelectionScreen
+import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 
 @Composable
@@ -39,6 +40,7 @@ fun AppNavHost() {
 
         composable<GameRoute> {
             GameScreen(
+                viewModel = GameViewModel(),
                 onGameFinishedClicked = {
                     navController.navigate(GameSummaryRoute)
                 }
