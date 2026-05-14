@@ -27,6 +27,9 @@ kotlin {
             implementation(libs.ktor.client.logging)
             implementation(libs.spotify.android.auth)
             implementation(libs.androidx.browser)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
