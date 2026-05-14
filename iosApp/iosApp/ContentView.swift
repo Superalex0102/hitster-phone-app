@@ -3,16 +3,13 @@ import Shared
 
 struct ContentView: View {
     let spotifyController = IOSSpotifyController()
-    let musicRepository: MusicRepositoryImpl
+    let musicRepository: MusicRepository
     
     init() {
-        self.musicRepository = RepositoryFactory.shared.createMusicRepository(spotifyPlayer: spotifyController)
+        self.musicRepository = Koin_iosKt.getMusicRepository()
     }
     
     var body: some View {
         SpotifyPlayerView(musicRepository: musicRepository)
-            .onOpenURL { url in
-                spotifyController.handleAuth(url: url)
-            }
     }
 }

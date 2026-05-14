@@ -9,12 +9,21 @@ class IOSSpotifyController: NSObject, SpotifyPlayerController, SPTAppRemoteDeleg
     let redirectURI = URL(string: "chronobeat://callback")!
     
     var appRemote: SPTAppRemote?
+
+    private let tokenKey = "spotify_access_token_cache"
     
     override init() {
         super.init()
         let configuration = SPTConfiguration(clientID: clientID, redirectURL: redirectURI)
         self.appRemote = SPTAppRemote(configuration: configuration, logLevel: .debug)
         self.appRemote?.delegate = self
+
+        if let savedToken = UserDefaults.standard.string(forKey: tokenKey) {
+            print("Found saved Spotify token, attempting to reconnect...")
+            self.appRemote?.connectionParameters.accessToken = savedToken
+            TokenManager.shared.accessToken = savedToken
+            self.appRemote?.connect()
+        }
     }
 
     func authenticate() {
@@ -39,6 +48,9 @@ class IOSSpotifyController: NSObject, SpotifyPlayerController, SPTAppRemoteDeleg
             self.appRemote?.connect()
 
             TokenManager.shared.accessToken = token
+
+            UserDefaults.standard.set(token, forKey: tokenKey)
+            print("Token saved to UserDefaults.")
 
         } else if let error = parameters[SPTAppRemoteErrorDescriptionKey] as? String {
             print("Spotify error: \(error)")

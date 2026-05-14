@@ -2,7 +2,7 @@ import SwiftUI
 import Shared
 
 struct SpotifyPlayerView: View {
-    let musicRepository: MusicRepositoryImpl
+    let musicRepository: MusicRepository
     
     @State private var isPlaying = false
     @State private var hasStarted = false
