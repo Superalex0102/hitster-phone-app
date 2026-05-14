@@ -5,7 +5,7 @@ import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import org.koin.dsl.module
 import org.koin.mp.KoinPlatform
 
-fun initKoinIOS(spotifyController: SpotifyPlayerController) {
+fun startKoinIOS(spotifyController: SpotifyPlayerController) {
     initKoin {
         modules( module {
             single<SpotifyPlayerController> { spotifyController}
