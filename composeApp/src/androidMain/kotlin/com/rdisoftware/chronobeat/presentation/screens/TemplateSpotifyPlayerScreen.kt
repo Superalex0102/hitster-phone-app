@@ -8,9 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 @Composable
-fun SpotifyPlayerScreen(musicRepository: MusicRepository) {
+fun SpotifyPlayerScreen(
+    musicRepository: MusicRepository = koinInject()
+) {
     val coroutineScope = rememberCoroutineScope()
 
     var isPlaying by remember { mutableStateOf(false) }

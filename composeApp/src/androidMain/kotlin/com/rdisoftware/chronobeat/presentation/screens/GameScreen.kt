@@ -26,12 +26,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,16 +83,23 @@ import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.random.Random
 
 @Composable
 fun GameScreen(
-    viewModel: GameViewModel,
+    viewModel: GameViewModel = koinViewModel(),
     onGameFinishedClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    var isPlaying by remember { mutableStateOf(false) }
+
+    var hasStarted by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -116,6 +128,35 @@ fun GameScreen(
                 }
             ) {
                 Text("Summary")
+            }
+
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        if (isPlaying) {
+                            //viewModel.pauseMusic()
+                        } else {
+                            if (!hasStarted) {
+                                viewModel.playMusic("3mAHFGVINgpLtl4HWhsTxG")
+                                //hasStarted = true
+                            } else {
+                                //viewModel.resumeMusic()
+                            }
+                        }
+                        isPlaying = !isPlaying
+                    }
+                },
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(220.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = if (isPlaying) "⏸ Szünet" else "▶ Zene Elindítása",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             GameSurface(
