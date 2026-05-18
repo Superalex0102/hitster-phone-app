@@ -24,7 +24,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run unit tests
-        run: ./gradlew test
+        run: ./gradlew test --no-daemon
 
       - name: Upload test results
         if: always()
@@ -32,3 +32,4 @@ jobs:
         with:
           name: test-results
           path: '**/build/reports/tests/'
+          retention-days: 3
