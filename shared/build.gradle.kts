@@ -60,6 +60,7 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.junit)
+            implementation(libs.ktor.client.mock)
         }
     }
 }
@@ -90,7 +91,7 @@ buildConfig {
     val spotifyBaseUrl = localProps.getProperty("SPOTIFY_BASE_URL") ?: "https://api.spotify.com/v1/"
     buildConfigField("String", "SPOTIFY_BASE_URL", "\"$spotifyBaseUrl\"")
 
-    val chronobeatBaseUrl = localProps.getProperty("CHRONOBEAT_BASE_URL") ?: ""
+    val chronobeatBaseUrl = System.getenv("CHRONOBEAT_BASE_URL") ?: localProps.getProperty("CHRONOBEAT_BASE_URL") ?: ""
     buildConfigField("String", "CHRONOBEAT_BASE_URL", "\"$chronobeatBaseUrl\"")
 
     val spotifyClientId = localProps.getProperty("SPOTIFY_CLIENT_ID") ?: ""

@@ -4,10 +4,12 @@ import com.rdisoftware.chronobeat.data.auth.TokenManager
 import com.rdisoftware.chronobeat.data.remote.api.ChronoBeatApi
 import com.rdisoftware.chronobeat.domain.player.FakeSpotifyPlayerController
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.mock.MockEngine
+import io.ktor.client.engine.mock.respond
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -17,41 +19,53 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class MusicRepositoryIntegrationTest {
+    private val mockTrackIds = (1..801).joinToString(",") { """{"track": {"id": "mock_track_$it"}}""" }
 
-    private val realClient = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                prettyPrint = true
-            })
-        }
-        install(Logging) {
-            logger = object : Logger {
-                override fun log(message: String) {
-                    println("KTOR-API: $message")
-                }
+    private val mockEngine = MockEngine { request ->
+        val url = request.url.toString()
+
+        when {
+            url.contains("tracks/4PTG3Z6ehGkBFwjybzWkR8") -> {
+                respond(
+                    content = """
+                        {
+                            "id": "4PTG3Z6ehGkBFwjybzWkR8",
+                            "name": "Never Gonna Give You Up",
+                            "is_playable": true,
+                            "album": { "release_date": "1987-07-27" },
+                            "artists": [ { "name": "Rick Astley" } ]
+                        }
+                    """.trimIndent(),
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json")
+                )
             }
-            level = LogLevel.ALL
+            else -> respond("Not Found", HttpStatusCode.NotFound)
         }
     }
 
-    private val realApi = ChronoBeatApi( realClient)
-
-    private val fakePlayer = FakeSpotifyPlayerController()
-    private val repository = MusicRepositoryImpl(realApi, fakePlayer)
+    private val mockClient = HttpClient(mockEngine) {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                isLenient = true
+            })
+        }
+    }
+    private val mockApi = ChronoBeatApi(mockClient)
+    private val mockRepository = MusicRepositoryImpl(mockApi, FakeSpotifyPlayerController())
 
     @BeforeTest
     fun setup() {
-        //Put a working token here!
-        TokenManager.accessToken = "BQBubU1fObARM4I8TTGhYIiwcod8UfjWtjQZIYZRZz4II9aLWOCF9_7QgXazyQ7d0rEg9U2kF7DyMHX1SK6W6ZzG__DySSi1PD-lslLREiFRGiObmi877nFMG_7U9Y21CwFue3xbecv6SZQkUG3BM03-Z2mp0ZhBIVku136Zu9E0m9o_BRA1pg_SUcEr0C0fVeLugaQjoynrDTDtFrJ2TVLoJAQsmuTgs1BmuEwuGx3Jf79lHnKKLTRwkPk7m0V_3Amklg"
+        TokenManager.accessToken = "mock_github_actions_token"
     }
 
     @Test
     fun getTrackInfo() = runTest {
         val testTrackId = "4PTG3Z6ehGkBFwjybzWkR8"
-        val track = repository.getTrackInfo(testTrackId)
+        val track = mockRepository.getTrackInfo(testTrackId)
 
-        println("Successfully fetched and converted: $track")
+        println("Successfully fetched and converted mocked track: $track")
 
         assertEquals(testTrackId, track.id)
         assertEquals("Rick Astley", track.mainArtist)
@@ -60,11 +74,21 @@ class MusicRepositoryIntegrationTest {
         assertEquals(0, track.featArtists.size)
     }
 
+    private val realClient = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    private val realApi = ChronoBeatApi(realClient)
+    private val realRepository = MusicRepositoryImpl(realApi, FakeSpotifyPlayerController())
+
     @Test
     fun getChronoBeatPlaylists() = runTest {
-        val playlists = repository.getChronobeatPlaylists()
+        val playlists = realRepository.getChronobeatPlaylists()
 
-        println("Successfully fetched and converted: $playlists")
+        println("Successfully fetched and converted mocked playlists: ${playlists.size} items")
 
         assertTrue(playlists.isNotEmpty(), "The playlist can't be empty")
 
