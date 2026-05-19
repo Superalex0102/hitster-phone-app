@@ -40,21 +40,6 @@ class MusicRepositoryIntegrationTest {
                     headers = headersOf(HttpHeaders.ContentType, "application/json")
                 )
             }
-            url.contains("database.json") -> {
-                respond(
-                    content = """
-                        {
-                            "id": "magyar_playlist_1",
-                            "name": "Legjobb Magyar Zenék",
-                            "tracks": {
-                                "items": [ $mockTrackIds ]
-                            }
-                        }
-                    """.trimIndent(),
-                    status = HttpStatusCode.OK,
-                    headers = headersOf(HttpHeaders.ContentType, "application/json")
-                )
-            }
             else -> respond("Not Found", HttpStatusCode.NotFound)
         }
     }
