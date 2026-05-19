@@ -54,7 +54,7 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 spotify-android-auth = { module = "com.spotify.android:auth", version = "4.0.1" }
 androidx-browser = { module = "androidx.browser:browser", version = "1.10.0" }
-
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
