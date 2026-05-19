@@ -24,6 +24,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run unit tests
+        env:
+          CHRONOBEAT_BASE_URL: ${{ secrets.CHRONOBEAT_BASE_URL }}
         run: ./gradlew test --no-daemon
 
       - name: Upload test results
