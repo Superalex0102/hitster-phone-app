@@ -329,7 +329,7 @@ fun GuessButton(
                 .matchParentSize()
                 .background(
                     shape = CircleShape,
-                    color = AppColors.GameGray.copy(alpha = 0.6f)
+                    color = Color(AppColors.GAME_GRAY).copy(alpha = 0.6f)
                 )
         )
 
@@ -338,7 +338,7 @@ fun GuessButton(
                 .size(32.dp)
                 .background(
                     shape = CircleShape,
-                    color = AppColors.GameGray
+                    color = Color(AppColors.GAME_GRAY)
                 )
         )
     }
@@ -362,7 +362,7 @@ fun GameCard(
             .semantics{
                 testTagsAsResourceId = true
             },
-        backgroundColor = AppColors.GameGray,
+        backgroundColor = Color(AppColors.GAME_GRAY),
         shape = RoundedCornerShape(12)
     ) {
         GameCardContent(track = track)
