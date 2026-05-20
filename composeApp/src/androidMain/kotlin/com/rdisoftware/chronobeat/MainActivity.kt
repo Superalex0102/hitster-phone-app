@@ -6,14 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.rdisoftware.chronobeat.data.auth.TokenManager
-import com.rdisoftware.chronobeat.data.remote.api.ChronoBeatApi
-import com.rdisoftware.chronobeat.data.repositories.MusicRepositoryImpl
 import com.rdisoftware.chronobeat.domain.player.AndroidSpotifyController
-import com.rdisoftware.chronobeat.presentation.screens.SpotifyPlayerScreen
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
+import com.rdisoftware.chronobeat.domain.player.SpotifyPlayerController
+import org.koin.core.context.loadKoinModules
+import org.koin.dsl.module
 
 class MainActivity : ComponentActivity() {
     lateinit var spotifyController: AndroidSpotifyController
@@ -23,17 +19,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         spotifyController = AndroidSpotifyController(this, TokenManager)
 
-        val httpClient = HttpClient {
-            install(ContentNegotiation) {
-                json(Json { ignoreUnknownKeys = true })
-            }
-        }
-        val api = ChronoBeatApi(httpClient)
-
-        val musicRepository = MusicRepositoryImpl(
-            chronoBeatApi = api,
-            spotifyPlayer = spotifyController
-        )
+        loadKoinModules(module {
+            single<SpotifyPlayerController> { spotifyController }
+        })
 
         setContent {
             // TODO (Architecture - Spotify & MusicRepository):
@@ -42,7 +30,7 @@ class MainActivity : ComponentActivity() {
             // The DI module will call 'RepositoryFactory.createMusicRepository(spotifyController)'
             // and inject the ready-to-use repository directly into the target Screen's ViewModel.
             App()
-            //SpotifyPlayerScreen(musicRepository)
+            //SpotifyPlayerScreen()
         }
     }
 

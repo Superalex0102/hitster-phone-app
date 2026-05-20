@@ -1,6 +1,8 @@
 package com.rdisoftware.chronobeat.testing
 
+import FakeMusicRepository
 import com.rdisoftware.chronobeat.domain.models.Track
+import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,10 +29,14 @@ class GameViewModelTest {
     private val testScope = TestScope(testDispatcher)
     private lateinit var viewModel: GameViewModel
 
+    private lateinit var fakeMusicRepository: FakeMusicRepository
+
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = GameViewModel()
+        fakeMusicRepository = FakeMusicRepository()
+        val playMusicUseCase = PlayMusicUseCase(fakeMusicRepository)
+        viewModel = GameViewModel(playMusicUseCase)
     }
 
     @AfterTest

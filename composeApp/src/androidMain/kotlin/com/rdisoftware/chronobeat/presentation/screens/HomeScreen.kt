@@ -38,10 +38,11 @@ import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel = koinViewModel(),
     onLocalGameClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()

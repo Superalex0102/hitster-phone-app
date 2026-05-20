@@ -20,6 +20,7 @@ ktor = "3.4.3"
 gmazzo-buildconfig = "6.0.9"
 gson = "2.14.0"
 navigation = "2.9.2"
+koin = "4.2.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -54,6 +55,10 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 google-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 spotify-android-auth = { module = "com.spotify.android:auth", version = "4.0.1" }
 androidx-browser = { module = "androidx.browser:browser", version = "1.10.0" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
+koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 [plugins]
