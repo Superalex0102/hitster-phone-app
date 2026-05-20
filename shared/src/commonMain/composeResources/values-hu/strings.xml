@@ -1,0 +1,31 @@
+<!-- TODO: Check translation - AI generated -->
+
+<resources>
+    <string name="local_game">Helyi</string>
+    <string name="online_game">Online</string>
+    <string name="powered_by">Működteti: </string>
+    <string name="bottom_app_name">ChronoBeat</string>
+    <string name="title">CHRONOBEAT</string>
+    <string name="settings">Beállítások</string>
+    <string name="team_selection_title">Csapat-\nválasztás</string>
+    <string name="ts_input_placeholder">Csapatnév megadása</string>
+    <string name="ts_info_text">A játék indításához 2-4 csapat szükséges</string>
+    <string name="start">Indítás</string>
+    <string name="content_disc_info">Infó</string>
+    <string name="content_disc_edit">Szerkesztés</string>
+    <string name="content_disc_delete">Törlés</string>
+    <string name="content_disc_add_team">Csapat hozzáadása</string>
+    <string name="arrow_oldest_text">Legrégebbi</string>
+    <string name="arrow_latest_text">Legújabb</string>
+    <string name="game_summary_title">Gratulálunk!</string>
+    <string name="content_disc_trophy_logo">Trófea logó</string>
+    <string name="home">Főmenü</string>
+    <string name="play_again">Új játék</string>
+    <string name="team_name">1. Csapat</string>
+    <string name="won_the_game">nyerte a játékot</string>
+    <string name="sing_in_to_spotify">A folytatáshoz jelentkezz be a Spotify-ba</string>
+    <string name="error_message">Sikertelen bejelentkezés. Kérjük, próbáld újra.</string>
+    <string name="sign_in">Bejelentkezés</string>
+    <string name="content_disc_error">Hiba</string>
+    <string name="button_hint">Kattints kétszer az aktiváláshoz</string>
+</resources>
