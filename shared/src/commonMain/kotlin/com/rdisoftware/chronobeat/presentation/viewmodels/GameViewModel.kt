@@ -2,8 +2,11 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.models.Game
 import com.rdisoftware.chronobeat.domain.models.Track
+import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
+import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
 import com.rdisoftware.chronobeat.presentation.constants.GameConstants
 import com.rdisoftware.chronobeat.presentation.preview.MockGameData
 import com.rdisoftware.chronobeat.presentation.preview.MockMusicData
@@ -12,147 +15,163 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
-import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
+import kotlin.uuid.Uuid
 
-data class GameState(
-    val game: Game? = null, // TODO: Replace with getGameUseCase()
-    val tracks: List<Track> = emptyList(), // TODO: Replace with getTracksUseCase()
+data class GameState @OptIn(ExperimentalUuidApi::class) constructor(
+    val game: Game? = null,
+    val tracks: List<Track> = emptyList(),
     val currentTrack: Track? = null,
-    val isGuessCorrect: Boolean? = null,        // TODO: popup trigger
+    val isGuessCorrect: Boolean? = null,
 ) {
     val currentTeam = game?.currentTeam
-    val timeline: List<Track> = game?.collectedCardsByTeam
-        ?.get(currentTeam) ?: emptyList()
+    val timeline: List<Track> = game?.collectedCardsByTeam?.get(currentTeam) ?: emptyList()
     val currentCardCount: Int = timeline.size
-    val isGameWon: Boolean = game?.collectedCardsByTeam
-        ?.any { (_, tracks) -> tracks.size >= GameConstants.CARDS_TO_WIN } ?: false
+    val isGameWon: Boolean = game?.winnerTeam != null
 }
 
 @OptIn(ExperimentalUuidApi::class)
 class GameViewModel(
-    // TODO: Inject usecases here
-    // private val getGameUseCase: GetGameUseCase,
-    // private val getTracksUseCase: GetTracksUseCase,
-    // private val validateGuessUseCase: ValidateGuessUseCase,
-    // private val getNextTrackUseCase: GetNextTrackUseCase,
-    // private val nextTeamUseCase: NextTeamUseCase,
-    // private val addTrackToTimelineUseCase: AddTrackToTimelineUseCase
+    private val activeGameRepository: ActiveGameRepository,
     private val playMusicUseCase: PlayMusicUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GameState())
     val state = _state.asStateFlow()
 
+    private val allTeams = MockGameData.teams
+    private val allTracks = MockMusicData.songs
+
     init {
-        loadFakeData()
+        _state.update { it.copy(tracks = allTracks) }
+
+        viewModelScope.launch {
+            activeGameRepository.observeGame().collect { dto ->
+                if (dto != null) {
+                    val mappedGame = mapDtoToGame(dto)
+                    _state.update {
+                        it.copy(
+                            game = mappedGame,
+                            currentTrack = mappedGame.currentTrack
+                        )
+                    }
+                }
+            }
+        }
+
+        initGame()
+    }
+
+    private fun mapDtoToGame(dto: GameDto): Game {
+        val teams = dto.teamIds.mapNotNull { id -> allTeams.find { it.id == id } }
+        val currentTeam = allTeams.first { it.id == dto.currentTeamId }
+        val currentTrack = allTracks.first { it.id == dto.currentTrackId }
+        val winnerTeam = dto.winnerTeamId?.let { id -> allTeams.find { it.id == id } }
+
+        val collectedCards = dto.collectedCardIdsByTeamId.mapNotNull { (teamId, trackIds) ->
+            val team = allTeams.find { it.id == teamId } ?: return@mapNotNull null
+            val tracks = trackIds.mapNotNull { trackId -> allTracks.find { it.id == trackId } }
+            team to tracks
+        }.toMap()
+
+        return Game(
+            id = dto.id,
+            teams = teams,
+            currentTeam = currentTeam,
+            currentTrack = currentTrack,
+            collectedCardsByTeam = collectedCards,
+            playlistId = dto.playlistId,
+            winnerTeam = winnerTeam
+        )
+    }
+
+    private fun initGame() {
+        viewModelScope.launch {
+            val tracks = allTracks.shuffled()
+            val updatedMap = mutableMapOf<Uuid, List<String>>()
+
+            allTeams.forEachIndexed { index, team ->
+                val starterTrack = tracks.getOrNull(index) ?: return@launch
+                updatedMap[team.id] = listOf(starterTrack.id)
+            }
+
+            val usedTrackIds = updatedMap.values.flatten()
+            val firstCurrentTrack = tracks.firstOrNull { it.id !in usedTrackIds } ?: return@launch
+
+            val initialDto = GameDto(
+                id = Uuid.random(),
+                teamIds = allTeams.map { it.id },
+                currentTeamId = allTeams.first().id,
+                currentTrackId = firstCurrentTrack.id,
+                collectedCardIdsByTeamId = updatedMap,
+                playlistId = "mock_playlist",
+                winnerTeamId = null
+            )
+
+            activeGameRepository.saveGame(initialDto)
+
+            println("GameViewModel: Init - each team got a starter track")
+            println("GameViewModel: Current track to guess: ${firstCurrentTrack.mainArtist} - ${firstCurrentTrack.title} (${firstCurrentTrack.releaseYear})")
+        }
     }
 
     fun onGuessPressed(position: Int) {
         viewModelScope.launch {
-            // TODO: Add popup trigger here (separate ticket)
-            // TODO: Replace with validateGuessUseCase()
             validateGuess(position)
         }
     }
 
-    // TODO: dismissPopup
+    private suspend fun validateGuess(position: Int) {
+        val currentGame = _state.value.game ?: return
+        val currentDto = activeGameRepository.getGame() ?: return
 
-    private fun loadFakeData() {
-        viewModelScope.launch {
-            // TODO: Replace with:
-            // val game = getGameUseCase()
-            // val tracks = getTracksUseCase(game.playlistId)
-            _state.update { it.copy(
-                game = MockGameData.game,
-                tracks = MockMusicData.songs
-            )}
-            initGame()
-        }
-    }
+        val currentTrack = currentGame.currentTrack
+        val timeline = _state.value.timeline
 
-    private fun initGame() {
-        // TODO: Replace with initGameUseCase()
-        // Should assign one unique starter track per team from the playlist
-        // and set the first currentTrack to the next available track
-        val currentState = _state.value
-        val game = currentState.game ?: return
-        val tracks = currentState.tracks.shuffled()
-
-        val updatedMap = game.collectedCardsByTeam.toMutableMap()
-        game.teams.forEachIndexed { index, team ->
-            val starterTrack = tracks.getOrNull(index) ?: return
-            updatedMap[team] = listOf(starterTrack)
-        }
-
-        val usedTracks = updatedMap.values.flatten()
-        val firstCurrentTrack = tracks.firstOrNull { it !in usedTracks } ?: return
-
-        _state.update { oldState ->
-            oldState.copy(
-                game = game.copy(collectedCardsByTeam = updatedMap),
-                currentTrack = firstCurrentTrack
-            )
-        }
-
-        println("GameViewModel: Init - each team got a starter track")
-        println("GameViewModel: Current track to guess: ${firstCurrentTrack.mainArtist} - ${firstCurrentTrack.title} (${firstCurrentTrack.releaseYear})")
-    }
-
-    private fun validateGuess(position: Int) {
-        val currentState = _state.value
-        val currentTrack = currentState.currentTrack ?: return
-        val game = currentState.game ?: return
-        val timeline = currentState.timeline
-
-        // TODO: Replace with validateGuessUseCase(timeline, currentTrack, position)
         val isCorrect = isPositionCorrect(timeline, currentTrack, position)
 
         println("GameViewModel: Guessing position: $position for track: ${currentTrack.mainArtist} - ${currentTrack.title} (${currentTrack.releaseYear})")
 
+        var nextTrackId = currentDto.currentTrackId
+        var winnerId: Uuid? = null
+        var newCollectedCards = currentDto.collectedCardIdsByTeamId
+
         if (isCorrect) {
-            val updatedTimeline = timeline.toMutableList().apply {
-                add(position, currentTrack)
+            val currentTrackIds = currentDto.collectedCardIdsByTeamId[currentDto.currentTeamId] ?: emptyList()
+            val updatedTrackIds = currentTrackIds.toMutableList().apply { add(position, currentTrack.id) }
+
+            newCollectedCards = currentDto.collectedCardIdsByTeamId.toMutableMap().apply {
+                put(currentDto.currentTeamId, updatedTrackIds)
             }
-            _state.update { oldState ->
-                oldState.copy(
-                    // TODO: Replace with addTrackToTimelineUseCase(game.currentTeam, updatedTimeline)
-                    game = game.copy(
-                        collectedCardsByTeam = game.collectedCardsByTeam.toMutableMap().apply {
-                            put(game.currentTeam, updatedTimeline)
-                        }
-                    ),
-                    // TODO: Replace with getNextTrackUseCase(oldState)
-                    currentTrack = drawNextTrack(oldState),
-                    isGuessCorrect = true
-                )
+
+            _state.update { it.copy(isGuessCorrect = true) }
+            println("GameViewModel: Correct! Track added at position $position")
+
+            if (updatedTrackIds.size >= GameConstants.CARDS_TO_WIN) {
+                winnerId = currentDto.currentTeamId
+                println("GameViewModel: Game over! A team reached ${GameConstants.CARDS_TO_WIN} cards")
             }
-            println("GameViewModel: Correct! Track added at position $position | ${currentTrack.mainArtist} - ${currentTrack.title} (${currentTrack.releaseYear})")
         } else {
-            _state.update { oldState ->
-                oldState.copy(
-                    // TODO: Replace with getNextTrackUseCase(oldState)
-                    currentTrack = drawNextTrack(oldState),
-                    isGuessCorrect = false
-                )
-            }
-            println("GameViewModel: Wrong! Discarded: ${currentTrack.mainArtist} - ${currentTrack.title} (${currentTrack.releaseYear})")
+            _state.update { it.copy(isGuessCorrect = false) }
+            println("GameViewModel: Wrong! Discarded: ${currentTrack.mainArtist}")
         }
 
-        if (_state.value.isGameWon) {
-            // TODO: Navigate to SummaryScreen via navigation event
-            _state.update { it.copy(currentTrack = null) }
-            println("GameViewModel: Game over! A team reached ${GameConstants.CARDS_TO_WIN} cards")
-            return
+        if (winnerId == null) {
+            nextTrackId = drawNextTrackId(newCollectedCards) ?: currentDto.currentTrackId
         }
 
-        // TODO: Replace with nextTeamUseCase()
-        nextTeam()
-        println("GameViewModel: Next team: ${_state.value.game?.currentTeam?.name} | Next track: ${_state.value.currentTrack?.mainArtist} - ${_state.value.currentTrack?.title} (${_state.value.currentTrack?.releaseYear})")
+        val updatedDto = currentDto.copy(
+            collectedCardIdsByTeamId = newCollectedCards,
+            currentTrackId = nextTrackId,
+            winnerTeamId = winnerId
+        )
+        activeGameRepository.saveGame(updatedDto)
+
+        if (winnerId == null) {
+            nextTeam()
+        }
     }
 
     private fun isPositionCorrect(timeline: List<Track>, track: Track, position: Int): Boolean {
-        // TODO: Replace with validateGuessUseCase(timeline, track, position)
-        // Domain rule: track must fit chronologically between neighbours
         if (position < 0 || position > timeline.size) return false
 
         val before = if (position > 0) timeline.getOrNull(position - 1) else null
@@ -162,27 +181,22 @@ class GameViewModel(
                 (after == null || after.releaseYear >= track.releaseYear)
     }
 
-    private fun drawNextTrack(state: GameState): Track? {
-        // TODO: Replace with getNextTrackUseCase(usedTracks, availableTracks)
-        // Should return a random unplayed track not already in any team's timeline
-        val usedTracks = state.game?.collectedCardsByTeam?.values?.flatten() ?: emptyList()
-        val availableTracks = state.tracks.filter { it !in usedTracks && it != state.currentTrack }
-        return availableTracks.randomOrNull()
+    private fun drawNextTrackId(collectedCards: Map<Uuid, List<String>>): String? {
+        val usedTrackIds = collectedCards.values.flatten()
+        val availableTracks = allTracks.filter { it.id !in usedTrackIds }
+        return availableTracks.randomOrNull()?.id
     }
 
-    private fun nextTeam() {
-        // TODO: Replace with nextTeamUseCase()
-        // Should advance currentTeam to the next team in the list, wrapping around
-        val currentState = _state.value
-        val game = currentState.game ?: return
-        val currentIndex = game.teams.indexOfFirst { it == game.currentTeam }
-        val nextTeam = game.teams[(currentIndex + 1) % game.teams.size]
+    private suspend fun nextTeam() {
+        val currentDto = activeGameRepository.getGame() ?: return
 
-        _state.update { oldState ->
-            oldState.copy(
-                game = oldState.game?.copy(currentTeam = nextTeam)
-            )
-        }
+        val currentIndex = currentDto.teamIds.indexOf(currentDto.currentTeamId)
+        val nextTeamId = currentDto.teamIds[(currentIndex + 1) % currentDto.teamIds.size]
+
+        val updatedDto = currentDto.copy(currentTeamId = nextTeamId)
+        activeGameRepository.saveGame(updatedDto)
+
+        println("GameViewModel: Next team: $nextTeamId")
     }
 
     fun playMusic(trackId: String) {

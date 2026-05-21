@@ -37,6 +37,7 @@ val sharedModule = module {
     //ViewModels
     factory { HomeViewModel() }
     factory { GameViewModel(
+        activeGameRepository = get(),
         playMusicUseCase = get()
     ) }
     factory { TeamSelectionViewModel() }
