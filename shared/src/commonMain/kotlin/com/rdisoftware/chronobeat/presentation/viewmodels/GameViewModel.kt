@@ -17,7 +17,8 @@ import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-data class GameState @OptIn(ExperimentalUuidApi::class) constructor(
+@OptIn(ExperimentalUuidApi::class)
+data class GameState(
     val game: Game? = null,
     val tracks: List<Track> = emptyList(),
     val currentTrack: Track? = null,
@@ -43,7 +44,6 @@ class GameViewModel(
 
     init {
         _state.update { it.copy(tracks = allTracks) }
-
         viewModelScope.launch {
             activeGameRepository.observeGame().collect { dto ->
                 if (dto != null) {
@@ -54,6 +54,7 @@ class GameViewModel(
                             currentTrack = mappedGame.currentTrack
                         )
                     }
+                    println("GameViewModel: Current team: ${mappedGame.currentTeam.name} | Track to guess: ${mappedGame.currentTrack.mainArtist} - ${mappedGame.currentTrack.title} (${mappedGame.currentTrack.releaseYear})")
                 }
             }
         }
@@ -108,9 +109,7 @@ class GameViewModel(
             )
 
             activeGameRepository.saveGame(initialDto)
-
             println("GameViewModel: Init - each team got a starter track")
-            println("GameViewModel: Current track to guess: ${firstCurrentTrack.mainArtist} - ${firstCurrentTrack.title} (${firstCurrentTrack.releaseYear})")
         }
     }
 
@@ -121,11 +120,10 @@ class GameViewModel(
     }
 
     private suspend fun validateGuess(position: Int) {
-        val currentGame = _state.value.game ?: return
+        val currentState = _state.value
+        val currentTrack = currentState.currentTrack ?: return
+        val timeline = currentState.timeline
         val currentDto = activeGameRepository.getGame() ?: return
-
-        val currentTrack = currentGame.currentTrack
-        val timeline = _state.value.timeline
 
         val isCorrect = isPositionCorrect(timeline, currentTrack, position)
 
@@ -155,20 +153,21 @@ class GameViewModel(
             println("GameViewModel: Wrong! Discarded: ${currentTrack.mainArtist}")
         }
 
+        var nextTeamId = currentDto.currentTeamId
         if (winnerId == null) {
             nextTrackId = drawNextTrackId(newCollectedCards) ?: currentDto.currentTrackId
+
+            val currentIndex = currentDto.teamIds.indexOf(currentDto.currentTeamId)
+            nextTeamId = currentDto.teamIds[(currentIndex + 1) % currentDto.teamIds.size]
         }
 
         val updatedDto = currentDto.copy(
             collectedCardIdsByTeamId = newCollectedCards,
             currentTrackId = nextTrackId,
-            winnerTeamId = winnerId
+            winnerTeamId = winnerId,
+            currentTeamId = nextTeamId
         )
         activeGameRepository.saveGame(updatedDto)
-
-        if (winnerId == null) {
-            nextTeam()
-        }
     }
 
     private fun isPositionCorrect(timeline: List<Track>, track: Track, position: Int): Boolean {
@@ -185,18 +184,6 @@ class GameViewModel(
         val usedTrackIds = collectedCards.values.flatten()
         val availableTracks = allTracks.filter { it.id !in usedTrackIds }
         return availableTracks.randomOrNull()?.id
-    }
-
-    private suspend fun nextTeam() {
-        val currentDto = activeGameRepository.getGame() ?: return
-
-        val currentIndex = currentDto.teamIds.indexOf(currentDto.currentTeamId)
-        val nextTeamId = currentDto.teamIds[(currentIndex + 1) % currentDto.teamIds.size]
-
-        val updatedDto = currentDto.copy(currentTeamId = nextTeamId)
-        activeGameRepository.saveGame(updatedDto)
-
-        println("GameViewModel: Next team: $nextTeamId")
     }
 
     fun playMusic(trackId: String) {
