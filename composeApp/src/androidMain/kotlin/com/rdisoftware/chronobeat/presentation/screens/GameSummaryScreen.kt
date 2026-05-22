@@ -1,15 +1,19 @@
 package com.rdisoftware.chronobeat.presentation.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -18,6 +22,11 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameSummaryScreen
+import com.rdisoftware.chronobeat.presentation.dimensions.GameSummaryLocalDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.LocalBaseDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.PhoneGameSumDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.TabletGameSumDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.gameSumDimens
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.content_disc_trophy_logo
 import com.rdisoftware.chronobeat.shared.resources.game_summary_title
@@ -40,60 +49,80 @@ fun GameSummaryScreen(
     onHomeClicked: () -> Unit,
     onPlayAgainClicked: () -> Unit
 ) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val dimensions = if (screenWidth >= 600.dp) TabletGameSumDimensions else PhoneGameSumDimensions
 
-    GradientBackground()
-
-    LogoText()
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    CompositionLocalProvider(
+        GameSummaryLocalDimensions provides dimensions,
+        LocalBaseDimensions provides dimensions.base
     ) {
-        ScreenTitle(
-            text = stringResource(Res.string.game_summary_title),
-            testTag = GameSummaryScreen.GAME_SUMMARY_TITLE,
-            resourceId = true
-        )
 
-        TrophyImage()
+        GradientBackground()
 
-        DisplayWinner(
-            winnerTeam = stringResource(Res.string.team_name)
-        )
+        LogoText()
 
-        GradientButton(
-            text = stringResource(Res.string.home),
-            enabled = true,
-            size = ButtonSize.SMALL,
-            testTag = GameSummaryScreen.HOME_BUTTON,
-            resourceId = true,
-            onClick = {
-                onHomeClicked()
-            } //TODO: Create "Start game" on click action
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .widthIn(max = gameSumDimens.base.maxContentWidth),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ScreenTitle(
+                text = stringResource(Res.string.game_summary_title),
+                testTag = GameSummaryScreen.GAME_SUMMARY_TITLE,
+                resourceId = true
+            )
 
-        Spacer(modifier = Modifier.padding(12.dp))
+            TrophyImage()
 
-        GradientButton(
-            text = stringResource(Res.string.play_again),
-            enabled = true,
-            size = ButtonSize.SMALL,
-            testTag = GameSummaryScreen.PLAY_AGAIN_BUTTON,
-            resourceId = true,
-            onClick = {
-                onPlayAgainClicked()
-            } //TODO: Create "Start game" on click action
-        )
+            DisplayWinner(
+                winnerTeam = stringResource(Res.string.team_name)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .widthIn(max = 320.dp),
+
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+
+            ) {
+                GradientButton(
+                    text = stringResource(Res.string.home),
+                    enabled = true,
+                    size = ButtonSize.SMALL,
+                    testTag = GameSummaryScreen.HOME_BUTTON,
+                    resourceId = true,
+                    onClick = {
+                        onHomeClicked()
+                    } //TODO: Create "Start game" on click action
+                )
+
+
+                Spacer(modifier = Modifier.padding(12.dp))
+
+                GradientButton(
+                    text = stringResource(Res.string.play_again),
+                    enabled = true,
+                    size = ButtonSize.SMALL,
+                    testTag = GameSummaryScreen.PLAY_AGAIN_BUTTON,
+                    resourceId = true,
+                    onClick = {
+                        onPlayAgainClicked()
+                    } //TODO: Create "Start game" on click action
+                )
+            }
+        }
     }
 }
 
 @Composable
-fun TrophyImage(){
+fun TrophyImage() {
     Image(
         modifier = Modifier
             .testTag(GameSummaryScreen.WIN_IMAGE)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
                 role = Role.Image
             },
@@ -103,16 +132,16 @@ fun TrophyImage(){
 }
 
 @Composable
-fun DisplayWinner(winnerTeam: String){
+fun DisplayWinner(winnerTeam: String) {
     Text(
         modifier = Modifier
             .padding(bottom = 6.dp)
             .testTag(GameSummaryScreen.TEAM_NAME_TEXT)
-            .semantics{
-            testTagsAsResourceId = true
-        },
+            .semantics {
+                testTagsAsResourceId = true
+            },
         text = winnerTeam,
-        fontSize = 36.sp,
+        fontSize = gameSumDimens.winnerTextFontSize,
         color = Color.White,
         fontFamily = kdamThmorProRegular
     )
@@ -121,7 +150,7 @@ fun DisplayWinner(winnerTeam: String){
         modifier = Modifier
             .padding(bottom = 24.dp)
             .testTag(GameSummaryScreen.WIN_TEXT)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         text = stringResource(Res.string.won_the_game),

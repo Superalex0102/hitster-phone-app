@@ -11,6 +11,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rdisoftware.chronobeat.presentation.dimensions.baseDimens
 import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 
 @Composable
@@ -21,7 +22,7 @@ fun ScreenTitle(
 ){
     Text(
         text = text,
-        fontSize = 48.sp,
+        fontSize = baseDimens.titleFontSize,
         lineHeight = 70.sp,
         textAlign = TextAlign.Center,
         color = Color.White,

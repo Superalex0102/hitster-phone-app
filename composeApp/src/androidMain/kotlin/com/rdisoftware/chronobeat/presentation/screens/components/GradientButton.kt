@@ -20,7 +20,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.rdisoftware.chronobeat.presentation.dimensions.baseDimens
 import com.rdisoftware.chronobeat.presentation.enums.ButtonSize
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
 import com.rdisoftware.chronobeat.presentation.theme.horizontalGradientBrush
@@ -30,19 +30,19 @@ data class ButtonDimensions(
     val ratio: Float,
     val fontSize: TextUnit
 )
-
+@Composable
 fun ButtonSize.toDimensions(): ButtonDimensions =
     when (this) {
         ButtonSize.SMALL -> ButtonDimensions(
             widthFraction = 0.5f,
             ratio = 2.9f,
-            fontSize = 24.sp
+            fontSize = baseDimens.smallButtonFontSize
         )
 
         ButtonSize.LARGE -> ButtonDimensions(
             widthFraction = 0.7f,
             ratio = 3.5f,
-            fontSize = 32.sp
+            fontSize = baseDimens.largeButtonFontSize
         )
     }
 

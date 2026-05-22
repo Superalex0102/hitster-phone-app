@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +31,7 @@ import androidx.compose.material.Card
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,6 +43,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -66,6 +71,11 @@ import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameSc
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.MUSIC_PLAYER_ICON
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TEAM_NAME_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TIME_LINE_ARROW
+import com.rdisoftware.chronobeat.presentation.dimensions.GameLocalDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.LocalBaseDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.PhoneGameDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.TabletGameDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.gameDimens
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.arrow_latest_text
 import com.rdisoftware.chronobeat.shared.resources.arrow_oldest_text
@@ -88,42 +98,49 @@ fun GameScreen(
     onGameFinishedClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val dimensions = if (screenWidth >= 600.dp) TabletGameDimensions else PhoneGameDimensions
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
+    CompositionLocalProvider(
+        GameLocalDimensions provides dimensions,
+        LocalBaseDimensions provides dimensions.base
     ) {
-        GradientBackground()
-
-        TimeLineArrow()
-
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(vertical = 16.dp, horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+                .fillMaxSize()
         ) {
-            GameHeader(
-                state.currentTeam,
-                state.currentCardCount
-            )
+            GradientBackground()
 
-            Button(
-                onClick = {
-                    onGameFinishedClicked() //TODO: Temporary button to be able to test navigation
-                }
+            TimeLineArrow()
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
-                Text("Summary")
-            }
+                GameHeader(
+                    state.currentTeam,
+                    state.currentCardCount
+                )
 
-            GameSurface(
-                timeline = state.timeline,
-                currentTrack = state.currentTrack,
-                teamColor = state.currentTeam?.color,
-                onGuessPressed = { position -> viewModel.onGuessPressed(position) }
-            )
+                Button(
+                    onClick = {
+                        onGameFinishedClicked() //TODO: Temporary button to be able to test navigation
+                    }
+                ) {
+                    Text("Summary")
+                }
+
+                GameSurface(
+                    timeline = state.timeline,
+                    currentTrack = state.currentTrack,
+                    teamColor = state.currentTeam?.color,
+                    onGuessPressed = { position -> viewModel.onGuessPressed(position) }
+                )
+            }
         }
     }
 }
@@ -135,7 +152,9 @@ fun GameHeader(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .wrapContentWidth()
+            .widthIn(max = gameDimens.base.maxContentWidth),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -175,7 +194,7 @@ fun TeamInformation(
             )
             .padding(start = 16.dp)
             .testTag(GAME_HEADER)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -183,8 +202,9 @@ fun TeamInformation(
     ) {
         GameText(
             text = currentTeam?.name ?: "",
-            fontSize = 32.sp,
+            fontSize = gameDimens.currentTeamNameFontSize,
             fontFamily = robotoMonoBold,
+            lineHeight = 40.sp,
             color = Color.White,
             testTag = TEAM_NAME_TEXT
         )
@@ -199,7 +219,7 @@ fun NumberCard(
 ) {
     Box(
         modifier = Modifier
-            .width(52.dp)
+            .width(gameDimens.cardCountBoxSize)
             .fillMaxHeight(1f)
             .clip(RoundedCornerShape(30))
             .background(Color.Transparent)
@@ -208,8 +228,9 @@ fun NumberCard(
     ) {
         GameText(
             text = cardCount,
-            fontSize = 24.sp,
+            fontSize = gameDimens.cardCountNumberFontSize,
             fontFamily = robotoMonoRegular,
+            lineHeight = 40.sp,
             color = Color.White,
             testTag = CARD_COUNT_TEXT
         )
@@ -235,7 +256,7 @@ fun AnimatedSoundWaves(
         modifier = modifier
             .height(30.dp)
             .testTag(MUSIC_PLAYER_ICON)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         horizontalArrangement = Arrangement.spacedBy(3.dp),
@@ -314,11 +335,11 @@ fun GuessButton(
 ) {
     Box(
         modifier = Modifier
-            .size(64.dp)
+            .size(gameDimens.guessButtonOuterCircle)
             .clip(CircleShape)
             .clickable(enabled = isEnabled, onClick = onClick)
             .testTag(GUESS_BUTTON)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
                 role = Role.Button
             },
@@ -335,7 +356,7 @@ fun GuessButton(
 
         Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(gameDimens.guessButtonInnerCircle)
                 .background(
                     shape = CircleShape,
                     color = AppColors.GameGray
@@ -351,7 +372,8 @@ fun GameCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(gameDimens.cardMaxWidthFraction)
+            .aspectRatio(1.4f)
             .padding(horizontal = 46.dp, vertical = 32.dp)
             .border(
                 width = 3.dp,
@@ -359,7 +381,7 @@ fun GameCard(
                 shape = RoundedCornerShape(12)
             )
             .testTag(GAME_CARD)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         backgroundColor = AppColors.GameGray,
@@ -375,14 +397,15 @@ fun GameCardContent(
 ) {
     Column(
         modifier = Modifier
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GameText(
             text = track.mainArtist,
-            fontSize = 28.sp,
+            fontSize = gameDimens.mainArtistFontSize,
             fontFamily = robotoMonoMedium,
+            lineHeight = 40.sp,
             color = Color.Black,
             testTag = GAME_CARD_ARTIST
         )
@@ -390,8 +413,9 @@ fun GameCardContent(
         if (track.featArtists.isNotEmpty()) {
             GameText(
                 text = track.featArtists.joinToString(", "),
-                fontSize = 12.sp,
+                fontSize = gameDimens.featArtistFontSize,
                 fontFamily = robotoMonoLightItalic,
+                lineHeight = 40.sp,
                 color = Color.Black,
                 testTag = GAME_CARD_CONTRIBUTOR
             )
@@ -399,16 +423,18 @@ fun GameCardContent(
 
         GameText(
             text = track.releaseYear.toString(),
-            fontSize = 64.sp,
+            fontSize = gameDimens.releaseYearFontSize,
             fontFamily = robotoMonoBold,
+            lineHeight = 40.sp,
             color = Color.Black,
             testTag = GAME_CARD_YEAR
         )
 
         GameText(
             text = track.title,
-            fontSize = 20.sp,
+            fontSize = gameDimens.trackTitleFontSize,
             fontFamily = robotoMonoLightItalic,
+            lineHeight = 40.sp,
             color = Color.Black,
             testTag = GAME_CARD_TITLE
         )
@@ -420,6 +446,7 @@ fun GameText(
     text: String,
     fontSize: TextUnit,
     fontFamily: FontFamily,
+    lineHeight: TextUnit,
     color: Color,
     testTag: String
 ) {
@@ -428,10 +455,11 @@ fun GameText(
         fontSize = fontSize,
         fontFamily = fontFamily,
         color = color,
+        lineHeight = lineHeight ,
         textAlign = TextAlign.Center,
         modifier = Modifier
             .testTag(testTag)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             }
     )
@@ -442,7 +470,7 @@ fun BoxScope.TimeLineArrow() {
     Box(
         modifier = Modifier
             .fillMaxHeight(0.8f)
-            .width(80.dp)
+            .width(gameDimens.arrowWidthPosition)
             .align(Alignment.CenterStart),
         contentAlignment = Alignment.Center
     ) {
@@ -451,7 +479,7 @@ fun BoxScope.TimeLineArrow() {
         ArrowText(
             text = Res.string.arrow_oldest_text,
             alignment = Alignment.TopCenter,
-            offset = 32.dp,
+            offset = gameDimens.arrowTextOffset,
             testTag = ARROW_OLDEST_TEXT
         )
 
@@ -472,7 +500,7 @@ fun DownwardArrow() {
             .fillMaxSize()
             .padding(end = 34.dp)
             .testTag(TIME_LINE_ARROW)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             }
     ) {
@@ -519,7 +547,7 @@ fun BoxScope.ArrowText(
             .rotate(90f)
             .padding(top = 16.dp)
             .testTag(testTag)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         color = Color.White.copy(alpha = 0.7f)
