@@ -11,6 +11,7 @@ import Shared
 struct GameSummaryScreen: View {
     @StateObject private var strings = StringProvider.shared
     let R = Res.string.shared
+    private let mockedWinnerTeam = "Team 1"
 
     var onHomeClicked: () -> Void
     var onPlayAgainClicked: () -> Void
@@ -64,7 +65,7 @@ struct GameSummaryScreen: View {
 
                 // Winner text
                 VStack(spacing: 6) {
-                    Text(strings.get(R.team_name))
+                    Text(mockedWinnerTeam)
                         .font(.kdam(size: 30))
                         .foregroundColor(.white)
 
