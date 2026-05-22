@@ -1,6 +1,7 @@
 package com.rdisoftware.chronobeat.data.repositories
 
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -46,7 +47,8 @@ class TeamRepositoryTest {
         val originalTeam = repository.createTeam("Old Name", TeamColor.PLUM)
         val newName = "New Awesome Name"
 
-        val updatedTeam = repository.editTeamName(originalTeam.id, newName)
+        val teamToUpdate = originalTeam.copy(name = newName)
+        val updatedTeam = repository.editTeamName(teamToUpdate)
         val fetchedTeam = repository.getTeams().first { it.id == originalTeam.id }
 
         assertEquals(newName, updatedTeam.name)
@@ -58,10 +60,20 @@ class TeamRepositoryTest {
     fun `editTeamName should throw IllegalArgumentException for non-existent id`() = runTest {
         val fakeId = Uuid.random()
 
+        val fakeTeam = Team(
+            id = fakeId,
+            name = "Hacker Team",
+            color = TeamColor.PLUM
+        )
+
         val exception = assertFailsWith<IllegalArgumentException> {
-            repository.editTeamName(fakeId, "Hacker Team")
+            repository.editTeamName(fakeTeam)
         }
-        assertTrue(exception.message!!.contains("not found"))
+
+        assertTrue(
+            actual = exception.message!!.contains("not found"),
+            message = "The exception message should indicate that the team was not found"
+        )
     }
 
     @Test
