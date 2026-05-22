@@ -29,13 +29,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -88,16 +93,23 @@ import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.random.Random
 
 @Composable
 fun GameScreen(
-    viewModel: GameViewModel,
+    viewModel: GameViewModel = koinViewModel(),
     onGameFinishedClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    var isPlaying by remember { mutableStateOf(false) }
+
+    var hasStarted by remember { mutableStateOf(false) }
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val dimensions = if (screenWidth >= 600.dp) TabletGameDimensions else PhoneGameDimensions
 
@@ -134,13 +146,41 @@ fun GameScreen(
                     Text("Summary")
                 }
 
-                GameSurface(
-                    timeline = state.timeline,
-                    currentTrack = state.currentTrack,
-                    teamColor = state.currentTeam?.color,
-                    onGuessPressed = { position -> viewModel.onGuessPressed(position) }
+            Button(
+                onClick = {
+                    coroutineScope.launch {
+                        if (isPlaying) {
+                            //viewModel.pauseMusic()
+                        } else {
+                            if (!hasStarted) {
+                                viewModel.playMusic("3mAHFGVINgpLtl4HWhsTxG")
+                                //hasStarted = true
+                            } else {
+                                //viewModel.resumeMusic()
+                            }
+                        }
+                        isPlaying = !isPlaying
+                    }
+                },
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(220.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = if (isPlaying) "⏸ Szünet" else "▶ Zene Elindítása",
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
+
+            GameSurface(
+                timeline = state.timeline,
+                currentTrack = state.currentTrack,
+                teamColor = state.currentTeam?.color,
+                onGuessPressed = { position -> viewModel.onGuessPressed(position) }
+            )}
         }
     }
 }
@@ -350,7 +390,7 @@ fun GuessButton(
                 .matchParentSize()
                 .background(
                     shape = CircleShape,
-                    color = AppColors.GameGray.copy(alpha = 0.6f)
+                    color = Color(AppColors.GAME_GRAY).copy(alpha = 0.6f)
                 )
         )
 
@@ -359,7 +399,7 @@ fun GuessButton(
                 .size(gameDimens.guessButtonInnerCircle)
                 .background(
                     shape = CircleShape,
-                    color = AppColors.GameGray
+                    color = Color(AppColors.GAME_GRAY)
                 )
         )
     }
@@ -384,7 +424,7 @@ fun GameCard(
             .semantics {
                 testTagsAsResourceId = true
             },
-        backgroundColor = AppColors.GameGray,
+        backgroundColor = Color(AppColors.GAME_GRAY),
         shape = RoundedCornerShape(12)
     ) {
         GameCardContent(track = track)

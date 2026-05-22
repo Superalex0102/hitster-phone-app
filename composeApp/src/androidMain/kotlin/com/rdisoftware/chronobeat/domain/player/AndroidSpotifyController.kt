@@ -1,7 +1,6 @@
 package com.rdisoftware.chronobeat.domain.player
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
@@ -11,6 +10,7 @@ import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import com.rdisoftware.chronobeat.data.auth.TokenManager
 import com.rdisoftware.chronobeat.data.auth.AppConfig
+
 class AndroidSpotifyController(
     private val activity: Activity,
     private val tokenManager: TokenManager
@@ -21,6 +21,7 @@ class AndroidSpotifyController(
     private val AUTH_REQUEST_CODE = 1337
 
     private var spotifyAppRemote: SpotifyAppRemote? = null
+    private var pendingAction: (() -> Unit)? = null
 
     override fun authenticate() {
         val builder = AuthorizationRequest.Builder(
@@ -28,7 +29,12 @@ class AndroidSpotifyController(
             AuthorizationResponse.Type.TOKEN,
             redirectUri
         )
-        builder.setScopes(arrayOf("streaming", "user-read-private", "playlist-read-private"))
+        builder.setScopes(arrayOf(
+            "app-remote-control",
+            "streaming",
+            "user-read-private",
+            "playlist-read-private"
+        ))
         val request = builder.build()
 
         AuthorizationClient.openLoginActivity(activity, AUTH_REQUEST_CODE, request)
@@ -41,12 +47,21 @@ class AndroidSpotifyController(
                 AuthorizationResponse.Type.TOKEN -> {
                     Log.d("SpotifySDK", "Successfully authenticated, access token: ${response.accessToken}")
                     tokenManager.accessToken = response.accessToken
+
+                    pendingAction?.let { action ->
+                        Log.d("SpotifySDK", "Resuming pending action after successful auth...")
+                        connectAndExecute(action)
+                        pendingAction = null
+                    }
                 }
                 AuthorizationResponse.Type.ERROR -> {
                     Log.e("SpotifySDK", "Auth error: ${response.error}")
+                    pendingAction = null
+
                 }
                 else -> {
                     Log.w("SpotifySDK", "Authentication cancelled: ${response.type}")
+                    pendingAction = null
                 }
             }
         }
@@ -69,8 +84,17 @@ class AndroidSpotifyController(
                 spotifyAppRemote = appRemote
                 action()
             }
+
             override fun onFailure(throwable: Throwable) {
                 Log.e("SpotifySDK", "Error while connecting: ", throwable)
+
+                if (throwable is com.spotify.android.appremote.api.error.UserNotAuthorizedException ||
+                    throwable is com.spotify.android.appremote.api.error.NotLoggedInException) {
+
+                    Log.d("SpotifySDK", "User not authorized. Saving pending action and triggering auth...")
+                    pendingAction = action
+                    authenticate()
+                }
             }
         })
     }

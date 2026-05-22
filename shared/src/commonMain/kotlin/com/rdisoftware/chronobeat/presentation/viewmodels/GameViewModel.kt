@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
+import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
 
 data class GameState(
     val game: Game? = null, // TODO: Replace with getGameUseCase()
@@ -28,7 +29,7 @@ data class GameState(
 }
 
 @OptIn(ExperimentalUuidApi::class)
-class GameViewModel : ViewModel() {
+class GameViewModel(
     // TODO: Inject usecases here
     // private val getGameUseCase: GetGameUseCase,
     // private val getTracksUseCase: GetTracksUseCase,
@@ -36,6 +37,8 @@ class GameViewModel : ViewModel() {
     // private val getNextTrackUseCase: GetNextTrackUseCase,
     // private val nextTeamUseCase: NextTeamUseCase,
     // private val addTrackToTimelineUseCase: AddTrackToTimelineUseCase
+    private val playMusicUseCase: PlayMusicUseCase
+) : ViewModel() {
 
     private val _state = MutableStateFlow(GameState())
     val state = _state.asStateFlow()
@@ -179,6 +182,16 @@ class GameViewModel : ViewModel() {
             oldState.copy(
                 game = oldState.game?.copy(currentTeam = nextTeam)
             )
+        }
+    }
+
+    fun playMusic(trackId: String) {
+        viewModelScope.launch {
+            try {
+                playMusicUseCase(trackId)
+            } catch (e: Exception) {
+                println("Error while playing: ${e.message}")
+            }
         }
     }
 }

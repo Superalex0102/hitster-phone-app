@@ -78,6 +78,7 @@ import com.rdisoftware.chronobeat.presentation.theme.horizontalGradientBrush
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -85,7 +86,7 @@ import kotlin.uuid.Uuid
 @OptIn(ExperimentalUuidApi::class)
 @Composable
 fun TeamSelectionScreen(
-    viewModel: TeamSelectionViewModel,
+    viewModel: TeamSelectionViewModel = koinViewModel(),
     onTeamsSelectedClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
