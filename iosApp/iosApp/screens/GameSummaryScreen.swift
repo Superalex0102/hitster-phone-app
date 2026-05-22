@@ -23,17 +23,7 @@ struct GameSummaryScreen: View {
 
     var body: some View {
         ZStack {
-            // Fullscreen dark background
-            LinearGradient(
-                colors: [
-                    Color.black,
-                    Color(white: 0.08),
-                    Color.black
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            MainBackground()
 
             VStack(spacing: 0) {
 
@@ -82,45 +72,31 @@ struct GameSummaryScreen: View {
                 Spacer().frame(height: 40)
 
                 // Buttons
-                OutlineButton(title: strings.get(R.home), action: onHomeClicked)
+                GradientButton(
+                    model: GradientButtonModel(
+                        title: strings.get(R.home),
+                        disabled: false,
+                        size: .small,
+                        accessibilityId: AccessibilityIds.GameSummaryScreen.shared.HOME_BUTTON,
+                        action: onHomeClicked
+                    )
+                )
 
                 Spacer().frame(height: 16)
 
-                OutlineButton(title: strings.get(R.play_again), action: onPlayAgainClicked)
+                GradientButton(
+                    model: GradientButtonModel(
+                        title: strings.get(R.play_again),
+                        disabled: false,
+                        size: .small,
+                        accessibilityId: AccessibilityIds.GameSummaryScreen.shared.PLAY_AGAIN_BUTTON,
+                        action: onPlayAgainClicked
+                    )
+                )
 
                 Spacer()
             }
             .padding(.horizontal, 32)
-        }
-    }
-}
-
-struct OutlineButton: View {
-    let title: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.kdam(size: 18))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(
-                    LinearGradient(
-                        colors: [
-                            Color.white.opacity(0.15),
-                            Color.black
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 28)
-                        .stroke(Color.white.opacity(0.8), lineWidth: 1.5)
-                )
-                .cornerRadius(28)
         }
     }
 }
