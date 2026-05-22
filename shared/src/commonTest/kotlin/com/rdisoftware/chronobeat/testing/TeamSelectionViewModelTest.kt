@@ -1,6 +1,12 @@
 package com.rdisoftware.chronobeat.testing
 
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
+import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.UpdateTeamUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,6 +22,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 @OptIn(
     ExperimentalCoroutinesApi::class,
@@ -26,7 +33,37 @@ class TeamSelectionViewModelTest {
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = TeamSelectionViewModel()
+
+        val fakeRepository = object : TeamRepository {
+            val list = mutableListOf<Team>()
+
+            override suspend fun getTeams(): List<Team> = list
+            override suspend fun createTeam(teamName: String, color: TeamColor): Team {
+                val team = Team(Uuid.random(), teamName, color)
+                list.add(team)
+                return team
+            }
+            override suspend fun deleteTeam(teamId: Uuid) {
+                list.removeAll { it.id == teamId }
+            }
+            override suspend fun editTeamName(team: Team): Team {
+                val index = list.indexOfFirst { it.id == team.id }
+                if (index != -1) list[index] = team
+                return team
+            }
+        }
+
+        val getTeamsUseCase = GetTeamsUseCase(fakeRepository)
+        val addTeamUseCase = AddTeamUseCase(fakeRepository)
+        val deleteTeamUseCase = DeleteTeamUseCase(fakeRepository)
+        val updateTeamUseCase = UpdateTeamUseCase(fakeRepository)
+
+        viewModel = TeamSelectionViewModel(
+            addTeamUseCase = addTeamUseCase,
+            deleteTeamUseCase = deleteTeamUseCase,
+            updateTeamUseCase = updateTeamUseCase,
+            getTeamsUseCase = getTeamsUseCase
+        )
     }
 
     @AfterTest
