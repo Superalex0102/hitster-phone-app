@@ -11,7 +11,7 @@ import Shared
 struct GameSummaryScreen: View {
     @StateObject private var strings = StringProvider.shared
     let R = Res.string.shared
-    private let mockedWinnerTeam = "Team 1"
+    let winnerTeam: Team
 
     var onHomeClicked: () -> Void
     var onPlayAgainClicked: () -> Void
@@ -65,7 +65,7 @@ struct GameSummaryScreen: View {
 
                 // Winner text
                 VStack(spacing: 6) {
-                    Text(mockedWinnerTeam)
+                    Text(winnerTeam.name)
                         .font(.kdam(size: 30))
                         .foregroundColor(.white)
 
@@ -128,6 +128,11 @@ extension Font {
 
 #Preview {
     GameSummaryScreen(
+        winnerTeam: Team(
+            id: KotlinUuid.companion.random(),
+            name: "Team 1",
+            color: TeamColor.teal
+        ),
         onHomeClicked: { print("Home tapped") },
         onPlayAgainClicked: { print("Play again tapped") }
     )
