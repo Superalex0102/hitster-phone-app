@@ -146,41 +146,42 @@ fun GameScreen(
                     Text("Summary")
                 }
 
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        if (isPlaying) {
-                            //viewModel.pauseMusic()
-                        } else {
-                            if (!hasStarted) {
-                                viewModel.playMusic("3mAHFGVINgpLtl4HWhsTxG")
-                                //hasStarted = true
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            if (isPlaying) {
+                                //viewModel.pauseMusic()
                             } else {
-                                //viewModel.resumeMusic()
+                                if (!hasStarted) {
+                                    viewModel.playMusic("3mAHFGVINgpLtl4HWhsTxG")
+                                    //hasStarted = true
+                                } else {
+                                    //viewModel.resumeMusic()
+                                }
                             }
+                            isPlaying = !isPlaying
                         }
-                        isPlaying = !isPlaying
-                    }
-                },
-                modifier = Modifier
-                    .height(56.dp)
-                    .width(220.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text(
-                    text = if (isPlaying) "⏸ Szünet" else "▶ Zene Elindítása",
-                    style = MaterialTheme.typography.titleMedium
+                    },
+                    modifier = Modifier
+                        .height(56.dp)
+                        .width(220.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(
+                        text = if (isPlaying) "⏸ Szünet" else "▶ Zene Elindítása",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+                GameSurface(
+                    timeline = state.timeline,
+                    currentTrack = state.currentTrack,
+                    teamColor = state.currentTeam?.color,
+                    onGuessPressed = { position -> viewModel.onGuessPressed(position) }
                 )
             }
-
-            GameSurface(
-                timeline = state.timeline,
-                currentTrack = state.currentTrack,
-                teamColor = state.currentTeam?.color,
-                onGuessPressed = { position -> viewModel.onGuessPressed(position) }
-            )}
         }
     }
 }
@@ -495,7 +496,7 @@ fun GameText(
         fontSize = fontSize,
         fontFamily = fontFamily,
         color = color,
-        lineHeight = lineHeight ,
+        lineHeight = lineHeight,
         textAlign = TextAlign.Center,
         modifier = Modifier
             .testTag(testTag)
