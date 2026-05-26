@@ -111,7 +111,8 @@ fun GameScreen(
 
     var hasStarted by remember { mutableStateOf(false) }
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val dimensions = if (screenWidth >= 600.dp) TabletGameDimensions else PhoneGameDimensions
+    val dimensions = if (screenWidth >= 600.dp) TabletGameDimensions
+    else PhoneGameDimensions
 
     CompositionLocalProvider(
         GameLocalDimensions provides dimensions,
@@ -286,7 +287,6 @@ fun AnimatedSoundWaves(
 ) {
     val barWidth = 3.dp
     val defaultHeight = 4.dp
-
     val minHeight = 6.dp
     val minMaxHeightDp = 20
     val maxMaxHeightDp = 40
@@ -439,7 +439,10 @@ fun GameCardContent(
     Column(
         modifier = Modifier
             .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(
+            space = 4.dp,
+            alignment = Alignment.CenterVertically
+        ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GameText(

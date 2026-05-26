@@ -50,7 +50,8 @@ fun GameSummaryScreen(
     onPlayAgainClicked: () -> Unit
 ) {
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val dimensions = if (screenWidth >= 600.dp) TabletGameSumDimensions else PhoneGameSumDimensions
+    val dimensions = if (screenWidth >= 600.dp) TabletGameSumDimensions
+    else PhoneGameSumDimensions
 
     CompositionLocalProvider(
         GameSummaryLocalDimensions provides dimensions,
@@ -81,11 +82,10 @@ fun GameSummaryScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(max = 320.dp),
-
+                    .widthIn(max = gameSumDimens.columnWidth)
+                    .padding(top = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(gameSumDimens.spaceByPadding)
 
             ) {
                 GradientButton(
@@ -98,9 +98,6 @@ fun GameSummaryScreen(
                         onHomeClicked()
                     } //TODO: Create "Start game" on click action
                 )
-
-
-                Spacer(modifier = Modifier.padding(12.dp))
 
                 GradientButton(
                     text = stringResource(Res.string.play_again),

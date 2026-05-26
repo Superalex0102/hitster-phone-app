@@ -91,16 +91,17 @@ fun TeamSelectionScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val dimensions = if (screenWidth >= 600.dp) TabletTeamSelectionDimensions else PhoneTeamSelectionDimensions
+    val dimensions = if (screenWidth >= 600.dp) TabletTeamSelectionDimensions
+    else PhoneTeamSelectionDimensions
 
     CompositionLocalProvider(
         TeamSelectionLocalDimensions provides dimensions,
         LocalBaseDimensions provides dimensions.base
     ) {
-
         GradientBackground()
 
         LogoText()
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -285,7 +286,6 @@ fun DisplayTeamNames(
                 .padding(start = 16.dp)
                 .weight(1f)
         )
-
         Row {
             IconButton(onClick = onEdit) {
                 Icon(
@@ -410,7 +410,6 @@ fun TeamInputField(
                                 modifier = Modifier.size(teamSelDimens.addIconSize)
                             )
                         }
-
                     }
                 }
             }

@@ -22,7 +22,6 @@ data class GameDimensions(
     val arrowWidthPosition: Dp,
     val cardMaxWidthFraction: Float,
     val arrowTextOffset: Dp
-
 )
 
 val PhoneGameDimensions = GameDimensions(
