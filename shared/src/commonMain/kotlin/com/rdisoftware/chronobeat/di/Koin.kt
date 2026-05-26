@@ -12,6 +12,7 @@ import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.UpdateTeamUseCase
+import com.rdisoftware.chronobeat.presentation.viewmodels.GameSummaryViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
@@ -49,11 +50,13 @@ val sharedModule = module {
         updateTeamUseCase = get(),
         getTeamsUseCase = get()
     ) }
+    factory { GameSummaryViewModel() }
 
     //UseCases
     factory { PlayMusicUseCase(
         musicRepository = get()
     ) }
+
 
     factory { AddTeamUseCase(teamRepository = get()) }
     factory { DeleteTeamUseCase(teamRepository = get()) }
