@@ -8,6 +8,7 @@ import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
+import com.rdisoftware.chronobeat.presentation.viewmodels.GameSummaryViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
@@ -40,6 +41,7 @@ val sharedModule = module {
         playMusicUseCase = get()
     ) }
     factory { TeamSelectionViewModel() }
+    factory { GameSummaryViewModel() }
 
     //UseCases
     factory { PlayMusicUseCase(
