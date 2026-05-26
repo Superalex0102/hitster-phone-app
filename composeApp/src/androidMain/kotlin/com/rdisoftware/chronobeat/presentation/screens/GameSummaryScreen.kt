@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +34,6 @@ import com.rdisoftware.chronobeat.shared.resources.content_disc_trophy_logo
 import com.rdisoftware.chronobeat.shared.resources.game_summary_title
 import com.rdisoftware.chronobeat.shared.resources.home
 import com.rdisoftware.chronobeat.shared.resources.play_again
-import com.rdisoftware.chronobeat.shared.resources.team_name
 import com.rdisoftware.chronobeat.shared.resources.trophy
 import com.rdisoftware.chronobeat.shared.resources.won_the_game
 import com.rdisoftware.chronobeat.presentation.enums.ButtonSize
@@ -41,14 +42,18 @@ import com.rdisoftware.chronobeat.presentation.screens.components.GradientButton
 import com.rdisoftware.chronobeat.presentation.screens.components.LogoText
 import com.rdisoftware.chronobeat.presentation.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
+import com.rdisoftware.chronobeat.presentation.viewmodels.GameSummaryViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun GameSummaryScreen(
+    viewModel: GameSummaryViewModel = koinViewModel(),
     onHomeClicked: () -> Unit,
     onPlayAgainClicked: () -> Unit
 ) {
+    val state by viewModel.state.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val dimensions = if (screenWidth >= 600.dp) TabletGameSumDimensions
     else PhoneGameSumDimensions
@@ -76,9 +81,9 @@ fun GameSummaryScreen(
 
             TrophyImage()
 
-            DisplayWinner(
-                winnerTeam = stringResource(Res.string.team_name)
-            )
+        DisplayWinner(
+            winnerTeam = state.gameWinner?.name ?: ""
+        )
 
             Column(
                 modifier = Modifier
@@ -96,7 +101,7 @@ fun GameSummaryScreen(
                     resourceId = true,
                     onClick = {
                         onHomeClicked()
-                    } //TODO: Create "Start game" on click action
+                    }
                 )
 
                 GradientButton(
@@ -107,7 +112,7 @@ fun GameSummaryScreen(
                     resourceId = true,
                     onClick = {
                         onPlayAgainClicked()
-                    } //TODO: Create "Start game" on click action
+                    }
                 )
             }
         }
