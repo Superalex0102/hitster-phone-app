@@ -37,13 +37,13 @@ class GameSummaryViewModel(
     private fun getWinnerTeam() {
         viewModelScope.launch {
             //TODO: getWinnerTeamUseCase which provides a team the gameWinner UiState can be updated with.
-            updateWinnerTeam(data = testTeam)
+            updateWinnerTeam(team = testTeam)
         }
     }
 
-    private fun updateWinnerTeam(data: Team?) {
+    private fun updateWinnerTeam(team: Team?) {
         _state.update {
-            it.copy(gameWinner = data)
+            it.copy(gameWinner = team)
         }
     }
 }
