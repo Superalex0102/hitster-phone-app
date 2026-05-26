@@ -51,15 +51,13 @@ class GameViewModel(
     val state = _state.asStateFlow()
 
     private val allTeams = listOf(
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000001"), "Feri", TeamColor.entries.getOrElse(0) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000002"), "Balázs", TeamColor.entries.getOrElse(1) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000003"), "Seng", TeamColor.entries.getOrElse(2) { TeamColor.entries.first() }),
-        //Team(Uuid.parse("00000000-0000-0000-0000-000000000004"), "Team 4", TeamColor.entries.getOrElse(3) { TeamColor.entries.first() })
+        Team(Uuid.parse("00000000-0000-0000-0000-000000000001"), "Team 1", TeamColor.entries.getOrElse(0) { TeamColor.entries.first() }),
+        Team(Uuid.parse("00000000-0000-0000-0000-000000000002"), "Team 2", TeamColor.entries.getOrElse(1) { TeamColor.entries.first() }),
+        Team(Uuid.parse("00000000-0000-0000-0000-000000000003"), "Team 3", TeamColor.entries.getOrElse(2) { TeamColor.entries.first() }),
+        Team(Uuid.parse("00000000-0000-0000-0000-000000000004"), "Team 4", TeamColor.entries.getOrElse(3) { TeamColor.entries.first() })
     )
 
-    // Itt tároljuk a letöltetlen ID-kat (a húzópakli)
     private var trackIdPool: MutableList<String> = mutableListOf()
-    // Itt tároljuk a már sikeresen letöltött, teljes Track objektumokat (a gyorsítótár)
     private var cachedTracks: MutableList<Track> = mutableListOf()
 
     init {
@@ -75,7 +73,7 @@ class GameViewModel(
                             )
                         }
                     } catch (e: Exception) {
-                        println("GameViewModel: Hiba a játék leképezésekor: ${e.message}")
+                        println("GameViewModel: Error while making game: ${e.message}")
                     }
                 }
             }
@@ -83,9 +81,6 @@ class GameViewModel(
 
         loadRealMusicAndInitGame()
     }
-
-    // --- ÚJ FUNKCIÓ: On-Demand zene letöltés ---
-    // Mindig csak 1 db zenét tölt le a pakliból. Ha rossz az ID vagy nem játszható, húz egy újat.
     private suspend fun getNextPlayableTrack(): Track? {
         while (trackIdPool.isNotEmpty()) {
             val nextId = trackIdPool.removeAt(0)
@@ -93,13 +88,12 @@ class GameViewModel(
                 val track = musicRepository.getTrackInfo(nextId)
                 if (track.isPlayable) {
                     cachedTracks.add(track)
-                    _state.update { it.copy(tracks = cachedTracks.toList()) } // Frissítjük a UI state-et is
-                    println("GameViewModel: ${track.mainArtist} - ${track.title} sikeresen letöltve!")
+                    _state.update { it.copy(tracks = cachedTracks.toList()) }
+                    println("GameViewModel: ${track.mainArtist} - ${track.title} downloaded!")
                     return track
                 }
             } catch (e: Exception) {
-                // Itt e.cause?.message-t is logolunk, hogy lássuk a valódi hibát (pl. 401 Unauthorized)
-                println("GameViewModel: HIBA a $nextId zene letöltésekor: ${e.cause?.message ?: e.message}")
+                println("GameViewModel: Error when downloading $nextId  music: ${e.cause?.message ?: e.message}")
             }
         }
         return null
@@ -108,27 +102,27 @@ class GameViewModel(
     private fun loadRealMusicAndInitGame() {
         viewModelScope.launch {
             try {
-                println("GameViewModel: ChronoBeat playlistek lekérése...")
+                println("GameViewModel: Getting ChronoBeat playlists...")
                 val chronobeatPlaylists = musicRepository.getChronobeatPlaylists()
                 if (chronobeatPlaylists.isEmpty()) {
-                    println("GameViewModel: Hiba - Nincs elérhető ChronoBeat playlist!")
+                    println("GameViewModel: Error - There is no available ChronoBeat playlist! Cannot start the game.")
                     return@launch
                 }
 
                 val selectedPlaylist = chronobeatPlaylists[0]
-                // Beállítjuk a húzópaklit az összekevert ID-kkal
                 trackIdPool = selectedPlaylist.trackIds.shuffled().toMutableList()
 
                 val existingGame = activeGameRepository.getGame()
                 if (existingGame != null && existingGame.playlistId == selectedPlaylist.id) {
-                    println("GameViewModel: Meglévő játék betöltése...")
-                    // Ha van meglévő játék, le kell töltenünk az abban szereplő ID-k részleteit is
+                    println("GameViewModel: Load current game...")
                     val neededIds = existingGame.collectedCardIdsByTeamId.values.flatten() + existingGame.currentTrackId
                     neededIds.forEach { id ->
                         try {
                             val track = musicRepository.getTrackInfo(id)
                             cachedTracks.add(track)
-                        } catch (e: Exception) { /* Ezt most csendben lenyeljük, a meglévő játékoknál ritka a hiba */ }
+                        } catch (e: Exception) {
+                            println("GameViewModel: Error: ${e.message}")
+                        }
                     }
                     _state.update { it.copy(tracks = cachedTracks.toList()) }
 
@@ -140,7 +134,7 @@ class GameViewModel(
                         )
                     }
                 } else {
-                    println("GameViewModel: Új játék indítása. Kezdőkártyák letöltése egyesével...")
+                    println("GameViewModel: Starting new game. Downloading started cards...")
 
                     val updatedMap = mutableMapOf<Uuid, List<String>>()
 
@@ -153,7 +147,7 @@ class GameViewModel(
 
                     val firstCurrentTrack = getNextPlayableTrack()
                     if (firstCurrentTrack == null) {
-                        println("GameViewModel: Hiba - Nincs elég játszható zene a playlistben!")
+                        println("GameViewModel: Error: Not enough music in playlist!")
                         return@launch
                     }
 
@@ -171,7 +165,7 @@ class GameViewModel(
                 }
 
             } catch (e: Exception) {
-                println("GameViewModel: Hiba az inicializáláskor: ${e.message}")
+                println("GameViewModel: Error while initialize: ${e.message}")
             }
         }
     }
@@ -252,7 +246,6 @@ class GameViewModel(
 
         var nextTeamId = currentDto.currentTeamId
         if (winnerId == null) {
-            // CSAK ITT töltünk le 1 db új zenét, ha szükség van rá
             val nextTrack = getNextPlayableTrack()
             nextTrackId = nextTrack?.id ?: currentDto.currentTrackId
 
