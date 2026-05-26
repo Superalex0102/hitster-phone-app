@@ -7,6 +7,6 @@ class UpdateTeamUseCase (
     private val teamRepository: TeamRepository
 ) {
     suspend operator fun invoke(team: Team) {
-        teamRepository.editTeamName(team)
+        teamRepository.updateTeamName(team)
     }
 }

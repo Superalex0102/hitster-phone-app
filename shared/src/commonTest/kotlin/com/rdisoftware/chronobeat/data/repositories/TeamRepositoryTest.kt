@@ -43,12 +43,12 @@ class TeamRepositoryTest {
     }
 
     @Test
-    fun `editTeamName should update the name of an existing team`() = runTest {
+    fun `updateTeamName should update the name of an existing team`() = runTest {
         val originalTeam = repository.createTeam("Old Name", TeamColor.PLUM)
         val newName = "New Awesome Name"
 
         val teamToUpdate = originalTeam.copy(name = newName)
-        val updatedTeam = repository.editTeamName(teamToUpdate)
+        val updatedTeam = repository.updateTeamName(teamToUpdate)
         val fetchedTeam = repository.getTeams().first { it.id == originalTeam.id }
 
         assertEquals(newName, updatedTeam.name)
@@ -57,7 +57,7 @@ class TeamRepositoryTest {
     }
 
     @Test
-    fun `editTeamName should throw IllegalArgumentException for non-existent id`() = runTest {
+    fun `updateTeamName should throw IllegalArgumentException for non-existent id`() = runTest {
         val fakeId = Uuid.random()
 
         val fakeTeam = Team(
@@ -67,7 +67,7 @@ class TeamRepositoryTest {
         )
 
         val exception = assertFailsWith<IllegalArgumentException> {
-            repository.editTeamName(fakeTeam)
+            repository.updateTeamName(fakeTeam)
         }
 
         assertTrue(

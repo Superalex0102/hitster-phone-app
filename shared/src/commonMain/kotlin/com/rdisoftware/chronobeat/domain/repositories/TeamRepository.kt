@@ -9,6 +9,6 @@ import kotlin.uuid.Uuid
 interface TeamRepository {
     suspend fun getTeams(): List<Team>
     suspend fun createTeam(teamName: String, color: TeamColor): Team
-    suspend fun editTeamName(team: Team): Team
+    suspend fun updateTeamName(team: Team): Team
     suspend fun deleteTeam(teamId: Uuid)
 }

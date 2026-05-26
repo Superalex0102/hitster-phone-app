@@ -32,7 +32,7 @@ class TeamRepositoryImpl : TeamRepository {
         }
     }
 
-    override suspend fun editTeamName(
+    override suspend fun updateTeamName(
         team: Team
     ): Team {
         return mutex.withLock {
