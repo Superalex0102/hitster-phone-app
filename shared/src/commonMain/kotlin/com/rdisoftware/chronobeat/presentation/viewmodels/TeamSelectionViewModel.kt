@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.UpdateTeamUseCase
 import com.rdisoftware.chronobeat.presentation.constants.TeamSelectionConstants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,15 +32,18 @@ data class TeamSelectionState(
 
 @OptIn(ExperimentalUuidApi::class)
 class TeamSelectionViewModel(
-    // TODO: Inject usecases here
-    // private val addTeamUseCase: AddTeamUseCase,
-    // private val deleteTeamUseCase: DeleteTeamUseCase,
-    // private val updateTeamUseCase: UpdateTeamUseCase,
-    // private val getTeamsUseCase: GetTeamsUseCase
+    private val addTeamUseCase: AddTeamUseCase,
+    private val deleteTeamUseCase: DeleteTeamUseCase,
+    private val updateTeamUseCase: UpdateTeamUseCase,
+    private val getTeamsUseCase: GetTeamsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TeamSelectionState())
     val state = _state.asStateFlow()
+
+    init {
+        loadTeams()
+    }
 
     fun onNameChanged(newName: String) {
         if (newName.length <= TeamSelectionConstants.MAX_NAME_LENGTH) {
@@ -50,53 +57,29 @@ class TeamSelectionViewModel(
 
     fun addTeam() {
         viewModelScope.launch {
-            // TODO: Replace with addTeamUseCase(team)
             val currentState = _state.value
             if (currentState.canAddTeam) {
-                val newTeam = Team(
-                    id = Uuid.random(),
-                    name = currentState.inputName.trim(),
-                    color = currentState.selectedColor
-                )
-                _state.update { oldState ->
-                    val updatedTeams = oldState.teams + newTeam
-                    oldState.copy(
-                        teams = updatedTeams,
-                        inputName = "",
-                        selectedColor = TeamColor.entries.firstOrNull { color ->
-                            updatedTeams.none { it.color == color }
-                        } ?: TeamColor.entries.first()
-                    )
-                }
+                val name = currentState.inputName.trim()
+                val color = currentState.selectedColor
+
+                addTeamUseCase(name, color)
+                _state.update { it.copy(inputName = "") }
+                loadTeams()
             }
         }
     }
 
     fun deleteTeam(teamId: Uuid) {
         viewModelScope.launch {
-            // TODO: Replace with deleteTeamUseCase(teamId)
-            _state.update { oldState ->
-                val updatedTeams = oldState.teams.filterNot { it.id == teamId }
-                oldState.copy(
-                    teams = updatedTeams,
-                    selectedColor = TeamColor.entries.firstOrNull { color ->
-                        updatedTeams.none { it.color == color }
-                    } ?: TeamColor.entries.first()
-                )
-            }
+            deleteTeamUseCase(teamId)
+            loadTeams()
         }
     }
 
     fun updateTeam(updatedTeam: Team) {
         viewModelScope.launch {
-            // TODO: Replace with updateTeamUseCase(updatedTeam)
-            _state.update { oldState ->
-                oldState.copy(
-                    teams = oldState.teams.map {
-                        if (it.id == updatedTeam.id) updatedTeam else it
-                    }
-                )
-            }
+            updateTeamUseCase(updatedTeam)
+            loadTeams()
         }
     }
 
@@ -112,5 +95,19 @@ class TeamSelectionViewModel(
         val editing = currentState.editingTeam ?: return
         updateTeam(editing.copy(name = currentState.inputName.trim()))
         _state.update { it.copy(editingTeam = null, inputName = "") }
+    }
+
+    private fun loadTeams() {
+        viewModelScope.launch {
+            val updatedTeams = getTeamsUseCase()
+            _state.update { oldState ->
+                oldState.copy(
+                    teams = updatedTeams,
+                    selectedColor = TeamColor.entries.firstOrNull { color ->
+                        updatedTeams.none { it.color == color }
+                    } ?: TeamColor.entries.first()
+                )
+            }
+        }
     }
 }
