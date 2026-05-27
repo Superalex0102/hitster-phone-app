@@ -3,7 +3,6 @@ package com.rdisoftware.chronobeat.presentation.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -43,7 +42,6 @@ import com.rdisoftware.chronobeat.presentation.screens.components.LogoText
 import com.rdisoftware.chronobeat.presentation.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameSummaryViewModel
-import com.rdisoftware.chronobeat.theme.AppColors
 import com.rdisoftware.chronobeat.theme.AppColors
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
