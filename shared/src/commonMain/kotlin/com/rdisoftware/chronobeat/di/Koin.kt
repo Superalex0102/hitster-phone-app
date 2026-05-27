@@ -8,6 +8,9 @@ import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.RestartGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SaveGameProgressUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
@@ -16,6 +19,7 @@ import com.rdisoftware.chronobeat.presentation.viewmodels.GameSummaryViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
+import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -38,11 +42,15 @@ val sharedModule = module {
     single { ChronoBeatApi(
         httpClient = get()
     ) }
+    single { Settings() }
 
     //ViewModels
     factory { HomeViewModel() }
     factory { GameViewModel(
-        playMusicUseCase = get()
+        playMusicUseCase = get(),
+        getSavedGameUseCase = get(),
+        saveGameProgressUseCase = get(),
+        resetGameUseCase = get()
     ) }
     factory { TeamSelectionViewModel(
         addTeamUseCase = get(),
@@ -56,6 +64,16 @@ val sharedModule = module {
     factory { PlayMusicUseCase(
         musicRepository = get()
     ) }
+    factory { GetSavedGameUseCase(
+        activeGameRepository = get()
+    ) }
+    factory { SaveGameProgressUseCase(
+        activeGameRepository = get()
+    ) }
+    factory { RestartGameUseCase(
+        activeGameRepository = get(),
+        teamRepository = get()
+    ) }
 
 
     factory { AddTeamUseCase(teamRepository = get()) }
@@ -64,8 +82,8 @@ val sharedModule = module {
     factory { GetTeamsUseCase(teamRepository = get()) }
 
     //Repositories
-    single<TeamRepository> { TeamRepositoryImpl() }
-    single<ActiveGameRepository> { ActiveGameRepositoryImpl() }
+    single<TeamRepository> { TeamRepositoryImpl(settings = get()) }
+    single<ActiveGameRepository> { ActiveGameRepositoryImpl(settings = get()) }
     single<MusicRepository> {
         MusicRepositoryImpl(
             chronoBeatApi = get(),

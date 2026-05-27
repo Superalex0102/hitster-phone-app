@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.RestartGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SaveGameProgressUseCase
 
 data class GameState(
     val game: Game? = null, // TODO: Replace with getGameUseCase()
@@ -37,7 +40,10 @@ class GameViewModel(
     // private val getNextTrackUseCase: GetNextTrackUseCase,
     // private val nextTeamUseCase: NextTeamUseCase,
     // private val addTrackToTimelineUseCase: AddTrackToTimelineUseCase
-    private val playMusicUseCase: PlayMusicUseCase
+    private val playMusicUseCase: PlayMusicUseCase,
+    private val getSavedGameUseCase: GetSavedGameUseCase,
+    private val saveGameProgressUseCase: SaveGameProgressUseCase,
+    private val resetGameUseCase: RestartGameUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GameState())
@@ -62,10 +68,30 @@ class GameViewModel(
             // TODO: Replace with:
             // val game = getGameUseCase()
             // val tracks = getTracksUseCase(game.playlistId)
-            _state.update { it.copy(
-                game = MockGameData.game,
-                tracks = MockMusicData.songs
-            )}
+            val loadSavedGame = getSavedGameUseCase()
+
+            if (loadSavedGame != null) {
+                _state.update {
+                    it.copy(
+                        game = loadSavedGame,
+                        tracks = MockMusicData.songs,
+                    )}
+                val nextTrack = drawNextTrack(_state.value)
+                _state.update { it.copy(currentTrack = nextTrack) }
+            } else {
+                startNewGame()
+            }
+        }
+    }
+    fun startNewGame() {
+        viewModelScope.launch {
+            resetGameUseCase()
+            _state.update {
+                it.copy(
+                    game = MockGameData.game,
+                    tracks = MockMusicData.songs
+                )
+            }
             initGame()
         }
     }
@@ -148,6 +174,12 @@ class GameViewModel(
         // TODO: Replace with nextTeamUseCase()
         nextTeam()
         println("GameViewModel: Next team: ${_state.value.game?.currentTeam?.name} | Next track: ${_state.value.currentTrack?.mainArtist} - ${_state.value.currentTrack?.title} (${_state.value.currentTrack?.releaseYear})")
+
+        viewModelScope.launch {
+        _state.value.game?.let { it -> saveGameProgressUseCase(it)
+        println("Game state is saved with saveGameProgressUseCase")
+        }
+        }
     }
 
     private fun isPositionCorrect(timeline: List<Track>, track: Track, position: Int): Boolean {

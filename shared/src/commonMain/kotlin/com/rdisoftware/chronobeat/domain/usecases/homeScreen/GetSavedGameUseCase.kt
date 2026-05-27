@@ -1,0 +1,10 @@
+package com.rdisoftware.chronobeat.domain.usecases.homeScreen
+
+import com.rdisoftware.chronobeat.domain.models.Game
+import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
+
+class GetSavedGameUseCase(
+    private val activeGameRepository: ActiveGameRepository
+) {
+    suspend operator fun invoke(): Game? = activeGameRepository.getSavedGame()
+}

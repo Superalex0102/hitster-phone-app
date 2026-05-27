@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ActiveGameRepository {
     suspend fun getGame(): Game?
+    suspend fun getSavedGame(): Game?
     suspend fun saveGame(game: Game)
     suspend fun clearGame()
 
