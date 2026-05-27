@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.rdisoftware.chronobeat.R
+import com.rdisoftware.chronobeat.theme.AppColors
 
 val kdamThmorProRegular = FontFamily(
     Font(R.font.kdam_thmor_pro_regular)
@@ -24,16 +25,16 @@ val robotoMonoLightItalic = FontFamily(
 val robotoMonoLight = FontFamily(
     Font(R.font.roboto_mono_light)
 )
-
 val horizontalGradientBrush = Brush.horizontalGradient(
     colors = listOf(
-    Color.Gray,
-    Color.DarkGray,
-    Color.Black
-))
+        Color(AppColors.DARK_GRAY),
+        Color(AppColors.BLACK)
+    )
+)
 val verticalGradientBrush = Brush.verticalGradient(
     colors = listOf(
-        Color.Black,
-        Color.DarkGray,
-        Color.Black
-    ))
+        Color(AppColors.BLACK),
+        Color(AppColors.DARK_GRAY),
+        Color(AppColors.BLACK)
+    )
+)

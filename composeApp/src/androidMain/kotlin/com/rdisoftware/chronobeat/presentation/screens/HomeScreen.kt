@@ -37,6 +37,7 @@ import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.LoginP
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
+import com.rdisoftware.chronobeat.theme.AppColors
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -138,7 +139,7 @@ fun BoxScope.SettingsButton(
         Icon(
             imageVector = Icons.Outlined.Settings,
             contentDescription = stringResource(Res.string.settings),
-            tint = Color.White,
+            tint = Color(AppColors.WHITE),
             modifier = Modifier
                 .size(34.dp)
         )
@@ -150,7 +151,7 @@ fun MainTitle() {
     Text(
         text = stringResource(Res.string.title),
         fontSize = 48.sp,
-        color = Color.White,
+        color = Color(AppColors.WHITE),
         fontFamily = kdamThmorProRegular,
         modifier = Modifier
             .padding(top = 24.dp)
@@ -180,7 +181,7 @@ fun LoginPopup(
                 .clip(RoundedCornerShape(5))
                 .border(
                     width = 2.dp,
-                    color = Color.White,
+                    color = Color(AppColors.WHITE),
                     shape = RoundedCornerShape(5)
                 ),
         ) {
@@ -226,7 +227,7 @@ fun PopupTitle(
         fontSize = 28.sp,
         lineHeight = 40.sp,
         textAlign = TextAlign.Center,
-        color = Color.White,
+        color = Color(AppColors.WHITE),
         fontFamily = kdamThmorProRegular,
         modifier = Modifier
             .testTag(testTag)
@@ -245,7 +246,7 @@ fun ErrorText() {
         Icon(
             imageVector = Icons.Outlined.Error,
             contentDescription = stringResource(Res.string.content_disc_error),
-            tint = Color.Red,
+            tint = Color(AppColors.RED),
             modifier = Modifier
                 .testTag(LoginPopup.ERROR_ICON)
                 .semantics {
@@ -255,7 +256,7 @@ fun ErrorText() {
 
         Text(
             text = stringResource(Res.string.error_message), // TODO: Create dynamic text
-            color = Color.Red,
+            color = Color(AppColors.RED),
             fontFamily = robotoMonoRegular,
             fontSize = 14.sp,
             modifier = Modifier

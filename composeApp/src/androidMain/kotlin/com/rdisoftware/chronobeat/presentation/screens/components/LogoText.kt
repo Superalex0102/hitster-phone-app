@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common.LOGO_TEXT
 import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.shared.resources.*
+import com.rdisoftware.chronobeat.theme.AppColors
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -28,7 +29,7 @@ fun LogoText() {
         Text(
             text = stringResource(Res.string.title),
             fontSize = 24.sp,
-            color = Color.White,
+            color = Color(AppColors.WHITE),
             fontFamily = kdamThmorProRegular,
             modifier = Modifier.testTag(LOGO_TEXT)
                 .semantics{
@@ -39,7 +40,7 @@ fun LogoText() {
         HorizontalDivider(
             modifier = Modifier.fillMaxWidth(0.44f),
             thickness = 2.dp,
-            color = Color.Gray,
+            color = Color(AppColors.WHITE),
             )
 
         Spacer(modifier = Modifier.weight(0.95f))

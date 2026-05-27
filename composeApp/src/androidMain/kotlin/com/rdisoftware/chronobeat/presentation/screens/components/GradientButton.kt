@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.enums.ButtonSize
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
 import com.rdisoftware.chronobeat.presentation.theme.horizontalGradientBrush
+import com.rdisoftware.chronobeat.theme.AppColors
 
 data class ButtonDimensions(
     val widthFraction: Float,
@@ -76,11 +77,11 @@ fun GradientButton(
             onClick()
         },
         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        border = BorderStroke(width = 2.dp, color = Color.White)
+        border = BorderStroke(width = 2.dp, color = Color(AppColors.WHITE))
     ) {
         Text(
             text = text,
-            color = Color.White,
+            color = Color(AppColors.WHITE),
             fontSize = dimensions.fontSize,
             fontWeight = FontWeight.Bold,
             fontFamily = robotoMonoBold
