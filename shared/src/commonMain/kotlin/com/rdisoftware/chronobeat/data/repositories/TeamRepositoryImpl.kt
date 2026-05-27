@@ -32,15 +32,16 @@ class TeamRepositoryImpl : TeamRepository {
         }
     }
 
-    override suspend fun editTeamName(
-        teamId: Uuid,
-        newTeamName: String
+    override suspend fun updateTeamName(
+        team: Team
     ): Team {
         return mutex.withLock {
-            val newTeam = _teams[teamId]?.copy(name = newTeamName)
-                ?: throw IllegalArgumentException("Team with id $teamId not found")
-            _teams[teamId] = newTeam
-            newTeam
+            if (!_teams.containsKey(team.id)) {
+                throw IllegalArgumentException("Team with id ${team.id} not found")
+            }
+
+            _teams[team.id] = team
+            team
         }
     }
 
