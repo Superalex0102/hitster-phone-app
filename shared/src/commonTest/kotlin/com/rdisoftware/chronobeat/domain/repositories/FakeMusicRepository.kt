@@ -4,32 +4,50 @@ import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 
 class FakeMusicRepository : MusicRepository {
-    var lastPlayedTrackId: String? = null
-    var isPausedCalled = false
-    var isResumedCalled = false
 
-    override suspend fun getUserPlaylistsSummary(): List<PlaylistSummary> = emptyList()
+    private val fakeTrackIds = (1..50).map { "fake_track_$it" }
 
-    override suspend fun getUserPlaylistDetails(playlistId: String): Playlist =
-        Playlist("dummy_id", "Dummy Playlist", emptyList())
+    override suspend fun getChronobeatPlaylists(): List<Playlist> {
+        return listOf(
+            Playlist(
+                id = "test_playlist_id",
+                name = "Test ChronoBeat Playlist",
+                trackIds = fakeTrackIds
+            )
+        )
+    }
 
-    override suspend fun getChronobeatPlaylists(): List<Playlist> = emptyList()
+    override suspend fun getTrackInfo(trackId: String): Track {
+        val numberId = trackId.removePrefix("fake_track_").toIntOrNull() ?: 1
 
-    override suspend fun getTrackInfo(trackId: String): Track =
-        Track(
-            "dummy_id", "Dummy Title", "Dummy Artist", emptyList(), 2000,
+        return Track(
+            id = trackId,
+            title = "Test Song $numberId",
+            mainArtist = "Test Artist",
+            featArtists = emptyList(),
+            releaseYear = 2000 + (numberId % 20),
             isPlayable = true
         )
+    }
+
+
+    override suspend fun getUserPlaylistsSummary(): List<PlaylistSummary> {
+        return emptyList()
+    }
+
+    override suspend fun getUserPlaylistDetails(playlistId: String): Playlist {
+        return Playlist(playlistId, "Test Playlist", fakeTrackIds)
+    }
 
     override suspend fun playMusic(trackId: String) {
-        lastPlayedTrackId = trackId
+
     }
 
     override suspend fun resumeMusic() {
-        isResumedCalled = true
+
     }
 
     override suspend fun pauseMusic() {
-        isPausedCalled = true
+
     }
 }
