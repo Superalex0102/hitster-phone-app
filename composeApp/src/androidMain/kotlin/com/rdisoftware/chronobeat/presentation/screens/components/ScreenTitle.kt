@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.dimensions.baseDimens
 import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
+import com.rdisoftware.chronobeat.theme.AppColors
 
 @Composable
 fun ScreenTitle(
@@ -25,7 +26,7 @@ fun ScreenTitle(
         fontSize = baseDimens.titleFontSize,
         lineHeight = 70.sp,
         textAlign = TextAlign.Center,
-        color = Color.White,
+        color = Color(AppColors.WHITE),
         fontFamily = kdamThmorProRegular,
         modifier = Modifier
             .padding(top = 80.dp, bottom = 24.dp)

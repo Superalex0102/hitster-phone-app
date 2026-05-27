@@ -222,14 +222,14 @@ fun TeamInformation(
             .fillMaxHeight(0.07f)
             .border(
                 width = 2.dp,
-                color = Color.White,
+                color = Color(AppColors.WHITE),
                 shape = RoundedCornerShape(30)
             )
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        currentTeam?.color?.color ?: Color(0xFF48A0B7),
-                        Color.Black
+                        currentTeam?.color?.color ?: Color(AppColors.WHITE),
+                        Color(AppColors.BLACK)
                     )
                 ),
                 shape = RoundedCornerShape(30)
@@ -247,7 +247,7 @@ fun TeamInformation(
             fontSize = gameDimens.currentTeamNameFontSize,
             fontFamily = robotoMonoBold,
             lineHeight = 40.sp,
-            color = Color.White,
+            color = Color(AppColors.WHITE),
             testTag = TEAM_NAME_TEXT
         )
 
@@ -265,7 +265,7 @@ fun NumberCard(
             .fillMaxHeight(1f)
             .clip(RoundedCornerShape(30))
             .background(Color.Transparent)
-            .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(30)),
+            .border(2.dp, Color(AppColors.WHITE).copy(alpha = 0.7f), RoundedCornerShape(30)),
         contentAlignment = Alignment.Center
     ) {
         GameText(
@@ -273,7 +273,7 @@ fun NumberCard(
             fontSize = gameDimens.cardCountNumberFontSize,
             fontFamily = robotoMonoRegular,
             lineHeight = 40.sp,
-            color = Color.White,
+            color = Color(AppColors.WHITE),
             testTag = CARD_COUNT_TEXT
         )
     }
@@ -283,7 +283,7 @@ fun NumberCard(
 fun AnimatedSoundWaves(
     isAnimating: Boolean,
     modifier: Modifier = Modifier,
-    barColor: Color = Color.White
+    barColor: Color = Color(AppColors.WHITE)
 ) {
     val barWidth = 3.dp
     val defaultHeight = 4.dp
@@ -418,7 +418,7 @@ fun GameCard(
             .padding(horizontal = 46.dp, vertical = 32.dp)
             .border(
                 width = 3.dp,
-                color = teamColor?.color ?: Color.Blue,
+                color = teamColor?.color ?: Color(AppColors.DEFAULT_BLUE),
                 shape = RoundedCornerShape(12)
             )
             .testTag(GAME_CARD)
@@ -450,7 +450,7 @@ fun GameCardContent(
             fontSize = gameDimens.mainArtistFontSize,
             fontFamily = robotoMonoMedium,
             lineHeight = 40.sp,
-            color = Color.Black,
+            color = Color(AppColors.BLACK),
             testTag = GAME_CARD_ARTIST
         )
 
@@ -460,7 +460,7 @@ fun GameCardContent(
                 fontSize = gameDimens.featArtistFontSize,
                 fontFamily = robotoMonoLightItalic,
                 lineHeight = 40.sp,
-                color = Color.Black,
+                color = Color(AppColors.BLACK),
                 testTag = GAME_CARD_CONTRIBUTOR
             )
         }
@@ -470,7 +470,7 @@ fun GameCardContent(
             fontSize = gameDimens.releaseYearFontSize,
             fontFamily = robotoMonoBold,
             lineHeight = 40.sp,
-            color = Color.Black,
+            color = Color(AppColors.BLACK),
             testTag = GAME_CARD_YEAR
         )
 
@@ -479,7 +479,7 @@ fun GameCardContent(
             fontSize = gameDimens.trackTitleFontSize,
             fontFamily = robotoMonoLightItalic,
             lineHeight = 40.sp,
-            color = Color.Black,
+            color = Color(AppColors.BLACK),
             testTag = GAME_CARD_TITLE
         )
     }
@@ -552,21 +552,21 @@ fun DownwardArrow() {
         val headPx = arrowHeadSize.toPx()
 
         drawLine(
-            color = Color.White.copy(alpha = 0.7f),
+            color = Color(AppColors.WHITE).copy(alpha = 0.7f),
             start = Offset(size.width / 2, size.width / 2),
             end = Offset(size.width / 2, size.height),
             strokeWidth = strokeWidth
         )
 
         drawLine(
-            color = Color.White.copy(alpha = 0.7f),
+            color = Color(AppColors.WHITE).copy(alpha = 0.7f),
             start = Offset(size.width / 2, size.height),
             end = Offset(size.width / 2 - headPx, size.height - headPx),
             strokeWidth = strokeWidth
         )
 
         drawLine(
-            color = Color.White.copy(alpha = 0.7f),
+            color = Color(AppColors.WHITE).copy(alpha = 0.7f),
             start = Offset(size.width / 2, size.height),
             end = Offset(size.width / 2 + headPx, size.height - headPx),
             strokeWidth = strokeWidth
@@ -594,6 +594,6 @@ fun BoxScope.ArrowText(
             .semantics {
                 testTagsAsResourceId = true
             },
-        color = Color.White.copy(alpha = 0.7f)
+        color = Color(AppColors.WHITE).copy(alpha = 0.7f)
     )
 }

@@ -18,6 +18,7 @@ import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common
 import com.rdisoftware.chronobeat.presentation.dimensions.baseDimens
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLight
+import com.rdisoftware.chronobeat.theme.AppColors
 
 @Composable
 fun BottomText(
@@ -26,10 +27,10 @@ fun BottomText(
 ) {
     Text(
         text = buildAnnotatedString {
-            withStyle(style = SpanStyle(color = Color.Gray, fontFamily = robotoMonoLight)) {
+            withStyle(style = SpanStyle(color = Color(AppColors.BOTTOM_GRAY), fontFamily = robotoMonoLight)) {
                 append(text)
             }
-            withStyle(style = SpanStyle(color = Color.LightGray, fontFamily = robotoMonoBold)) {
+            withStyle(style = SpanStyle(color = Color(AppColors.BOTTOM_GRAY), fontFamily = robotoMonoBold)) {
                 append(name)
             }
         },

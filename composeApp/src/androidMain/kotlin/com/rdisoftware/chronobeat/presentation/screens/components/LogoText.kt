@@ -20,6 +20,7 @@ import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common
 import com.rdisoftware.chronobeat.presentation.dimensions.baseDimens
 import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.shared.resources.*
+import com.rdisoftware.chronobeat.theme.AppColors
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -35,7 +36,7 @@ fun LogoText() {
             Text(
                 text = stringResource(Res.string.title),
                 fontSize = baseDimens.logoTextFontSize,
-                color = Color.White,
+                color = Color(AppColors.WHITE),
                 fontFamily = kdamThmorProRegular,
                 modifier = Modifier
                     .testTag(LOGO_TEXT)
@@ -50,7 +51,7 @@ fun LogoText() {
     }
 }
 fun Modifier.underline(
-    color: Color = Color.White,
+    color: Color = Color(AppColors.WHITE),
     thickness: Dp = 2.dp,
     paddingValues: Dp = 4.dp,
 ): Modifier =  this.drawBehind{

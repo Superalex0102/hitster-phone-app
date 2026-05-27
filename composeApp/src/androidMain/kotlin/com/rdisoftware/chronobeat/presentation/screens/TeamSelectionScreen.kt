@@ -77,6 +77,7 @@ import com.rdisoftware.chronobeat.presentation.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.presentation.theme.horizontalGradientBrush
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
+import com.rdisoftware.chronobeat.theme.AppColors
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.uuid.ExperimentalUuidApi
@@ -174,7 +175,7 @@ fun InfoText() {
         Icon(
             imageVector = Icons.Outlined.Info,
             contentDescription = stringResource(Res.string.content_disc_info),
-            tint = Color.White,
+            tint = Color(AppColors.WHITE),
             modifier = Modifier
                 .testTag(TeamSelectionScreen.INFO_ICON)
                 .semantics {
@@ -186,7 +187,7 @@ fun InfoText() {
 
         Text(
             text = stringResource(Res.string.ts_info_text), // TODO: Create dynamic text
-            color = Color.White,
+            color = Color(AppColors.WHITE),
             fontFamily = robotoMonoRegular,
             fontSize = teamSelDimens.infoMessageFontSize,
             modifier = Modifier
@@ -242,7 +243,7 @@ fun TeamRow(
                 .clip(RoundedCornerShape(teamSelDimens.teamRowRoundedCornerShape))
                 .border(
                     width = teamSelDimens.teamRowBorderWidth,
-                    Color.White,
+                    Color(AppColors.WHITE),
                     shape = RoundedCornerShape(teamSelDimens.teamRowRoundedCornerShape)
                 )
                 .background(color = team.color.color.copy(alpha = 1f))
@@ -251,7 +252,7 @@ fun TeamRow(
                     shadow = Shadow(
                         radius = 10.dp,
                         spread = 2.dp,
-                        color = Color.White.copy(0.8f),
+                        color = Color(AppColors.WHITE).copy(0.8f),
                         offset = DpOffset.Zero
                     )
                 ),
@@ -280,7 +281,7 @@ fun DisplayTeamNames(
             text = teamName,
             fontSize = teamSelDimens.teamNameFontSize,
             textAlign = TextAlign.Start,
-            color = Color.White,
+            color = Color(AppColors.WHITE),
             fontFamily = robotoMonoRegular,
             modifier = Modifier
                 .padding(start = 16.dp)
@@ -291,7 +292,7 @@ fun DisplayTeamNames(
                 Icon(
                     Icons.Outlined.Edit,
                     contentDescription = stringResource(Res.string.content_disc_edit),
-                    tint = Color.White,
+                    tint = Color(AppColors.WHITE),
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.EDIT_ICON_BUTTON)
                         .semantics {
@@ -306,7 +307,7 @@ fun DisplayTeamNames(
                 Icon(
                     Icons.Outlined.Delete,
                     contentDescription = stringResource(Res.string.content_disc_delete),
-                    tint = Color.White,
+                    tint = Color(AppColors.WHITE),
                     modifier = Modifier
                         .testTag(TeamSelectionScreen.DELETE_ICON_BUTTON)
                         .semantics {
@@ -336,16 +337,16 @@ fun TeamInputField(
             .background(brush = horizontalGradientBrush)
             .border(
                 width = 3.dp,
-                Color.White.copy(alpha = 1f),
+                Color(AppColors.WHITE).copy(alpha = 1f),
                 RoundedCornerShape(teamSelDimens.roundedCornerShape)
             )
             .testTag(TeamSelectionScreen.TEAM_INPUT_FIELD)
             .semantics {
                 testTagsAsResourceId = true
             },
-        textStyle = TextStyle(color = Color.White, fontSize = teamSelDimens.inputFontSize),
+        textStyle = TextStyle(color = Color(AppColors.WHITE), fontSize = teamSelDimens.inputFontSize),
         singleLine = true,
-        cursorBrush = SolidColor(Color.White),
+        cursorBrush = SolidColor(Color(AppColors.WHITE)),
         decorationBox = { innerTextField ->
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -360,7 +361,7 @@ fun TeamInputField(
                         Text(
                             text = stringResource(Res.string.ts_input_placeholder),
                             fontFamily = robotoMonoRegular,
-                            color = Color.White.copy(alpha = 0.7f),
+                            color = Color(AppColors.WHITE).copy(alpha = 0.7f),
                             fontSize = teamSelDimens.inputFontSize,
                             modifier = Modifier
                                 .testTag(TeamSelectionScreen.TEAM_INPUT_PLACEHOLDER_TEXT)
@@ -383,7 +384,7 @@ fun TeamInputField(
                             .clip(RoundedCornerShape(teamSelDimens.roundedCornerShape))
                             .border(
                                 width = 3.dp,
-                                color = Color.White,
+                                color = Color(AppColors.WHITE),
                                 shape = RoundedCornerShape(teamSelDimens.roundedCornerShape),
                             )
                             .background(
@@ -405,7 +406,7 @@ fun TeamInputField(
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.Check,
-                                tint = Color.White,
+                                tint = Color(AppColors.WHITE),
                                 contentDescription = stringResource(Res.string.content_disc_add_team),
                                 modifier = Modifier.size(teamSelDimens.addIconSize)
                             )
