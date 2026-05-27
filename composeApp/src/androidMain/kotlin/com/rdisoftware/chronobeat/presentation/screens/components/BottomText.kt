@@ -14,8 +14,8 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.Common.BOTTOM_TEXT
+import com.rdisoftware.chronobeat.presentation.dimensions.baseDimens
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLight
 import com.rdisoftware.chronobeat.theme.AppColors
@@ -34,7 +34,7 @@ fun BottomText(
                 append(name)
             }
         },
-        fontSize = 16.sp,
+        fontSize = baseDimens.bottomTextFontSize ,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
