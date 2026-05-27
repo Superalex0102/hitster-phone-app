@@ -34,6 +34,7 @@ import com.rdisoftware.chronobeat.presentation.screens.components.LogoText
 import com.rdisoftware.chronobeat.presentation.screens.components.ScreenTitle
 import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameSummaryViewModel
+import com.rdisoftware.chronobeat.theme.AppColors
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -118,7 +119,7 @@ fun DisplayWinner(winnerTeam: String){
         },
         text = winnerTeam,
         fontSize = 36.sp,
-        color = Color.White,
+        color = Color(AppColors.WHITE),
         fontFamily = kdamThmorProRegular
     )
 
@@ -131,7 +132,7 @@ fun DisplayWinner(winnerTeam: String){
             },
         text = stringResource(Res.string.won_the_game),
         fontSize = 36.sp,
-        color = Color.White,
+        color = Color(AppColors.WHITE),
         fontFamily = kdamThmorProRegular
     )
 }
