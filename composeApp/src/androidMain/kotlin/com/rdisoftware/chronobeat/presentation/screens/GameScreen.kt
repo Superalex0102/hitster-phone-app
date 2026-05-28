@@ -1,4 +1,5 @@
 package com.rdisoftware.chronobeat.presentation.screens
+
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -362,7 +363,7 @@ fun AnimatedSoundWaves(
 }
 @Composable
 fun GameSurface(
-    timeline: List,
+    timeline: List<Track>,
     currentTrack: Track?,
     teamColor: TeamColor?,
     onGuessPressed: (Int) -> Unit,
