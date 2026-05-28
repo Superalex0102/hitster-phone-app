@@ -1,13 +1,13 @@
 package com.rdisoftware.chronobeat.domain.repositories
 
-import com.rdisoftware.chronobeat.domain.models.Game
+import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import kotlinx.coroutines.flow.Flow
 
 interface ActiveGameRepository {
-    suspend fun getGame(): Game?
-    suspend fun getSavedGame(): Game?
-    suspend fun saveGame(game: Game)
+    suspend fun getGame(): GameDto?
+    suspend fun saveGame(game: GameDto)
     suspend fun clearGame()
+    suspend fun getSavedGame(): Game?
 
-    fun observeGame(): Flow<Game?>
+    fun observeGame(): Flow<GameDto?>
 }

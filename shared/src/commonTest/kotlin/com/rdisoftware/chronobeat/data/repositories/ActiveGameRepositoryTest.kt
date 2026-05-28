@@ -1,8 +1,6 @@
 package com.rdisoftware.chronobeat.data.repositories
 
-import com.rdisoftware.chronobeat.domain.enums.TeamColor
-import com.rdisoftware.chronobeat.domain.models.Game
-import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
@@ -25,16 +23,17 @@ class ActiveGameRepositoryTest {
     fun setup() {
         repository = ActiveGameRepositoryImpl()
     }
+    private fun createDummyGameDto(): GameDto {
+        val dummyTeamId = Uuid.random()
 
-    private fun createDummyGame(): Game {
-        val dummyTeam = Team(id = Uuid.random(), name = "Test Team", color = TeamColor.CRIMSON)
-
-        return Game(
+        return GameDto(
             id = Uuid.random(),
-            teams = listOf(dummyTeam),
-            currentTeam = dummyTeam,
-            collectedCardsByTeam = emptyMap(),
-            playlistId = "test_playlist_id_123"
+            teamIds = listOf(dummyTeamId),
+            currentTeamId = dummyTeamId,
+            collectedCardIdsByTeamId = emptyMap(),
+            playlistId = "test_playlist_id_123",
+            currentTrackId = "test_track_id_123",
+            winnerTeamId = dummyTeamId
         )
     }
 
@@ -45,18 +44,18 @@ class ActiveGameRepositoryTest {
 
     @Test
     fun `saveGame should store the game correctly`() = runTest {
-        val testGame = createDummyGame()
+        val testGameDto = createDummyGameDto()
 
-        repository.saveGame(testGame)
+        repository.saveGame(testGameDto)
 
         val fetchedGame = repository.getGame()
-        assertEquals(testGame, fetchedGame)
+        assertEquals(testGameDto, fetchedGame)
     }
 
     @Test
     fun `clearGame should remove the stored game`() = runTest {
-        val testGame = createDummyGame()
-        repository.saveGame(testGame)
+        val testGameDto = createDummyGameDto()
+        repository.saveGame(testGameDto)
 
         repository.clearGame()
 
@@ -65,14 +64,14 @@ class ActiveGameRepositoryTest {
 
     @Test
     fun `observeGame should emit state changes sequentially`() = runTest {
-        val states = mutableListOf<Game?>()
+        val states = mutableListOf<GameDto?>()
 
         val job = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             repository.observeGame().toList(states)
         }
 
-        val game1 = createDummyGame()
-        val game2 = createDummyGame().copy(playlistId = "another_playlist_id")
+        val game1 = createDummyGameDto()
+        val game2 = createDummyGameDto().copy(playlistId = "another_playlist_id")
 
         repository.saveGame(game1)
         repository.saveGame(game2)

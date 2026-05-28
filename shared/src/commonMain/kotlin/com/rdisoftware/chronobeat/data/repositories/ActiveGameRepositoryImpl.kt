@@ -1,6 +1,6 @@
 package com.rdisoftware.chronobeat.data.repositories
 
-import com.rdisoftware.chronobeat.domain.models.Game
+import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.Flow
@@ -8,10 +8,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 
+
 class ActiveGameRepositoryImpl(
     private val settings: Settings
 ) : ActiveGameRepository {
-    private val _game = MutableStateFlow<Game?>(null)
+    private val _game = MutableStateFlow<GameDto?>(null)
     private val customJson = Json {
         allowStructuredMapKeys = true
         ignoreUnknownKeys = true
@@ -21,7 +22,7 @@ class ActiveGameRepositoryImpl(
         val saveGameJson = settings.getStringOrNull("SAVED_GAME")
         if (saveGameJson != null) {
             _game.value = try {
-                customJson.decodeFromString<Game>(saveGameJson)
+                customJson.decodeFromString<GameDto>(saveGameJson)
             }catch (e: Exception) {
                 null
             }
@@ -29,11 +30,11 @@ class ActiveGameRepositoryImpl(
     }
 
 
-    override suspend fun getGame(): Game? {
+    override suspend fun getGame(): GameDto? {
         return _game.value
     }
 
-    override suspend fun getSavedGame(): Game? {
+    override suspend fun getSavedGame(): GameDto? {
         val savedGameJson = settings.getStringOrNull("SAVED_GAME")
         if (savedGameJson != null) {
             return try {
@@ -47,7 +48,7 @@ class ActiveGameRepositoryImpl(
         return null
     }
 
-    override suspend fun saveGame(game: Game) {
+    override suspend fun saveGame(game: GameDto) {
         _game.value = game
         val jsonString = customJson.encodeToString(game)
         settings.putString("SAVED_GAME", jsonString)
@@ -58,7 +59,7 @@ class ActiveGameRepositoryImpl(
         settings.remove("SAVED_GAME")
     }
 
-    override fun observeGame(): Flow<Game?> {
+    override fun observeGame(): Flow<GameDto?> {
         return _game.asStateFlow()
     }
 }

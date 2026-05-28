@@ -51,6 +51,8 @@ val sharedModule = module {
         getSavedGameUseCase = get(),
         saveGameProgressUseCase = get(),
         resetGameUseCase = get()
+        activeGameRepository = get(),
+        musicRepository = get()
     ) }
     factory { TeamSelectionViewModel(
         addTeamUseCase = get(),
