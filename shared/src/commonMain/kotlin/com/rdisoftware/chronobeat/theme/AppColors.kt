@@ -10,4 +10,6 @@ object AppColors {
     const val BOTTOM_GRAY = 0xFFA2A2A2
     const val BLACK = 0xFF000000
     const val WHITE = 0xFFFFFFFF
+    const val RED = 0xFFF44336
+    const val DEFAULT_BLUE = 0xFF0000FF
 }

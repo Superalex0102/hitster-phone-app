@@ -33,10 +33,10 @@ struct GameSummaryScreen: View {
                 VStack(spacing: 4) {
                     Text(strings.get(R.title))
                         .font(.kdam(size: 20))
-                        .foregroundColor(.white.opacity(0.8))
+                        .foregroundColor(Color(hex: AppColors.shared.WHITE).opacity(0.8))
 
                     Rectangle()
-                        .fill(Color.white.opacity(0.6))
+                        .fill(Color(hex: AppColors.shared.WHITE).opacity(0.6))
                         .frame(width: 120, height: 1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -46,7 +46,7 @@ struct GameSummaryScreen: View {
                 // Title
                 Text(strings.get(R.game_summary_title))
                     .font(.kdam(size: 40))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: AppColors.shared.WHITE))
 
                 Spacer().frame(height: 30)
 
@@ -66,7 +66,7 @@ struct GameSummaryScreen: View {
 
                     Text(strings.get(R.won_the_game))
                         .font(.kdam(size: 30))
-                        .foregroundColor(.white.opacity(0.9))
+                        .foregroundColor(Color(hex: AppColors.shared.WHITE).opacity(0.9))
                 }
 
                 Spacer().frame(height: 40)

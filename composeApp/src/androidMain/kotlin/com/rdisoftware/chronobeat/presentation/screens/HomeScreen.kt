@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -22,7 +23,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.HomeScreen
@@ -34,9 +34,15 @@ import com.rdisoftware.chronobeat.presentation.theme.kdamThmorProRegular
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.*
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.LoginPopup
+import com.rdisoftware.chronobeat.presentation.dimensions.HomeLocalDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.LocalBaseDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.PhoneHomeDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.TabletHomeDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.homeDimens
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
+import com.rdisoftware.chronobeat.theme.AppColors
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -46,74 +52,84 @@ fun HomeScreen(
     onLocalGameClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        GradientBackground()
-
-        if (state.showLoginPopup) {
-            LoginPopup(
-                onDismissRequest = {
-                    viewModel.onEvent(event = HomeEvent.OnLoginPopupDismiss)
-                }
-            )
-        }
-
-        SettingsButton(
-            onClick = {
-                viewModel.onEvent(event = HomeEvent.OnSettingsClick)
-            }
-        ) //TODO: Settings on click action
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        val dimensions = if (screenWidth >= 600.dp) TabletHomeDimensions
+        else PhoneHomeDimensions
+        CompositionLocalProvider(
+            HomeLocalDimensions provides dimensions,
+            LocalBaseDimensions provides dimensions.base
         ) {
-            Spacer(modifier = Modifier.weight(1.5f))
 
-            MainTitle()
+            GradientBackground()
 
-            Spacer(modifier = Modifier.weight(2f))
+            if (state.showLoginPopup) {
+                LoginPopup(
+                    onDismissRequest = {
+                        viewModel.onEvent(event = HomeEvent.OnLoginPopupDismiss)
+                    }
+                )
+            }
+
+            SettingsButton(
+                onClick = {
+                    viewModel.onEvent(event = HomeEvent.OnSettingsClick)
+                }
+            ) //TODO: Settings on click action
 
             Column(
                 modifier = Modifier
-                    .padding(top = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(32.dp)
+                    .fillMaxSize()
+                    .widthIn(max = homeDimens.base.maxContentWidth),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                GradientButton(
-                    text = stringResource(Res.string.local_game),
-                    enabled = state.isLocalEnabled,
-                    size = ButtonSize.LARGE,
-                    testTag = HomeScreen.LOCAL_GAME_BUTTON,
-                    resourceId = true,
-                    onClick = {
-                        onLocalGameClicked()
-                    }
-                )
+                Spacer(modifier = Modifier.weight(homeDimens.spacerTopWeight))
 
-                GradientButton(
-                    text = stringResource(Res.string.online_game),
-                    enabled = state.isOnlineEnabled,
-                    size = ButtonSize.LARGE,
-                    testTag = HomeScreen.ONLINE_GAME_BUTTON,
-                    resourceId = true,
-                    onClick = {
-                        viewModel.onEvent(event = HomeEvent.OnOnlineGameClick)
-                    }
-                    //TODO: Online game mode on click action - not in current scope
+                MainTitle()
+
+                Spacer(modifier = Modifier.weight(homeDimens.spacerMiddleWeight))
+
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(homeDimens.basePadding)
+                ) {
+                    GradientButton(
+                        text = stringResource(Res.string.local_game),
+                        enabled = state.isLocalEnabled,
+                        size = ButtonSize.LARGE,
+                        testTag = HomeScreen.LOCAL_GAME_BUTTON,
+                        resourceId = true,
+                        onClick = {
+                            onLocalGameClicked()
+                        }
+                    )
+
+                    GradientButton(
+                        text = stringResource(Res.string.online_game),
+                        enabled = state.isOnlineEnabled,
+                        size = ButtonSize.LARGE,
+                        testTag = HomeScreen.ONLINE_GAME_BUTTON,
+                        resourceId = true,
+                        onClick = {
+                            viewModel.onEvent(event = HomeEvent.OnOnlineGameClick)
+                        }
+                        //TODO: Online game mode on click action - not in current scope
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(homeDimens.spacerBottomWeight))
+
+                BottomText(
+                    text = stringResource(Res.string.powered_by),
+                    name = stringResource(Res.string.bottom_app_name)
                 )
             }
-
-            Spacer(modifier = Modifier.weight(4f))
-
-            BottomText(
-                text = stringResource(Res.string.powered_by),
-                name = stringResource(Res.string.bottom_app_name)
-            )
         }
     }
 }
@@ -128,7 +144,7 @@ fun BoxScope.SettingsButton(
         },
         modifier = Modifier
             .align(Alignment.TopEnd)
-            .padding(top = 16.dp, end = 8.dp)
+            .padding(top = homeDimens.screenEdgePadding, end = homeDimens.screenEdgePadding)
             .testTag(HomeScreen.SETTINGS_BUTTON)
             .semantics {
                 testTagsAsResourceId = true
@@ -138,9 +154,9 @@ fun BoxScope.SettingsButton(
         Icon(
             imageVector = Icons.Outlined.Settings,
             contentDescription = stringResource(Res.string.settings),
-            tint = Color.White,
+            tint = Color(AppColors.WHITE),
             modifier = Modifier
-                .size(34.dp)
+                .size(homeDimens.settingsIconSize)
         )
     }
 }
@@ -149,8 +165,8 @@ fun BoxScope.SettingsButton(
 fun MainTitle() {
     Text(
         text = stringResource(Res.string.title),
-        fontSize = 48.sp,
-        color = Color.White,
+        fontSize = homeDimens.base.titleFontSize,
+        color = Color(AppColors.WHITE),
         fontFamily = kdamThmorProRegular,
         modifier = Modifier
             .padding(top = 24.dp)
@@ -174,13 +190,13 @@ fun LoginPopup(
     ) {
         Box(
             modifier = Modifier
-                .widthIn(400.dp)
-                .fillMaxWidth(0.80f)
+                .widthIn(homeDimens.popupMaxContentWidth)
+                .fillMaxWidth(homeDimens.base.contentWidthFraction)
                 .height(IntrinsicSize.Min)
                 .clip(RoundedCornerShape(5))
                 .border(
                     width = 2.dp,
-                    color = Color.White,
+                    color = Color(AppColors.WHITE),
                     shape = RoundedCornerShape(5)
                 ),
         ) {
@@ -190,9 +206,9 @@ fun LoginPopup(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
+                    .padding(homeDimens.basePadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(space = 48.dp)
+                verticalArrangement = Arrangement.spacedBy(space = homeDimens.basePadding)
             ) {
                 PopupTitle(
                     text = stringResource(Res.string.sing_in_to_spotify),
@@ -223,10 +239,10 @@ fun PopupTitle(
 ) {
     Text(
         text = text,
-        fontSize = 28.sp,
-        lineHeight = 40.sp,
+        fontSize = homeDimens.popupTitleFontSize,
+        lineHeight = homeDimens.popupTitleLineHeight,
         textAlign = TextAlign.Center,
-        color = Color.White,
+        color = Color(AppColors.WHITE),
         fontFamily = kdamThmorProRegular,
         modifier = Modifier
             .testTag(testTag)
@@ -245,7 +261,7 @@ fun ErrorText() {
         Icon(
             imageVector = Icons.Outlined.Error,
             contentDescription = stringResource(Res.string.content_disc_error),
-            tint = Color.Red,
+            tint = Color(AppColors.RED),
             modifier = Modifier
                 .testTag(LoginPopup.ERROR_ICON)
                 .semantics {
@@ -255,9 +271,9 @@ fun ErrorText() {
 
         Text(
             text = stringResource(Res.string.error_message), // TODO: Create dynamic text
-            color = Color.Red,
+            color = Color(AppColors.RED),
             fontFamily = robotoMonoRegular,
-            fontSize = 14.sp,
+            fontSize = homeDimens.errorTextFontSize,
             modifier = Modifier
                 .testTag(LoginPopup.ERROR_TEXT)
                 .semantics {

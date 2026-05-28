@@ -1,19 +1,40 @@
 package com.rdisoftware.chronobeat.presentation.screens
-
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,6 +42,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -48,12 +70,20 @@ import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameSc
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.MUSIC_PLAYER_ICON
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TEAM_NAME_TEXT
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.GameScreen.TIME_LINE_ARROW
+import com.rdisoftware.chronobeat.presentation.dimensions.GameLocalDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.LocalBaseDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.PhoneGameDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.TabletGameDimensions
+import com.rdisoftware.chronobeat.presentation.dimensions.gameDimens
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.arrow_latest_text
 import com.rdisoftware.chronobeat.shared.resources.arrow_oldest_text
 import com.rdisoftware.chronobeat.theme.AppColors
 import com.rdisoftware.chronobeat.presentation.screens.components.GradientBackground
-import com.rdisoftware.chronobeat.presentation.theme.*
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLightItalic
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoMedium
+import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.delay
@@ -62,63 +92,68 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.random.Random
-
 @Composable
 fun GameScreen(
     viewModel: GameViewModel = koinViewModel(),
     onGameFinishedClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-
     LaunchedEffect(state.currentPhase) {
         if (state.currentPhase == GamePhase.GAME_OVER) {
             onGameFinishedClicked()
         }
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val dimensions = if (screenWidth >= 600.dp) TabletGameDimensions else PhoneGameDimensions
+
+    CompositionLocalProvider(
+        GameLocalDimensions provides dimensions,
+        LocalBaseDimensions provides dimensions.base
     ) {
-        GradientBackground()
-
-        TimeLineArrow()
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(vertical = 16.dp, horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            GameHeader(
-                currentTeam = state.currentTeam,
-                cardCount = state.currentCardCount,
-                isAnimating = state.currentPhase == GamePhase.GUESSING
-            )
+            GradientBackground()
 
-            GameSurface(
-                timeline = state.timeline,
-                currentTrack = state.currentTrack,
-                teamColor = state.currentTeam?.color,
-                onGuessPressed = { position -> viewModel.onGuessPressed(position) },
-                isGuessingPhase = state.currentPhase == GamePhase.GUESSING
-            )
-        }
+            TimeLineArrow()
 
-        if (state.currentPhase == GamePhase.SHOW_NEXT_TEAM_POPUP) {
-            NextTeamPopupOverlay(
-                teamName = state.currentTeam?.name ?: "",
-                onOkClicked = { viewModel.onPopupAcknowledgePressed() }
-            )
-        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(32.dp)
+            ) {
+                GameHeader(
+                    currentTeam = state.currentTeam,
+                    cardCount = state.currentCardCount,
+                    isAnimating = state.currentPhase == GamePhase.GUESSING
+                )
 
-        if (state.currentPhase == GamePhase.SHOW_RESULT) {
-            ResultOverlay(isCorrect = state.isGuessCorrect)
+                GameSurface(
+                    timeline = state.timeline,
+                    currentTrack = state.currentTrack,
+                    teamColor = state.currentTeam?.color,
+                    onGuessPressed = { position -> viewModel.onGuessPressed(position) },
+                    isGuessingPhase = state.currentPhase == GamePhase.GUESSING
+                )
+            }
+
+            if (state.currentPhase == GamePhase.SHOW_NEXT_TEAM_POPUP) {
+                NextTeamPopupOverlay(
+                    teamName = state.currentTeam?.name ?: "",
+                    onOkClicked = { viewModel.onPopupAcknowledgePressed() }
+                )
+            }
+
+            if (state.currentPhase == GamePhase.SHOW_RESULT) {
+                ResultOverlay(isCorrect = state.isGuessCorrect)
+            }
         }
     }
 }
-
 @Composable
 fun NextTeamPopupOverlay(
     teamName: String,
@@ -154,7 +189,6 @@ fun NextTeamPopupOverlay(
         }
     }
 }
-
 @Composable
 fun ResultOverlay(isCorrect: Boolean?) {
     Box(
@@ -168,7 +202,6 @@ fun ResultOverlay(isCorrect: Boolean?) {
         } else {
             "Helytelen!" to Color.Red
         }
-
         Text(
             text = text,
             fontSize = 48.sp,
@@ -180,7 +213,6 @@ fun ResultOverlay(isCorrect: Boolean?) {
         )
     }
 }
-
 @Composable
 fun GameHeader(
     currentTeam: Team?,
@@ -189,7 +221,9 @@ fun GameHeader(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .wrapContentWidth()
+            .widthIn(max = gameDimens.base.maxContentWidth),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -197,13 +231,11 @@ fun GameHeader(
             currentTeam = currentTeam,
             cardCount = cardCount
         )
-
         AnimatedSoundWaves(
             isAnimating = isAnimating
         )
     }
 }
-
 @Composable
 fun TeamInformation(
     currentTeam: Team?,
@@ -215,21 +247,21 @@ fun TeamInformation(
             .fillMaxHeight(0.07f)
             .border(
                 width = 2.dp,
-                color = Color.White,
+                color = Color(AppColors.WHITE),
                 shape = RoundedCornerShape(30)
             )
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        currentTeam?.color?.color ?: Color(0xFF48A0B7),
-                        Color.Black
+                        currentTeam?.color?.color ?: Color(AppColors.WHITE),
+                        Color(AppColors.BLACK)
                     )
                 ),
                 shape = RoundedCornerShape(30)
             )
             .padding(start = 16.dp)
             .testTag(GAME_HEADER)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -237,59 +269,56 @@ fun TeamInformation(
     ) {
         GameText(
             text = currentTeam?.name ?: "",
-            fontSize = 32.sp,
+            fontSize = gameDimens.currentTeamNameFontSize,
             fontFamily = robotoMonoBold,
-            color = Color.White,
+            lineHeight = 40.sp,
+            color = Color(AppColors.WHITE),
             testTag = TEAM_NAME_TEXT
         )
-
         NumberCard(cardCount = cardCount.toString())
     }
 }
-
 @Composable
 fun NumberCard(
     cardCount: String
 ) {
     Box(
         modifier = Modifier
-            .width(52.dp)
+            .width(gameDimens.cardCountBoxSize)
             .fillMaxHeight(1f)
             .clip(RoundedCornerShape(30))
             .background(Color.Transparent)
-            .border(2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(30)),
+            .border(2.dp, Color(AppColors.WHITE).copy(alpha = 0.7f), RoundedCornerShape(30)),
         contentAlignment = Alignment.Center
     ) {
         GameText(
             text = cardCount,
-            fontSize = 24.sp,
+            fontSize = gameDimens.cardCountNumberFontSize,
             fontFamily = robotoMonoRegular,
-            color = Color.White,
+            lineHeight = 40.sp,
+            color = Color(AppColors.WHITE),
             testTag = CARD_COUNT_TEXT
         )
     }
 }
-
 @Composable
 fun AnimatedSoundWaves(
     isAnimating: Boolean,
     modifier: Modifier = Modifier,
-    barColor: Color = Color.White
+    barColor: Color = Color(AppColors.WHITE)
 ) {
     val barWidth = 3.dp
     val defaultHeight = 4.dp
-
     val minHeight = 6.dp
     val minMaxHeightDp = 20
     val maxMaxHeightDp = 40
     val minDelayMs = 0
     val maxDelayMs = 300
-
     Row(
         modifier = modifier
             .height(30.dp)
             .testTag(MUSIC_PLAYER_ICON)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         horizontalArrangement = Arrangement.spacedBy(3.dp),
@@ -331,17 +360,15 @@ fun AnimatedSoundWaves(
         }
     }
 }
-
 @Composable
 fun GameSurface(
-    timeline: List<Track>,
+    timeline: List,
     currentTrack: Track?,
     teamColor: TeamColor?,
     onGuessPressed: (Int) -> Unit,
     isGuessingPhase: Boolean
 ) {
     val itemCount = timeline.size * 2 + 1
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -361,7 +388,6 @@ fun GameSurface(
         }
     }
 }
-
 @Composable
 fun GuessButton(
     isEnabled: Boolean = true,
@@ -369,11 +395,11 @@ fun GuessButton(
 ) {
     Box(
         modifier = Modifier
-            .size(64.dp)
+            .size(gameDimens.guessButtonOuterCircle)
             .clip(CircleShape)
             .clickable(enabled = isEnabled, onClick = onClick)
             .testTag(GUESS_BUTTON)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
                 role = Role.Button
             },
@@ -387,10 +413,9 @@ fun GuessButton(
                     color = Color(AppColors.GAME_GRAY).copy(alpha = 0.6f)
                 )
         )
-
         Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(gameDimens.guessButtonInnerCircle)
                 .background(
                     shape = CircleShape,
                     color = Color(AppColors.GAME_GRAY)
@@ -398,7 +423,6 @@ fun GuessButton(
         )
     }
 }
-
 @Composable
 fun GameCard(
     track: Track,
@@ -406,15 +430,16 @@ fun GameCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(gameDimens.cardMaxWidthFraction)
+            .aspectRatio(1.4f)
             .padding(horizontal = 46.dp, vertical = 32.dp)
             .border(
                 width = 3.dp,
-                color = teamColor?.color ?: Color.Blue,
+                color = teamColor?.color ?: Color(AppColors.DEFAULT_BLUE),
                 shape = RoundedCornerShape(12)
             )
             .testTag(GAME_CARD)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
         backgroundColor = Color(AppColors.GAME_GRAY),
@@ -423,58 +448,63 @@ fun GameCard(
         GameCardContent(track = track)
     }
 }
-
 @Composable
 fun GameCardContent(
     track: Track
 ) {
     Column(
         modifier = Modifier
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(
+            space = 4.dp,
+            alignment = Alignment.CenterVertically
+        ),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GameText(
             text = track.mainArtist,
-            fontSize = 28.sp,
+            fontSize = gameDimens.mainArtistFontSize,
             fontFamily = robotoMonoMedium,
-            color = Color.Black,
+            lineHeight = 40.sp,
+            color = Color(AppColors.BLACK),
             testTag = GAME_CARD_ARTIST
         )
-
         if (track.featArtists.isNotEmpty()) {
             GameText(
                 text = track.featArtists.joinToString(", "),
-                fontSize = 12.sp,
+                fontSize = gameDimens.featArtistFontSize,
                 fontFamily = robotoMonoLightItalic,
-                color = Color.Black,
+                lineHeight = 40.sp,
+                color = Color(AppColors.BLACK),
                 testTag = GAME_CARD_CONTRIBUTOR
             )
         }
 
         GameText(
             text = track.releaseYear.toString(),
-            fontSize = 64.sp,
+            fontSize = gameDimens.releaseYearFontSize,
             fontFamily = robotoMonoBold,
-            color = Color.Black,
+            lineHeight = 40.sp,
+            color = Color(AppColors.BLACK),
             testTag = GAME_CARD_YEAR
         )
 
         GameText(
             text = track.title,
-            fontSize = 20.sp,
+            fontSize = gameDimens.trackTitleFontSize,
             fontFamily = robotoMonoLightItalic,
-            color = Color.Black,
+            lineHeight = 40.sp,
+            color = Color(AppColors.BLACK),
             testTag = GAME_CARD_TITLE
         )
     }
 }
-
 @Composable
 fun GameText(
     text: String,
     fontSize: TextUnit,
     fontFamily: FontFamily,
+    lineHeight: TextUnit,
     color: Color,
     testTag: String
 ) {
@@ -483,30 +513,29 @@ fun GameText(
         fontSize = fontSize,
         fontFamily = fontFamily,
         color = color,
+        lineHeight = lineHeight,
         textAlign = TextAlign.Center,
         modifier = Modifier
             .testTag(testTag)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             }
     )
 }
-
 @Composable
 fun BoxScope.TimeLineArrow() {
     Box(
         modifier = Modifier
             .fillMaxHeight(0.8f)
-            .width(80.dp)
+            .width(gameDimens.arrowWidthPosition)
             .align(Alignment.CenterStart),
         contentAlignment = Alignment.Center
     ) {
         DownwardArrow()
-
         ArrowText(
             text = Res.string.arrow_oldest_text,
             alignment = Alignment.TopCenter,
-            offset = 32.dp,
+            offset = gameDimens.arrowTextOffset,
             testTag = ARROW_OLDEST_TEXT
         )
 
@@ -518,7 +547,6 @@ fun BoxScope.TimeLineArrow() {
         )
     }
 }
-
 @Composable
 fun DownwardArrow() {
     val arrowHeadSize = 10.dp
@@ -527,36 +555,34 @@ fun DownwardArrow() {
             .fillMaxSize()
             .padding(end = 34.dp)
             .testTag(TIME_LINE_ARROW)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             }
     ) {
         val strokeWidth = 2.dp.toPx()
         val headPx = arrowHeadSize.toPx()
-
         drawLine(
-            color = Color.White.copy(alpha = 0.7f),
+            color = Color(AppColors.WHITE).copy(alpha = 0.7f),
             start = Offset(size.width / 2, size.width / 2),
             end = Offset(size.width / 2, size.height),
             strokeWidth = strokeWidth
         )
 
         drawLine(
-            color = Color.White.copy(alpha = 0.7f),
+            color = Color(AppColors.WHITE).copy(alpha = 0.7f),
             start = Offset(size.width / 2, size.height),
             end = Offset(size.width / 2 - headPx, size.height - headPx),
             strokeWidth = strokeWidth
         )
 
         drawLine(
-            color = Color.White.copy(alpha = 0.7f),
+            color = Color(AppColors.WHITE).copy(alpha = 0.7f),
             start = Offset(size.width / 2, size.height),
             end = Offset(size.width / 2 + headPx, size.height - headPx),
             strokeWidth = strokeWidth
         )
     }
 }
-
 @Composable
 fun BoxScope.ArrowText(
     text: StringResource,
@@ -574,9 +600,9 @@ fun BoxScope.ArrowText(
             .rotate(90f)
             .padding(top = 16.dp)
             .testTag(testTag)
-            .semantics{
+            .semantics {
                 testTagsAsResourceId = true
             },
-        color = Color.White.copy(alpha = 0.7f)
+        color = Color(AppColors.WHITE).copy(alpha = 0.7f)
     )
 }
