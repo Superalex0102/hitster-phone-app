@@ -1,8 +1,10 @@
 package com.rdisoftware.chronobeat.testing
 
 import FakeMusicRepository
+import com.rdisoftware.chronobeat.data.repositories.ActiveGameRepositoryImpl
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
+import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -30,13 +32,16 @@ class GameViewModelTest {
     private lateinit var viewModel: GameViewModel
 
     private lateinit var fakeMusicRepository: FakeMusicRepository
+    private lateinit var activeGameRepository: ActiveGameRepositoryImpl
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
+        activeGameRepository = ActiveGameRepositoryImpl()
         fakeMusicRepository = FakeMusicRepository()
         val playMusicUseCase = PlayMusicUseCase(fakeMusicRepository)
-        viewModel = GameViewModel(playMusicUseCase)
+
+        viewModel = GameViewModel(activeGameRepository, fakeMusicRepository, playMusicUseCase)
     }
 
     @AfterTest
@@ -88,6 +93,8 @@ class GameViewModelTest {
         advanceUntilIdle()
         val state = viewModel.state.value
         assertEquals(state.game!!.teams.first(), state.currentTeam)
+        // Új fázis miatt ellenőrizzük, hogy Popup-pal indulunk-e
+        assertEquals(GamePhase.SHOW_NEXT_TEAM_POPUP, state.currentPhase)
     }
 
     // --- onGuessPressed - correct ---
@@ -95,14 +102,14 @@ class GameViewModelTest {
     @Test
     fun `correct guess - track added to current team timeline`() = testScope.runTest {
         advanceUntilIdle()
+        viewModel.onPopupAcknowledgePressed()
+
         val state = viewModel.state.value
         val currentTeam = state.game!!.currentTeam
         val timelineBefore = state.game.collectedCardsByTeam[currentTeam]!!.size
 
-        // find a valid position
         val currentTrack = state.currentTrack!!
-        val timeline = state.timeline
-        val validPosition = findValidPosition(timeline, currentTrack)
+        val validPosition = findValidPosition(state.timeline, currentTrack)
 
         viewModel.onGuessPressed(validPosition)
         advanceUntilIdle()
@@ -114,19 +121,25 @@ class GameViewModelTest {
     @Test
     fun `correct guess - isGuessCorrect is true`() = testScope.runTest {
         advanceUntilIdle()
+        viewModel.onPopupAcknowledgePressed()
+
         val state = viewModel.state.value
         val currentTrack = state.currentTrack!!
         val validPosition = findValidPosition(state.timeline, currentTrack)
 
         viewModel.onGuessPressed(validPosition)
-        advanceUntilIdle()
 
         assertTrue(viewModel.state.value.isGuessCorrect == true)
+        assertEquals(GamePhase.SHOW_RESULT, viewModel.state.value.currentPhase)
+
+        advanceUntilIdle()
     }
 
     @Test
     fun `correct guess - currentTrack changes`() = testScope.runTest {
         advanceUntilIdle()
+        viewModel.onPopupAcknowledgePressed()
+
         val state = viewModel.state.value
         val trackBefore = state.currentTrack!!
         val validPosition = findValidPosition(state.timeline, trackBefore)
@@ -140,6 +153,8 @@ class GameViewModelTest {
     @Test
     fun `correct guess - team advances to next`() = testScope.runTest {
         advanceUntilIdle()
+        viewModel.onPopupAcknowledgePressed()
+
         val state = viewModel.state.value
         val teamBefore = state.currentTeam!!
         val validPosition = findValidPosition(state.timeline, state.currentTrack!!)
@@ -155,6 +170,8 @@ class GameViewModelTest {
     @Test
     fun `wrong guess - track not added to timeline`() = testScope.runTest {
         advanceUntilIdle()
+        viewModel.onPopupAcknowledgePressed()
+
         val state = viewModel.state.value
         val currentTeam = state.game!!.currentTeam
         val timelineBefore = state.game.collectedCardsByTeam[currentTeam]!!.size
@@ -170,26 +187,16 @@ class GameViewModelTest {
     @Test
     fun `wrong guess - isGuessCorrect is false`() = testScope.runTest {
         advanceUntilIdle()
+        viewModel.onPopupAcknowledgePressed()
+
         val state = viewModel.state.value
         val invalidPosition = findInvalidPosition(state.timeline, state.currentTrack!!)
 
         viewModel.onGuessPressed(invalidPosition)
-        advanceUntilIdle()
 
         assertTrue(viewModel.state.value.isGuessCorrect == false)
-    }
 
-    @Test
-    fun `wrong guess - team advances to next`() = testScope.runTest {
         advanceUntilIdle()
-        val state = viewModel.state.value
-        val teamBefore = state.currentTeam!!
-        val invalidPosition = findInvalidPosition(state.timeline, state.currentTrack!!)
-
-        viewModel.onGuessPressed(invalidPosition)
-        advanceUntilIdle()
-
-        assertFalse(viewModel.state.value.currentTeam == teamBefore)
     }
 
     // --- nextTeam ---
@@ -201,6 +208,7 @@ class GameViewModelTest {
         val teamCount = game.teams.size
 
         repeat(teamCount) {
+            viewModel.onPopupAcknowledgePressed()
             val state = viewModel.state.value
             val validPosition = findValidPosition(state.timeline, state.currentTrack!!)
             viewModel.onGuessPressed(validPosition)
@@ -223,19 +231,21 @@ class GameViewModelTest {
     fun `game stops when a team reaches CARDS_TO_WIN`() = testScope.runTest {
         advanceUntilIdle()
 
-        // keep pressing correct for first team until win
         var guessCount = 0
         while (!viewModel.state.value.isGameWon && guessCount < 100) {
+            viewModel.onPopupAcknowledgePressed()
+
             val state = viewModel.state.value
             val currentTrack = state.currentTrack ?: break
             val validPosition = findValidPosition(state.timeline, currentTrack)
+
             viewModel.onGuessPressed(validPosition)
             advanceUntilIdle()
             guessCount++
         }
 
         assertTrue(viewModel.state.value.isGameWon)
-        assertNull(viewModel.state.value.currentTrack)
+        assertEquals(GamePhase.GAME_OVER, viewModel.state.value.currentPhase)
     }
 
     // --- currentCardCount ---

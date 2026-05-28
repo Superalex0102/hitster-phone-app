@@ -29,18 +29,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -90,37 +85,35 @@ import com.rdisoftware.chronobeat.presentation.theme.robotoMonoBold
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLightItalic
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoMedium
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
+import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.random.Random
-
 @Composable
 fun GameScreen(
     viewModel: GameViewModel = koinViewModel(),
     onGameFinishedClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(state.currentPhase) {
+        if (state.currentPhase == GamePhase.GAME_OVER) {
+            onGameFinishedClicked()
+        }
+    }
 
-    var isPlaying by remember { mutableStateOf(false) }
-
-    var hasStarted by remember { mutableStateOf(false) }
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val dimensions = if (screenWidth >= 600.dp) TabletGameDimensions
-    else PhoneGameDimensions
+    val dimensions = if (screenWidth >= 600.dp) TabletGameDimensions else PhoneGameDimensions
 
     CompositionLocalProvider(
         GameLocalDimensions provides dimensions,
         LocalBaseDimensions provides dimensions.base
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
         ) {
             GradientBackground()
 
@@ -135,62 +128,97 @@ fun GameScreen(
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
                 GameHeader(
-                    state.currentTeam,
-                    state.currentCardCount
+                    currentTeam = state.currentTeam,
+                    cardCount = state.currentCardCount,
+                    isAnimating = state.currentPhase == GamePhase.GUESSING
                 )
-
-                Button(
-                    onClick = {
-                        onGameFinishedClicked() //TODO: Temporary button to be able to test navigation
-                    }
-                ) {
-                    Text("Summary")
-                }
-
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            if (isPlaying) {
-                                //viewModel.pauseMusic()
-                            } else {
-                                if (!hasStarted) {
-                                    viewModel.playMusic("3mAHFGVINgpLtl4HWhsTxG")
-                                    //hasStarted = true
-                                } else {
-                                    //viewModel.resumeMusic()
-                                }
-                            }
-                            isPlaying = !isPlaying
-                        }
-                    },
-                    modifier = Modifier
-                        .height(56.dp)
-                        .width(220.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isPlaying) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text(
-                        text = if (isPlaying) "⏸ Szünet" else "▶ Zene Elindítása",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
 
                 GameSurface(
                     timeline = state.timeline,
                     currentTrack = state.currentTrack,
                     teamColor = state.currentTeam?.color,
-                    onGuessPressed = { position -> viewModel.onGuessPressed(position) }
+                    onGuessPressed = { position -> viewModel.onGuessPressed(position) },
+                    isGuessingPhase = state.currentPhase == GamePhase.GUESSING
                 )
+            }
+
+            if (state.currentPhase == GamePhase.SHOW_NEXT_TEAM_POPUP) {
+                NextTeamPopupOverlay(
+                    teamName = state.currentTeam?.name ?: "",
+                    onOkClicked = { viewModel.onPopupAcknowledgePressed() }
+                )
+            }
+
+            if (state.currentPhase == GamePhase.SHOW_RESULT) {
+                ResultOverlay(isCorrect = state.isGuessCorrect)
             }
         }
     }
 }
-
+@Composable
+fun NextTeamPopupOverlay(
+    teamName: String,
+    onOkClicked: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.7f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            backgroundColor = Color(AppColors.GAME_GRAY),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "$teamName következik!",
+                    fontSize = 24.sp,
+                    fontFamily = robotoMonoBold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+                )
+                Button(onClick = onOkClicked) {
+                    Text("OK, Mehet!")
+                }
+            }
+        }
+    }
+}
+@Composable
+fun ResultOverlay(isCorrect: Boolean?) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.4f)),
+        contentAlignment = Alignment.Center
+    ) {
+        val (text, color) = if (isCorrect == true) {
+            "Helyes!" to Color.Green
+        } else {
+            "Helytelen!" to Color.Red
+        }
+        Text(
+            text = text,
+            fontSize = 48.sp,
+            fontFamily = robotoMonoBold,
+            color = color,
+            modifier = Modifier
+                .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(12.dp))
+                .padding(24.dp)
+        )
+    }
+}
 @Composable
 fun GameHeader(
     currentTeam: Team?,
-    cardCount: Int
+    cardCount: Int,
+    isAnimating: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -204,13 +232,11 @@ fun GameHeader(
             currentTeam = currentTeam,
             cardCount = cardCount
         )
-
         AnimatedSoundWaves(
-            isAnimating = false // TODO: Replace with music playing state
+            isAnimating = isAnimating
         )
     }
 }
-
 @Composable
 fun TeamInformation(
     currentTeam: Team?,
@@ -250,11 +276,9 @@ fun TeamInformation(
             color = Color(AppColors.WHITE),
             testTag = TEAM_NAME_TEXT
         )
-
         NumberCard(cardCount = cardCount.toString())
     }
 }
-
 @Composable
 fun NumberCard(
     cardCount: String
@@ -278,7 +302,6 @@ fun NumberCard(
         )
     }
 }
-
 @Composable
 fun AnimatedSoundWaves(
     isAnimating: Boolean,
@@ -292,7 +315,6 @@ fun AnimatedSoundWaves(
     val maxMaxHeightDp = 40
     val minDelayMs = 0
     val maxDelayMs = 300
-
     Row(
         modifier = modifier
             .height(30.dp)
@@ -339,16 +361,15 @@ fun AnimatedSoundWaves(
         }
     }
 }
-
 @Composable
 fun GameSurface(
     timeline: List<Track>,
     currentTrack: Track?,
     teamColor: TeamColor?,
-    onGuessPressed: (Int) -> Unit
+    onGuessPressed: (Int) -> Unit,
+    isGuessingPhase: Boolean
 ) {
     val itemCount = timeline.size * 2 + 1
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize(),
@@ -358,7 +379,7 @@ fun GameSurface(
             if (index % 2 == 0) {
                 val position = index / 2
                 GuessButton(
-                    isEnabled = currentTrack != null,
+                    isEnabled = currentTrack != null && isGuessingPhase,
                     onClick = { onGuessPressed(position) }
                 )
             } else {
@@ -368,7 +389,6 @@ fun GameSurface(
         }
     }
 }
-
 @Composable
 fun GuessButton(
     isEnabled: Boolean = true,
@@ -394,7 +414,6 @@ fun GuessButton(
                     color = Color(AppColors.GAME_GRAY).copy(alpha = 0.6f)
                 )
         )
-
         Box(
             modifier = Modifier
                 .size(gameDimens.guessButtonInnerCircle)
@@ -405,7 +424,6 @@ fun GuessButton(
         )
     }
 }
-
 @Composable
 fun GameCard(
     track: Track,
@@ -431,7 +449,6 @@ fun GameCard(
         GameCardContent(track = track)
     }
 }
-
 @Composable
 fun GameCardContent(
     track: Track
@@ -453,7 +470,6 @@ fun GameCardContent(
             color = Color(AppColors.BLACK),
             testTag = GAME_CARD_ARTIST
         )
-
         if (track.featArtists.isNotEmpty()) {
             GameText(
                 text = track.featArtists.joinToString(", "),
@@ -484,7 +500,6 @@ fun GameCardContent(
         )
     }
 }
-
 @Composable
 fun GameText(
     text: String,
@@ -508,7 +523,6 @@ fun GameText(
             }
     )
 }
-
 @Composable
 fun BoxScope.TimeLineArrow() {
     Box(
@@ -519,7 +533,6 @@ fun BoxScope.TimeLineArrow() {
         contentAlignment = Alignment.Center
     ) {
         DownwardArrow()
-
         ArrowText(
             text = Res.string.arrow_oldest_text,
             alignment = Alignment.TopCenter,
@@ -535,7 +548,6 @@ fun BoxScope.TimeLineArrow() {
         )
     }
 }
-
 @Composable
 fun DownwardArrow() {
     val arrowHeadSize = 10.dp
@@ -550,7 +562,6 @@ fun DownwardArrow() {
     ) {
         val strokeWidth = 2.dp.toPx()
         val headPx = arrowHeadSize.toPx()
-
         drawLine(
             color = Color(AppColors.WHITE).copy(alpha = 0.7f),
             start = Offset(size.width / 2, size.width / 2),
@@ -573,7 +584,6 @@ fun DownwardArrow() {
         )
     }
 }
-
 @Composable
 fun BoxScope.ArrowText(
     text: StringResource,
