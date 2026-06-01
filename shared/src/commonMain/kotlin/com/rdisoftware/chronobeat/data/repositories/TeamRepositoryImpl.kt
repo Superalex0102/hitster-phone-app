@@ -23,9 +23,11 @@ class TeamRepositoryImpl(
             try {
                 val teamList = Json.decodeFromString<List<Team>>(savedTeamJson)
                 teamList.forEach { _teams[it.id] = it }
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+            }
         }
     }
+
     private fun persistTeams() {
         val jsonString = Json.encodeToString(_teams.values.toList())
         settings.putString("SAVED_TEAMS", jsonString)
@@ -58,7 +60,6 @@ class TeamRepositoryImpl(
             if (!_teams.containsKey(team.id)) {
                 throw IllegalArgumentException("Team with id ${team.id} not found")
             }
-
             _teams[team.id] = team
             persistTeams()
             team

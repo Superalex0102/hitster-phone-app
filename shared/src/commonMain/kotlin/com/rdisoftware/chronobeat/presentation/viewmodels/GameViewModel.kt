@@ -57,10 +57,22 @@ class GameViewModel(
     val state = _state.asStateFlow()
 
     private val allTeams = listOf(
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000001"), "Team 1", TeamColor.entries.getOrElse(0) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000002"), "Team 2", TeamColor.entries.getOrElse(1) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000003"), "Team 3", TeamColor.entries.getOrElse(2) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000004"), "Team 4", TeamColor.entries.getOrElse(3) { TeamColor.entries.first() })
+        Team(
+            Uuid.parse("00000000-0000-0000-0000-000000000001"),
+            "Team 1",
+            TeamColor.entries.getOrElse(0) { TeamColor.entries.first() }),
+        Team(
+            Uuid.parse("00000000-0000-0000-0000-000000000002"),
+            "Team 2",
+            TeamColor.entries.getOrElse(1) { TeamColor.entries.first() }),
+        Team(
+            Uuid.parse("00000000-0000-0000-0000-000000000003"),
+            "Team 3",
+            TeamColor.entries.getOrElse(2) { TeamColor.entries.first() }),
+        Team(
+            Uuid.parse("00000000-0000-0000-0000-000000000004"),
+            "Team 4",
+            TeamColor.entries.getOrElse(3) { TeamColor.entries.first() })
     )
 
     private var trackIdPool: MutableList<String> = mutableListOf()
@@ -85,6 +97,7 @@ class GameViewModel(
             }
         }
     }
+
     private suspend fun getNextPlayableTrack(): Track? {
         while (trackIdPool.isNotEmpty()) {
             val nextId = trackIdPool.removeAt(0)
@@ -103,53 +116,54 @@ class GameViewModel(
         return null
     }
 
-     fun loadSavedGameOrStartNew() {
-        viewModelScope.launch { try {
-            cachedTracks.clear()
-            println("GameViewModel: Getting ChronoBeat playlist...")
-            val chronoBeatPlaylists = musicRepository.getChronobeatPlaylists()
-            if (chronoBeatPlaylists.isEmpty()) {
-                println(" GameViewModel - Error: There is no available ChronoBeat playlist!")
-                return@launch
-            }
+    fun loadSavedGameOrStartNew() {
+        viewModelScope.launch {
+            try {
+                cachedTracks.clear()
+                println("GameViewModel: Getting ChronoBeat playlist...")
+                val chronoBeatPlaylists = musicRepository.getChronobeatPlaylists()
+                if (chronoBeatPlaylists.isEmpty()) {
+                    println(" GameViewModel - Error: There is no available ChronoBeat playlist!")
+                    return@launch
+                }
 
-            val selectedPlaylist = chronoBeatPlaylists[0]
-            trackIdPool = selectedPlaylist.trackIds.shuffled().toMutableList()
+                val selectedPlaylist = chronoBeatPlaylists[0]
+                trackIdPool = selectedPlaylist.trackIds.shuffled().toMutableList()
 
-            val savedGame = getSavedGameUseCase()
-            if (savedGame != null) {
-                println("GameViewModel: Downloading saved tracks for existing game...")
-                val neededIds = savedGame.collectedCardIdsByTeamId.values.flatten() + savedGame.currentTrackId
-                neededIds.forEach { id ->
-                    try {
-                        val track = musicRepository.getTrackInfo(id)
-                        if (cachedTracks.none { it.id == track.id }) {
-                            cachedTracks.add(track)
+                val savedGame = getSavedGameUseCase()
+                if (savedGame != null) {
+                    println("GameViewModel: Downloading saved tracks for existing game...")
+                    val neededIds = savedGame.collectedCardIdsByTeamId.values.flatten() + savedGame.currentTrackId
+                    neededIds.forEach { id ->
+                        try {
+                            val track = musicRepository.getTrackInfo(id)
+                            if (cachedTracks.none { it.id == track.id }) {
+                                cachedTracks.add(track)
+                            }
+                        } catch (e: Exception) {
+                            println("GameViewModel: Error downloading track: ${e.message}")
                         }
-                    } catch (e: Exception) {
-                        println("GameViewModel: Error downloading track: ${e.message}")
                     }
-                }
-                _state.update { it.copy(tracks = cachedTracks.toList()) }
+                    _state.update { it.copy(tracks = cachedTracks.toList()) }
 
-                val mappedGame = mapDtoToGame(savedGame)
-                _state.update { oldState ->
-                    oldState.copy(
-                        game = mappedGame,
-                        currentTrack = mappedGame.currentTrack
-                    )
+                    val mappedGame = mapDtoToGame(savedGame)
+                    _state.update { oldState ->
+                        oldState.copy(
+                            game = mappedGame,
+                            currentTrack = mappedGame.currentTrack
+                        )
+                    }
+                    println("GameViewModel: Saved game successfully resumed!")
+                } else {
+                    loadRealMusicAndInitGame()
                 }
-                println("GameViewModel: Saved game successfully resumed!")
-            } else {
-                loadRealMusicAndInitGame()
+            } catch (e: Exception) {
+                println("GameViewModel: Error during loading saved game: ${e.message}")
             }
-        } catch (e: Exception) {
-            println("GameViewModel: Error during loading saved game: ${e.message}")
-        }
         }
     }
 
-     fun loadRealMusicAndInitGame() {
+    fun loadRealMusicAndInitGame() {
         viewModelScope.launch {
             try {
                 resetGameUseCase()
@@ -248,6 +262,7 @@ class GameViewModel(
             winnerTeam = winnerTeam
         )
     }
+
     fun onPopupAcknowledgePressed() {
         _state.update { it.copy(currentPhase = GamePhase.GUESSING) }
 

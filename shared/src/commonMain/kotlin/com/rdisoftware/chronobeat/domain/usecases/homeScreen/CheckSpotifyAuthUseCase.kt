@@ -16,7 +16,7 @@ sealed interface AuthResult {
 
 class CheckSpotifyAuthUseCase(
     private val musicRepository: MusicRepository
-){
+) {
     suspend operator fun invoke(): AuthResult {
         return if (musicRepository.hasValidToken()) {
             AuthResult.Authenticated

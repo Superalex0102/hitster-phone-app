@@ -93,6 +93,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.random.Random
+
 @Composable
 fun GameScreen(
     shouldLoadSave: Boolean,
@@ -164,6 +165,7 @@ fun GameScreen(
         }
     }
 }
+
 @Composable
 fun NextTeamPopupOverlay(
     teamName: String,
@@ -199,6 +201,7 @@ fun NextTeamPopupOverlay(
         }
     }
 }
+
 @Composable
 fun ResultOverlay(isCorrect: Boolean?) {
     Box(
@@ -223,6 +226,7 @@ fun ResultOverlay(isCorrect: Boolean?) {
         )
     }
 }
+
 @Composable
 fun GameHeader(
     currentTeam: Team?,
@@ -246,6 +250,7 @@ fun GameHeader(
         )
     }
 }
+
 @Composable
 fun TeamInformation(
     currentTeam: Team?,
@@ -288,6 +293,7 @@ fun TeamInformation(
         NumberCard(cardCount = cardCount.toString())
     }
 }
+
 @Composable
 fun NumberCard(
     cardCount: String
@@ -311,6 +317,7 @@ fun NumberCard(
         )
     }
 }
+
 @Composable
 fun AnimatedSoundWaves(
     isAnimating: Boolean,
@@ -370,6 +377,7 @@ fun AnimatedSoundWaves(
         }
     }
 }
+
 @Composable
 fun GameSurface(
     timeline: List<Track>,
@@ -398,6 +406,7 @@ fun GameSurface(
         }
     }
 }
+
 @Composable
 fun GuessButton(
     isEnabled: Boolean = true,
@@ -433,6 +442,7 @@ fun GuessButton(
         )
     }
 }
+
 @Composable
 fun GameCard(
     track: Track,
@@ -458,6 +468,7 @@ fun GameCard(
         GameCardContent(track = track)
     }
 }
+
 @Composable
 fun GameCardContent(
     track: Track
@@ -509,6 +520,7 @@ fun GameCardContent(
         )
     }
 }
+
 @Composable
 fun GameText(
     text: String,
@@ -532,6 +544,7 @@ fun GameText(
             }
     )
 }
+
 @Composable
 fun BoxScope.TimeLineArrow() {
     Box(
@@ -557,6 +570,7 @@ fun BoxScope.TimeLineArrow() {
         )
     }
 }
+
 @Composable
 fun DownwardArrow() {
     val arrowHeadSize = 10.dp
@@ -593,6 +607,7 @@ fun DownwardArrow() {
         )
     }
 }
+
 @Composable
 fun BoxScope.ArrowText(
     text: StringResource,

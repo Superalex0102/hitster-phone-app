@@ -88,7 +88,7 @@ fun HomeScreen(
                 SimpleResumeGamePopup(
                     onConfirm = { viewModel.onEvent(HomeEvent.OnResumeConfirm(navigate = onLocalGameClicked)) },
                     onDiscard = { viewModel.onEvent(HomeEvent.OnResumeDiscard(navigate = onLocalGameClicked)) })
-                    }
+            }
 
 
             SettingsButton(
@@ -243,7 +243,7 @@ fun LoginPopup(
                     onClick = { viewModel.onEvent(HomeEvent.OnSignInClick) }
                 )
 
-                ErrorText(message = state.loginMessage )
+                ErrorText(message = state.loginMessage)
             }
         }
     }
@@ -333,7 +333,7 @@ fun SimpleResumeGamePopup(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement =  Arrangement.End,
+                    horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(onClick = onDiscard) {

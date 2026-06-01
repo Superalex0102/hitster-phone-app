@@ -23,7 +23,7 @@ fun AppNavHost() {
                 onLocalGameClicked = { shouldLoadSave ->
                     if (shouldLoadSave) {
                         navController.navigate(GameRoute(shouldLoadSave = true))
-                    }else {
+                    } else {
                         navController.navigate(TeamSelectionRoute)
                     }
                 }

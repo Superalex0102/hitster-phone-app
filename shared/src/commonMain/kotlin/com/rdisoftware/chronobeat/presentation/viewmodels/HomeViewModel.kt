@@ -42,7 +42,7 @@ class HomeViewModel(
     private val getSavedGameUseCase: GetSavedGameUseCase,
     private val checkSpotifyAuthUseCase: CheckSpotifyAuthUseCase,
     private val spotifyAuthenticationUseCase: SpotifyAuthenticationUseCase
-): ViewModel() {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state
@@ -54,28 +54,34 @@ class HomeViewModel(
                     it.copy(showSettingsPopup = !it.showSettingsPopup)
                 }
             }
+
             HomeEvent.OnSettingsDismiss -> {
                 _state.update {
                     it.copy(showSettingsPopup = false)
                 }
             }
+
             HomeEvent.OnOnlineGameClick -> {
                 if (_state.value.isOnlineEnabled) {
                     // TODO: Navigation implementation goes here, future plan
                 }
             }
+
             HomeEvent.OnLoginPopupDismiss -> {
                 _state.update {
-                    it.copy( showLoginPopup = false)
+                    it.copy(showLoginPopup = false)
                 }
             }
+
             is HomeEvent.OnLocalGameClick -> {
                 event.navigate(false)
             }
+
             is HomeEvent.OnResumeConfirm -> {
                 _state.update { it.copy(showResumePopup = false) }
                 event.navigate(true)
             }
+
             is HomeEvent.OnResumeDiscard -> {
                 _state.update { it.copy(showResumePopup = false) }
                 event.navigate(false)
@@ -86,7 +92,7 @@ class HomeViewModel(
                     try {
                         spotifyAuthenticationUseCase()
                         _state.update { it.copy(showLoginPopup = false) }
-                    }catch (e: Exception){
+                    } catch (e: Exception) {
                         println("Login failed: ${e.message}")
                     }
                     checkResumeGame()
@@ -94,10 +100,11 @@ class HomeViewModel(
             }
         }
     }
-    fun checkSpotifyAuthentication(){
+
+    fun checkSpotifyAuthentication() {
         viewModelScope.launch {
-            when(checkSpotifyAuthUseCase()) {
-                 AuthResult.Authenticated -> {
+            when (checkSpotifyAuthUseCase()) {
+                AuthResult.Authenticated -> {
                     _state.update {
                         it.copy(
                             showLoginPopup = false,
@@ -105,7 +112,7 @@ class HomeViewModel(
                             loginMessage = null
                         )
                     }
-                     checkResumeGame()
+                    checkResumeGame()
                 }
 
                 AuthResult.RequiresLogin -> {
@@ -114,10 +121,11 @@ class HomeViewModel(
                             showLoginPopup = true,
                             isLocalEnabled = true,
                             loginMessage = Res.string.sing_in_to_spotify
-                            )
+                        )
 
                     }
                 }
+
                 AuthResult.Error -> {
                     _state.update {
                         it.copy(
@@ -132,9 +140,9 @@ class HomeViewModel(
         }
     }
 
-    private suspend fun checkResumeGame(){
+    private suspend fun checkResumeGame() {
         val savedGame = getSavedGameUseCase()
-        if (savedGame != null){
+        if (savedGame != null) {
             _state.update { it.copy(showResumePopup = true) }
         }
     }

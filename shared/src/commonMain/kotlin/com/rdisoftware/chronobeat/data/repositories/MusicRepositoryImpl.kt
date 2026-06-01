@@ -41,7 +41,7 @@ class MusicRepositoryImpl(
         }
     }
 
-    override suspend fun getChronobeatPlaylists() : List<Playlist>{
+    override suspend fun getChronobeatPlaylists(): List<Playlist> {
         return try {
             chronoBeatApi.fetchChronoBeatPlaylists().toDomain()
         } catch (e: Exception) {

@@ -23,12 +23,11 @@ class ActiveGameRepositoryImpl(
         if (saveGameJson != null) {
             _game.value = try {
                 customJson.decodeFromString<GameDto>(saveGameJson)
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 null
             }
         }
     }
-
 
     override suspend fun getGame(): GameDto? {
         return _game.value
