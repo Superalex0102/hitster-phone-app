@@ -327,9 +327,9 @@ fun SimpleResumeGamePopup(
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(text = "Félbehagyott játék")
+                Text(text = "You left behind a game in progess")
 
-                Text(text = "szeretnéd folytatni a játékot?")
+                Text(text = "Do you want to continue?")
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -337,10 +337,10 @@ fun SimpleResumeGamePopup(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     TextButton(onClick = onDiscard) {
-                        Text("new game")
+                        Text("New Game!")
                     }
                     TextButton(onClick = onConfirm) {
-                        Text("continue")
+                        Text("Continue!")
                     }
                 }
             }
