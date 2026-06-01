@@ -45,14 +45,17 @@ val sharedModule = module {
     single { Settings() }
 
     //ViewModels
-    factory { HomeViewModel() }
+    factory { HomeViewModel(
+        getSavedGameUseCase = get()
+    ) }
     factory { GameViewModel(
         playMusicUseCase = get(),
         getSavedGameUseCase = get(),
         saveGameProgressUseCase = get(),
-        resetGameUseCase = get()
+        resetGameUseCase = get(),
         activeGameRepository = get(),
-        musicRepository = get()
+        teamRepository = get(),
+        musicRepository = get(),
     ) }
     factory { TeamSelectionViewModel(
         addTeamUseCase = get(),

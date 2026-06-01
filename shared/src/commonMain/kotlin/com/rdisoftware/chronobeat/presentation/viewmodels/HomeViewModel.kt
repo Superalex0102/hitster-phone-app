@@ -2,16 +2,20 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @Stable
 data class HomeUiState(
     val showSettingsPopup: Boolean = false,
     val isLocalEnabled: Boolean = true,
     val isOnlineEnabled: Boolean = false,
-    val showLoginPopup: Boolean = true
+    val showLoginPopup: Boolean = true,
+    val showResumePopup: Boolean = false
 )
 
 sealed interface HomeEvent {
@@ -19,9 +23,15 @@ sealed interface HomeEvent {
     data object OnSettingsDismiss : HomeEvent
     data object OnOnlineGameClick : HomeEvent
     data object OnLoginPopupDismiss : HomeEvent
+
+    data class OnLocalGameClick(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
+    data class OnResumeConfirm(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
+    data class OnResumeDiscard(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
 }
 
-class HomeViewModel(): ViewModel() {
+class HomeViewModel(
+    private val getSavedGameUseCase: GetSavedGameUseCase
+): ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state
@@ -47,6 +57,25 @@ class HomeViewModel(): ViewModel() {
                 _state.update {
                     it.copy( showLoginPopup = false)
                 }
+            }
+            is HomeEvent.OnLocalGameClick -> {
+                event.navigate(false)
+            }
+            is HomeEvent.OnResumeConfirm -> {
+                _state.update { it.copy(showResumePopup = false) }
+                event.navigate(true)
+            }
+            is HomeEvent.OnResumeDiscard -> {
+                _state.update { it.copy(showResumePopup = false) }
+                event.navigate(false)
+            }
+        }
+    }
+    fun checkSavedGameOnStart(){
+        viewModelScope.launch {
+            val savedGame = getSavedGameUseCase()
+            if (savedGame != null){
+                _state.update { it.copy(showResumePopup = true) }
             }
         }
     }

@@ -38,7 +38,7 @@ class ActiveGameRepositoryImpl(
         val savedGameJson = settings.getStringOrNull("SAVED_GAME")
         if (savedGameJson != null) {
             return try {
-                val deserializedGame = customJson.decodeFromString<Game>(savedGameJson)
+                val deserializedGame = customJson.decodeFromString<GameDto>(savedGameJson)
                 _game.value = deserializedGame
                 deserializedGame
             } catch (e: Exception) {

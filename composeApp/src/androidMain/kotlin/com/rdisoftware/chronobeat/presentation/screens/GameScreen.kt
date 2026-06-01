@@ -95,13 +95,22 @@ import org.koin.compose.viewmodel.koinViewModel
 import kotlin.random.Random
 @Composable
 fun GameScreen(
+    shouldLoadSave: Boolean,
     viewModel: GameViewModel = koinViewModel(),
-    onGameFinishedClicked: () -> Unit
+    onGameFinishedClicked: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(state.currentPhase) {
         if (state.currentPhase == GamePhase.GAME_OVER) {
             onGameFinishedClicked()
+        }
+    }
+    LaunchedEffect(Unit) {
+        println("az értéke a loadnak: ${shouldLoadSave}")
+        if (shouldLoadSave) {
+            viewModel.loadSavedGameOrStartNew()
+        } else {
+            viewModel.loadRealMusicAndInitGame()
         }
     }
 

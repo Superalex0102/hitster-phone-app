@@ -1,14 +1,18 @@
 package com.rdisoftware.chronobeat.presentation.screens
 
+
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -49,10 +53,13 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onLocalGameClicked: () -> Unit
+    onLocalGameClicked: (shouldLoadSave: Boolean) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    LaunchedEffect(Unit) {
+        viewModel.checkSavedGameOnStart()
+    }
 
     Box(
         modifier = Modifier
@@ -74,6 +81,12 @@ fun HomeScreen(
                     }
                 )
             }
+            if (state.showResumePopup) {
+                SimpleResumeGamePopup(
+                    onConfirm = { viewModel.onEvent(HomeEvent.OnResumeConfirm(navigate = onLocalGameClicked)) },
+                    onDiscard = { viewModel.onEvent(HomeEvent.OnResumeDiscard(navigate = onLocalGameClicked)) })
+                    }
+
 
             SettingsButton(
                 onClick = {
@@ -106,7 +119,7 @@ fun HomeScreen(
                         testTag = HomeScreen.LOCAL_GAME_BUTTON,
                         resourceId = true,
                         onClick = {
-                            onLocalGameClicked()
+                            onLocalGameClicked(false)
                         }
                     )
 
@@ -280,5 +293,50 @@ fun ErrorText() {
                     testTagsAsResourceId = true
                 }
         )
+    }
+}
+
+@Composable
+fun SimpleResumeGamePopup(
+    onConfirm: () -> Unit,
+    onDiscard: () -> Unit
+) {
+    Popup(
+        alignment = Alignment.Center,
+        properties = PopupProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Surface(
+            modifier = Modifier
+                .widthIn(min = 280.dp, max = 400.dp)
+                .padding(24.dp),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(text = "Félbehagyott játék")
+
+                Text(text = "szeretnéd folytatni a játékot?")
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement =  Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onDiscard) {
+                        Text("new game")
+                    }
+                    TextButton(onClick = onConfirm) {
+                        Text("continue")
+                    }
+                }
+            }
+        }
     }
 }

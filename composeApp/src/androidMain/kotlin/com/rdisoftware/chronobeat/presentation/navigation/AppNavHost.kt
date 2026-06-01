@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
@@ -19,8 +20,12 @@ fun AppNavHost() {
     ) {
         composable<HomeRoute> {
             HomeScreen(
-                onLocalGameClicked = {
-                    navController.navigate(TeamSelectionRoute)
+                onLocalGameClicked = { shouldLoadSave ->
+                    if (shouldLoadSave) {
+                        navController.navigate(GameRoute(shouldLoadSave = true))
+                    }else {
+                        navController.navigate(TeamSelectionRoute)
+                    }
                 }
             )
         }
@@ -28,13 +33,16 @@ fun AppNavHost() {
         composable<TeamSelectionRoute> {
             TeamSelectionScreen(
                 onTeamsSelectedClicked = {
-                    navController.navigate(GameRoute)
+                    navController.navigate(GameRoute(shouldLoadSave = false))
                 }
             )
         }
 
-        composable<GameRoute> {
+        composable<GameRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<GameRoute>()
+
             GameScreen(
+                shouldLoadSave = route.shouldLoadSave,
                 onGameFinishedClicked = {
                     navController.navigate(GameSummaryRoute)
                 }
