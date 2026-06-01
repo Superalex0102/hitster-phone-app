@@ -45,8 +45,10 @@ import com.rdisoftware.chronobeat.presentation.dimensions.TabletHomeDimensions
 import com.rdisoftware.chronobeat.presentation.dimensions.homeDimens
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
+import com.rdisoftware.chronobeat.presentation.viewmodels.HomeUiState
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.theme.AppColors
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -58,7 +60,7 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     LaunchedEffect(Unit) {
-        viewModel.checkSavedGameOnStart()
+        viewModel.checkSpotifyAuthentication()
     }
 
     Box(
@@ -76,6 +78,7 @@ fun HomeScreen(
 
             if (state.showLoginPopup) {
                 LoginPopup(
+                    state = state,
                     onDismissRequest = {
                         viewModel.onEvent(event = HomeEvent.OnLoginPopupDismiss)
                     }
@@ -192,7 +195,9 @@ fun MainTitle() {
 
 @Composable
 fun LoginPopup(
-    onDismissRequest: () -> Unit
+    viewModel: HomeViewModel = koinViewModel(),
+    state: HomeUiState,
+    onDismissRequest: () -> Unit,
 ) {
     Popup(
         alignment = Alignment.Center,
@@ -235,10 +240,10 @@ fun LoginPopup(
                     size = ButtonSize.LARGE,
                     testTag = LoginPopup.SIGN_IN_BUTTON,
                     resourceId = true,
-                    onClick = {} //TODO: Sign in on click action
+                    onClick = { viewModel.onEvent(HomeEvent.OnSignInClick) }
                 )
 
-                ErrorText()
+                ErrorText(message = state.loginMessage )
             }
         }
     }
@@ -266,7 +271,9 @@ fun PopupTitle(
 }
 
 @Composable
-fun ErrorText() {
+fun ErrorText(message: StringResource?) {
+    if (message == null) return
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -283,7 +290,7 @@ fun ErrorText() {
         )
 
         Text(
-            text = stringResource(Res.string.error_message), // TODO: Create dynamic text
+            text = stringResource(message), // TODO: Create dynamic text
             color = Color(AppColors.RED),
             fontFamily = robotoMonoRegular,
             fontSize = homeDimens.errorTextFontSize,
