@@ -28,12 +28,12 @@ class TeamRepositoryIntegrationTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var viewModel: TeamSelectionViewModel
-    private lateinit var settings: Settings
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
+        val settings = Settings()
         val repository = TeamRepositoryImpl(settings)
         viewModel = TeamSelectionViewModel(
             addTeamUseCase    = AddTeamUseCase(repository),

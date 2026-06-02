@@ -36,12 +36,12 @@ class GameViewModelTest {
     private lateinit var viewModel: GameViewModel
 
     private lateinit var fakeMusicRepository: FakeMusicRepository
-    private lateinit var settings: Settings
     private lateinit var activeGameRepository: ActiveGameRepositoryImpl
     private lateinit var teamRepository: TeamRepository
 
     @BeforeTest
     fun setup() {
+        val settings = Settings()
         Dispatchers.setMain(testDispatcher)
         activeGameRepository = ActiveGameRepositoryImpl(settings)
         fakeMusicRepository = FakeMusicRepository()

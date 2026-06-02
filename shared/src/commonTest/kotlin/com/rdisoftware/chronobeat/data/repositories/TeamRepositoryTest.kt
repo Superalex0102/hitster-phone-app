@@ -17,10 +17,10 @@ import kotlin.uuid.Uuid
 class TeamRepositoryTest {
 
     private lateinit var repository: TeamRepository
-    private  lateinit var settings: Settings
 
     @BeforeTest
     fun setup() {
+        val settings = Settings()
         repository = TeamRepositoryImpl(settings)
     }
 

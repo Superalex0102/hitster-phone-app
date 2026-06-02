@@ -19,10 +19,10 @@ import kotlin.uuid.Uuid
 class ActiveGameRepositoryTest {
 
     private lateinit var repository: ActiveGameRepository
-    private lateinit var settings: Settings
 
     @BeforeTest
     fun setup() {
+        val settings = Settings()
         repository = ActiveGameRepositoryImpl(settings)
     }
     private fun createDummyGameDto(): GameDto {
