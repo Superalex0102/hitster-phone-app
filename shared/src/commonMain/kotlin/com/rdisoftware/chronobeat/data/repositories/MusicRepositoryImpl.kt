@@ -8,6 +8,7 @@ import com.rdisoftware.chronobeat.domain.models.PlaylistSummary
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.player.SpotifyPlayerController
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
+import com.rdisoftware.chronobeat.shared.BuildConfig
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
@@ -17,17 +18,10 @@ class MusicRepositoryImpl(
     private val spotifyPlayer: SpotifyPlayerController
 ) : MusicRepository {
     private suspend fun ensureValidToken() {
-        if (TokenManager.accessToken != null && TokenManager.accessToken != com.rdisoftware.chronobeat.shared.BuildConfig.SPOTIFY_ACCESS_TOKEN_DEBUG) {
+        if (hasValidToken()) {
             return
         }
-
-        spotifyPlayer.authenticate()
-
-        val token = withTimeoutOrNull(60_000L) {
-            TokenManager.accessTokenFlow.filterNotNull().first()
-        }
-
-        if (token == null) throw RuntimeException("Spotify login timeout")
+        authenticate()
     }
 
     override suspend fun getUserPlaylistsSummary(): List<PlaylistSummary> {
@@ -48,7 +42,7 @@ class MusicRepositoryImpl(
         }
     }
 
-    override suspend fun getChronobeatPlaylists() : List<Playlist>{
+    override suspend fun getChronobeatPlaylists(): List<Playlist> {
         return try {
             chronoBeatApi.fetchChronoBeatPlaylists().toDomain()
         } catch (e: Exception) {
@@ -75,5 +69,27 @@ class MusicRepositoryImpl(
 
     override suspend fun pauseMusic() {
         spotifyPlayer.pause()
+    }
+
+    override fun hasValidToken(): Boolean {
+        return TokenManager.accessToken != null &&
+                TokenManager.accessToken != BuildConfig.SPOTIFY_ACCESS_TOKEN_DEBUG
+
+    }
+
+    override suspend fun authenticate() {
+
+        spotifyPlayer.authenticate()
+
+        val token = withTimeoutOrNull(60_000L) {
+            TokenManager.accessTokenFlow
+                .filterNotNull()
+                .first()
+        }
+
+        if (token == null) {
+            throw RuntimeException("Spotify login timeout")
+        }
+
     }
 }

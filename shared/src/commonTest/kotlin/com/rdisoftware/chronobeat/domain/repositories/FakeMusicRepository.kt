@@ -50,4 +50,12 @@ class FakeMusicRepository : MusicRepository {
     override suspend fun pauseMusic() {
 
     }
+
+    override fun hasValidToken(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun authenticate() {
+        TODO("Not yet implemented")
+    }
 }

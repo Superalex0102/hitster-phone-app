@@ -2,10 +2,17 @@ package com.rdisoftware.chronobeat.testing
 
 import FakeMusicRepository
 import com.rdisoftware.chronobeat.data.repositories.ActiveGameRepositoryImpl
+import com.rdisoftware.chronobeat.data.repositories.TeamRepositoryImpl
 import com.rdisoftware.chronobeat.domain.models.Track
+import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.RestartGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SaveGameProgressUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
+import com.russhwolf.settings.MapSettings
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
@@ -20,7 +27,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.uuid.ExperimentalUuidApi
 
@@ -33,15 +39,22 @@ class GameViewModelTest {
 
     private lateinit var fakeMusicRepository: FakeMusicRepository
     private lateinit var activeGameRepository: ActiveGameRepositoryImpl
+    private lateinit var teamRepository: TeamRepository
 
     @BeforeTest
     fun setup() {
+        val settings = MapSettings()
         Dispatchers.setMain(testDispatcher)
-        activeGameRepository = ActiveGameRepositoryImpl()
+        teamRepository = TeamRepositoryImpl(settings)
+        activeGameRepository = ActiveGameRepositoryImpl(settings)
         fakeMusicRepository = FakeMusicRepository()
         val playMusicUseCase = PlayMusicUseCase(fakeMusicRepository)
+        val getSavedGameUseCase = GetSavedGameUseCase(activeGameRepository)
+        val restartGameUseCase = RestartGameUseCase(activeGameRepository,teamRepository)
+        val saveGameProgressUseCase = SaveGameProgressUseCase(activeGameRepository)
 
-        viewModel = GameViewModel(activeGameRepository, fakeMusicRepository, playMusicUseCase)
+
+        viewModel = GameViewModel(activeGameRepository, fakeMusicRepository, playMusicUseCase, getSavedGameUseCase,saveGameProgressUseCase,restartGameUseCase)
     }
 
     @AfterTest

@@ -1,14 +1,18 @@
 package com.rdisoftware.chronobeat.presentation.screens
 
+
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Error
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,18 +45,23 @@ import com.rdisoftware.chronobeat.presentation.dimensions.TabletHomeDimensions
 import com.rdisoftware.chronobeat.presentation.dimensions.homeDimens
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
+import com.rdisoftware.chronobeat.presentation.viewmodels.HomeUiState
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.theme.AppColors
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onLocalGameClicked: () -> Unit
+    onLocalGameClicked: (shouldLoadSave: Boolean) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    LaunchedEffect(Unit) {
+        viewModel.checkSpotifyAuthentication()
+    }
 
     Box(
         modifier = Modifier
@@ -69,11 +78,18 @@ fun HomeScreen(
 
             if (state.showLoginPopup) {
                 LoginPopup(
+                    state = state,
                     onDismissRequest = {
                         viewModel.onEvent(event = HomeEvent.OnLoginPopupDismiss)
                     }
                 )
             }
+            if (state.showResumePopup) {
+                SimpleResumeGamePopup(
+                    onConfirm = { viewModel.onEvent(HomeEvent.OnResumeConfirm(navigate = onLocalGameClicked)) },
+                    onDiscard = { viewModel.onEvent(HomeEvent.OnResumeDiscard(navigate = onLocalGameClicked)) })
+            }
+
 
             SettingsButton(
                 onClick = {
@@ -106,7 +122,7 @@ fun HomeScreen(
                         testTag = HomeScreen.LOCAL_GAME_BUTTON,
                         resourceId = true,
                         onClick = {
-                            onLocalGameClicked()
+                            onLocalGameClicked(false)
                         }
                     )
 
@@ -179,7 +195,9 @@ fun MainTitle() {
 
 @Composable
 fun LoginPopup(
-    onDismissRequest: () -> Unit
+    viewModel: HomeViewModel = koinViewModel(),
+    state: HomeUiState,
+    onDismissRequest: () -> Unit,
 ) {
     Popup(
         alignment = Alignment.Center,
@@ -222,10 +240,10 @@ fun LoginPopup(
                     size = ButtonSize.LARGE,
                     testTag = LoginPopup.SIGN_IN_BUTTON,
                     resourceId = true,
-                    onClick = {} //TODO: Sign in on click action
+                    onClick = { viewModel.onEvent(HomeEvent.OnSignInClick) }
                 )
 
-                ErrorText()
+                ErrorText(message = state.loginMessage)
             }
         }
     }
@@ -253,7 +271,9 @@ fun PopupTitle(
 }
 
 @Composable
-fun ErrorText() {
+fun ErrorText(message: StringResource?) {
+    if (message == null) return
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -270,7 +290,7 @@ fun ErrorText() {
         )
 
         Text(
-            text = stringResource(Res.string.error_message), // TODO: Create dynamic text
+            text = stringResource(message), // TODO: Create dynamic text
             color = Color(AppColors.RED),
             fontFamily = robotoMonoRegular,
             fontSize = homeDimens.errorTextFontSize,
@@ -280,5 +300,50 @@ fun ErrorText() {
                     testTagsAsResourceId = true
                 }
         )
+    }
+}
+
+@Composable
+fun SimpleResumeGamePopup(
+    onConfirm: () -> Unit,
+    onDiscard: () -> Unit
+) {
+    Popup(
+        alignment = Alignment.Center,
+        properties = PopupProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        )
+    ) {
+        Surface(
+            modifier = Modifier
+                .widthIn(min = 280.dp, max = 400.dp)
+                .padding(24.dp),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(text = "You left behind a game in progess")
+
+                Text(text = "Do you want to continue?")
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = onDiscard) {
+                        Text("New Game!")
+                    }
+                    TextButton(onClick = onConfirm) {
+                        Text("Continue!")
+                    }
+                }
+            }
+        }
     }
 }
