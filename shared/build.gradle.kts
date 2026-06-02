@@ -51,6 +51,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.compose.components.resources)
+            implementation(libs.multiplatform.settings.no.arg)
         }
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
@@ -66,6 +67,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.junit)
             implementation(libs.ktor.client.mock)
+            implementation(libs.multiplatform.settings.test)
         }
     }
 }

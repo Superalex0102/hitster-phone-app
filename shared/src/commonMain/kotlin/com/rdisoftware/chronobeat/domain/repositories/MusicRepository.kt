@@ -12,4 +12,7 @@ interface MusicRepository {
     suspend fun playMusic(trackId: String)
     suspend fun resumeMusic()
     suspend fun pauseMusic()
+    fun hasValidToken(): Boolean
+    suspend fun authenticate()
+
 }
