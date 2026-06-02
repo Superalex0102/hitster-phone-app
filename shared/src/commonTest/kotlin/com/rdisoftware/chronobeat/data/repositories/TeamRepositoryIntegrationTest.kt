@@ -6,6 +6,7 @@ import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.UpdateTeamUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -27,12 +28,13 @@ class TeamRepositoryIntegrationTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var viewModel: TeamSelectionViewModel
+    private lateinit var settings: Settings
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
-        val repository = TeamRepositoryImpl()
+        val repository = TeamRepositoryImpl(settings)
         viewModel = TeamSelectionViewModel(
             addTeamUseCase    = AddTeamUseCase(repository),
             deleteTeamUseCase = DeleteTeamUseCase(repository),
