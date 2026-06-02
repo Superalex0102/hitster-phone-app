@@ -311,8 +311,6 @@ class GameViewModel(
 
             if (updatedTrackIds.size >= GameConstants.CARDS_TO_WIN) {
                 winnerId = currentDto.currentTeamId
-                resetGameUseCase()
-
             }
         }
 
