@@ -3,6 +3,7 @@ package com.rdisoftware.chronobeat.data.repositories
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
+import com.russhwolf.settings.MapSettings
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
@@ -20,7 +21,7 @@ class TeamRepositoryTest {
 
     @BeforeTest
     fun setup() {
-        val settings = Settings()
+        val settings = MapSettings()
         repository = TeamRepositoryImpl(settings)
     }
 

@@ -10,6 +10,7 @@ import com.rdisoftware.chronobeat.domain.usecases.homeScreen.RestartGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SaveGameProgressUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
+import com.russhwolf.settings.MapSettings
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -41,7 +42,7 @@ class GameViewModelTest {
 
     @BeforeTest
     fun setup() {
-        val settings = Settings()
+        val settings = MapSettings()
         Dispatchers.setMain(testDispatcher)
         activeGameRepository = ActiveGameRepositoryImpl(settings)
         fakeMusicRepository = FakeMusicRepository()
