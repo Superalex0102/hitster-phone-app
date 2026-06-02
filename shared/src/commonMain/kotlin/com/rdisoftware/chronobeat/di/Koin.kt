@@ -7,7 +7,16 @@ import com.rdisoftware.chronobeat.data.repositories.TeamRepositoryImpl
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
+import com.rdisoftware.chronobeat.domain.usecases.AdvanceTurnUseCase
+import com.rdisoftware.chronobeat.domain.usecases.CheckGuessPositionUseCase
+import com.rdisoftware.chronobeat.domain.usecases.GetChronobeatPlaylistsUseCase
+import com.rdisoftware.chronobeat.domain.usecases.GetGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.GetPlayableTrackUseCase
+import com.rdisoftware.chronobeat.domain.usecases.LoadGameSessionUseCase
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
+import com.rdisoftware.chronobeat.domain.usecases.ProcessCorrectGuessUseCase
+import com.rdisoftware.chronobeat.domain.usecases.SaveGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.SetupInitialGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
@@ -42,9 +51,16 @@ val sharedModule = module {
     //ViewModels
     factory { HomeViewModel() }
     factory { GameViewModel(
-        activeGameRepository = get(),
+        getPlayableTrackUseCase = get(),
+        setupInitialGameUseCase = get(),
+        loadGameSessionUseCase = get(),
+        checkGuessPositionUseCase = get(),
+        processCorrectGuessUseCase = get(),
+        advanceTurnUseCase = get(),
         playMusicUseCase = get(),
-        musicRepository = get()
+        getGameUseCase = get(),
+        saveGameUseCase = get(),
+        getChronobeatPlaylistsUseCase = get(),
     ) }
     factory { TeamSelectionViewModel(
         addTeamUseCase = get(),
@@ -55,15 +71,23 @@ val sharedModule = module {
     factory { GameSummaryViewModel() }
 
     //UseCases
-    factory { PlayMusicUseCase(
-        musicRepository = get()
+    factory { PlayMusicUseCase(musicRepository = get()) }
+    factory { GetPlayableTrackUseCase(musicRepository = get()) }
+    factory { SetupInitialGameUseCase(
+        getPlayableTrackUseCase = get(),
+        activeGameRepository = get()
     ) }
-
-
+    factory { LoadGameSessionUseCase(musicRepository = get()) }
+    factory { CheckGuessPositionUseCase() }
+    factory { ProcessCorrectGuessUseCase() }
+    factory { AdvanceTurnUseCase() }
     factory { AddTeamUseCase(teamRepository = get()) }
     factory { DeleteTeamUseCase(teamRepository = get()) }
     factory { UpdateTeamUseCase(teamRepository = get()) }
     factory { GetTeamsUseCase(teamRepository = get()) }
+    factory { GetGameUseCase(activeGameRepository = get()) }
+    factory { SaveGameUseCase(activeGameRepository = get()) }
+    factory { GetChronobeatPlaylistsUseCase(musicRepository = get()) }
 
     //Repositories
     single<TeamRepository> { TeamRepositoryImpl() }

@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -140,6 +141,17 @@ fun GameScreen(
                     onGuessPressed = { position -> viewModel.onGuessPressed(position) },
                     isGuessingPhase = state.currentPhase == GamePhase.GUESSING
                 )
+            }
+
+            if (state.currentPhase == GamePhase.LOADING) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.8f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color.White)
+                }
             }
 
             if (state.currentPhase == GamePhase.SHOW_NEXT_TEAM_POPUP) {

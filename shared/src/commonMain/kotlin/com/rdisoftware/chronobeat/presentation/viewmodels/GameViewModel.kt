@@ -9,8 +9,7 @@ import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
-import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
-import com.rdisoftware.chronobeat.presentation.constants.GameConstants
+import com.rdisoftware.chronobeat.domain.usecases.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +19,7 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 enum class GamePhase {
+    LOADING,
     SHOW_NEXT_TEAM_POPUP,
     GUESSING,
     SHOW_RESULT,
@@ -29,22 +29,27 @@ enum class GamePhase {
 @OptIn(ExperimentalUuidApi::class)
 data class GameState(
     val game: Game? = null,
-    val tracks: List<Track> = emptyList(),
     val currentTrack: Track? = null,
     val isGuessCorrect: Boolean? = null,
-    val currentPhase: GamePhase = GamePhase.SHOW_NEXT_TEAM_POPUP
+    val currentPhase: GamePhase = GamePhase.LOADING
 ) {
     val currentTeam = game?.currentTeam
     val timeline: List<Track> = game?.collectedCardsByTeam?.get(currentTeam) ?: emptyList()
     val currentCardCount: Int = timeline.size
-    val isGameWon: Boolean = game?.winnerTeam != null
 }
 
 @OptIn(ExperimentalUuidApi::class)
 class GameViewModel(
-    private val activeGameRepository: ActiveGameRepository,
-    private val musicRepository: MusicRepository,
-    private val playMusicUseCase: PlayMusicUseCase
+    private val getPlayableTrackUseCase: GetPlayableTrackUseCase,
+    private val setupInitialGameUseCase: SetupInitialGameUseCase,
+    private val loadGameSessionUseCase: LoadGameSessionUseCase,
+    private val checkGuessPositionUseCase: CheckGuessPositionUseCase,
+    private val processCorrectGuessUseCase: ProcessCorrectGuessUseCase,
+    private val advanceTurnUseCase: AdvanceTurnUseCase,
+    private val playMusicUseCase: PlayMusicUseCase,
+    private val getGameUseCase: GetGameUseCase,
+    private val saveGameUseCase: SaveGameUseCase,
+    private val getChronobeatPlaylistsUseCase: GetChronobeatPlaylistsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GameState())
@@ -58,127 +63,59 @@ class GameViewModel(
     )
 
     private var trackIdPool: MutableList<String> = mutableListOf()
-    private var cachedTracks: MutableList<Track> = mutableListOf()
+    private val globalTrackCache = mutableMapOf<String, Track>()
 
     init {
-        viewModelScope.launch {
-            activeGameRepository.observeGame().collect { dto ->
-                if (dto != null && cachedTracks.isNotEmpty()) {
-                    try {
-                        val mappedGame = mapDtoToGame(dto)
-                        _state.update { oldState ->
-                            oldState.copy(
-                                game = mappedGame,
-                                currentTrack = mappedGame.currentTrack
-                            )
-                        }
-                    } catch (e: Exception) {
-                        println("GameViewModel: Error while making game: ${e.message}")
-                    }
-                }
-            }
-        }
-
-        loadRealMusicAndInitGame()
-    }
-    private suspend fun getNextPlayableTrack(): Track? {
-        while (trackIdPool.isNotEmpty()) {
-            val nextId = trackIdPool.removeAt(0)
-            try {
-                val track = musicRepository.getTrackInfo(nextId)
-                if (track.isPlayable) {
-                    cachedTracks.add(track)
-                    _state.update { it.copy(tracks = cachedTracks.toList()) }
-                    println("GameViewModel: ${track.mainArtist} - ${track.title} downloaded!")
-                    return track
-                }
-            } catch (e: Exception) {
-                println("GameViewModel: Error when downloading $nextId  music: ${e.cause?.message ?: e.message}")
-            }
-        }
-        return null
+        loadAndInitializeEngine()
     }
 
-    private fun loadRealMusicAndInitGame() {
+    private fun loadAndInitializeEngine() {
         viewModelScope.launch {
+            _state.update { it.copy(currentPhase = GamePhase.LOADING) }
             try {
-                println("GameViewModel: Getting ChronoBeat playlists...")
-                val chronobeatPlaylists = musicRepository.getChronobeatPlaylists()
-                if (chronobeatPlaylists.isEmpty()) {
-                    println("GameViewModel: Error - There is no available ChronoBeat playlist! Cannot start the game.")
-                    return@launch
+                val playlists = getChronobeatPlaylistsUseCase()
+                if (playlists.isEmpty()) return@launch
+
+                val playlist = playlists.first()
+                trackIdPool = playlist.trackIds.shuffled().toMutableList()
+
+                val activeDto = getGameUseCase()
+                val finalDto = if (activeDto != null && activeDto.playlistId == playlist.id) {
+                    val loaded = loadGameSessionUseCase(activeDto)
+                    globalTrackCache.putAll(loaded)
+                    activeDto
+                } else {
+                    setupInitialGameUseCase(playlist.id, allTeams, trackIdPool)
                 }
 
-                val selectedPlaylist = chronobeatPlaylists[0]
-                trackIdPool = selectedPlaylist.trackIds.shuffled().toMutableList()
+                if (finalDto != null) {
+                    val freshLoaded = loadGameSessionUseCase(finalDto)
+                    globalTrackCache.putAll(freshLoaded)
 
-                val existingGame = activeGameRepository.getGame()
-                if (existingGame != null && existingGame.playlistId == selectedPlaylist.id) {
-                    println("GameViewModel: Load current game...")
-                    val neededIds = existingGame.collectedCardIdsByTeamId.values.flatten() + existingGame.currentTrackId
-                    neededIds.forEach { id ->
-                        try {
-                            val track = musicRepository.getTrackInfo(id)
-                            cachedTracks.add(track)
-                        } catch (e: Exception) {
-                            println("GameViewModel: Error: ${e.message}")
-                        }
-                    }
-                    _state.update { it.copy(tracks = cachedTracks.toList()) }
-
-                    val mappedGame = mapDtoToGame(existingGame)
-                    _state.update { oldState ->
-                        oldState.copy(
-                            game = mappedGame,
-                            currentTrack = mappedGame.currentTrack
+                    val initialGame = mapDtoToGame(finalDto)
+                    _state.update {
+                        it.copy(
+                            game = initialGame,
+                            currentTrack = initialGame.currentTrack,
+                            currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP
                         )
                     }
-                } else {
-                    println("GameViewModel: Starting new game. Downloading started cards...")
-
-                    val updatedMap = mutableMapOf<Uuid, List<String>>()
-
-                    allTeams.forEach { team ->
-                        val starterTrack = getNextPlayableTrack()
-                        if (starterTrack != null) {
-                            updatedMap[team.id] = listOf(starterTrack.id)
-                        }
-                    }
-
-                    val firstCurrentTrack = getNextPlayableTrack()
-                    if (firstCurrentTrack == null) {
-                        println("GameViewModel: Error: Not enough music in playlist!")
-                        return@launch
-                    }
-
-                    val initialDto = GameDto(
-                        id = Uuid.random(),
-                        teamIds = allTeams.map { it.id },
-                        currentTeamId = allTeams.first().id,
-                        currentTrackId = firstCurrentTrack.id,
-                        collectedCardIdsByTeamId = updatedMap,
-                        playlistId = selectedPlaylist.id,
-                        winnerTeamId = null
-                    )
-
-                    activeGameRepository.saveGame(initialDto)
                 }
-
             } catch (e: Exception) {
-                println("GameViewModel: Error while initialize: ${e.message}")
+                println("GameViewModel: Initialization fail: ${e.message}")
             }
         }
     }
 
     private fun mapDtoToGame(dto: GameDto): Game {
-        val teams = dto.teamIds.mapNotNull { id -> allTeams.find { it.id == id } }
+        val teams = dto.teamIds.map { id -> allTeams.first { it.id == id } }
         val currentTeam = allTeams.first { it.id == dto.currentTeamId }
-        val currentTrack = cachedTracks.first { it.id == dto.currentTrackId }
+        val currentTrack = globalTrackCache[dto.currentTrackId] ?: Track(dto.currentTrackId, "Unknown","Unknown", emptyList(), 0, false)
         val winnerTeam = dto.winnerTeamId?.let { id -> allTeams.find { it.id == id } }
 
-        val collectedCards = dto.collectedCardIdsByTeamId.mapNotNull { (teamId, trackIds) ->
-            val team = allTeams.find { it.id == teamId } ?: return@mapNotNull null
-            val tracks = trackIds.mapNotNull { trackId -> cachedTracks.find { it.id == trackId } }
+        val collectedCards = dto.collectedCardIdsByTeamId.map { (teamId, trackIds) ->
+            val team = allTeams.first { it.id == teamId }
+            val tracks = trackIds.mapNotNull { globalTrackCache[it] }
             team to tracks
         }.toMap()
 
@@ -194,102 +131,79 @@ class GameViewModel(
     }
 
     fun onPopupAcknowledgePressed() {
+        if (_state.value.currentPhase != GamePhase.SHOW_NEXT_TEAM_POPUP) return
         _state.update { it.copy(currentPhase = GamePhase.GUESSING) }
-
-        val trackId = _state.value.currentTrack?.id
-        if (trackId != null) {
-            playMusic(trackId)
-        }
+        _state.value.currentTrack?.id?.let { playMusic(it) }
     }
 
     fun onGuessPressed(position: Int) {
         if (_state.value.currentPhase != GamePhase.GUESSING) return
 
         viewModelScope.launch {
-            validateGuess(position)
-        }
-    }
+            val currentState = _state.value
+            val currentTrack = currentState.currentTrack ?: return@launch
+            val timeline = currentState.timeline
+            val currentDto = getGameUseCase() ?: return@launch
 
-    private suspend fun validateGuess(position: Int) {
-        val currentState = _state.value
-        val currentTrack = currentState.currentTrack ?: return
-        val timeline = currentState.timeline
-        val currentDto = activeGameRepository.getGame() ?: return
+            val isCorrect = checkGuessPositionUseCase(timeline, currentTrack, position)
 
-        val isCorrect = isPositionCorrect(timeline, currentTrack, position)
-
-        var nextTrackId = currentDto.currentTrackId
-        var winnerId: Uuid? = null
-        var newCollectedCards = currentDto.collectedCardIdsByTeamId
-
-        _state.update {
-            it.copy(
-                isGuessCorrect = isCorrect,
-                currentPhase = GamePhase.SHOW_RESULT
-            )
-        }
-
-        if (isCorrect) {
-            val currentTrackIds = currentDto.collectedCardIdsByTeamId[currentDto.currentTeamId] ?: emptyList()
-            val updatedTrackIds = currentTrackIds.toMutableList().apply { add(position, currentTrack.id) }
-
-            newCollectedCards = currentDto.collectedCardIdsByTeamId.toMutableMap().apply {
-                put(currentDto.currentTeamId, updatedTrackIds)
-            }
-
-            if (updatedTrackIds.size >= GameConstants.CARDS_TO_WIN) {
-                winnerId = currentDto.currentTeamId
-            }
-        }
-
-        delay(2000)
-
-        var nextTeamId = currentDto.currentTeamId
-        if (winnerId == null) {
-            val nextTrack = getNextPlayableTrack()
-            nextTrackId = nextTrack?.id ?: currentDto.currentTrackId
-
-            val currentIndex = currentDto.teamIds.indexOf(currentDto.currentTeamId)
-            nextTeamId = currentDto.teamIds[(currentIndex + 1) % currentDto.teamIds.size]
-        }
-
-        val updatedDto = currentDto.copy(
-            collectedCardIdsByTeamId = newCollectedCards,
-            currentTrackId = nextTrackId,
-            winnerTeamId = winnerId,
-            currentTeamId = nextTeamId
-        )
-        activeGameRepository.saveGame(updatedDto)
-
-        if (winnerId != null) {
-            _state.update { it.copy(currentPhase = GamePhase.GAME_OVER) }
-        } else {
             _state.update {
                 it.copy(
-                    isGuessCorrect = null,
-                    currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP
+                    isGuessCorrect = isCorrect,
+                    currentPhase = GamePhase.SHOW_RESULT
                 )
             }
+
+            delay(2000)
+
+            var nextTrackId = currentDto.currentTrackId
+            var winnerId: Uuid? = null
+            var newCollectedCards = currentDto.collectedCardIdsByTeamId
+            var nextTeamId = currentDto.currentTeamId
+
+            if (isCorrect) {
+                val result = processCorrectGuessUseCase(currentDto, currentTrack.id, position)
+                newCollectedCards = result.first
+                winnerId = result.second
+            }
+
+            if (winnerId == null) {
+                val nextTrack = getPlayableTrackUseCase(trackIdPool)
+                if (nextTrack != null) {
+                    globalTrackCache[nextTrack.id] = nextTrack
+                    nextTrackId = nextTrack.id
+                }
+                nextTeamId = Uuid.parse(advanceTurnUseCase(currentDto))
+            }
+
+            val updatedDto = currentDto.copy(
+                collectedCardIdsByTeamId = newCollectedCards,
+                currentTrackId = nextTrackId,
+                winnerTeamId = winnerId,
+                currentTeamId = nextTeamId
+            )
+
+            saveGameUseCase(updatedDto)
+
+            if (winnerId != null) {
+                _state.update { it.copy(currentPhase = GamePhase.GAME_OVER) }
+            } else {
+                val nextGameModel = mapDtoToGame(updatedDto)
+                _state.update {
+                    it.copy(
+                        game = nextGameModel,
+                        currentTrack = nextGameModel.currentTrack,
+                        isGuessCorrect = null,
+                        currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP
+                    )
+                }
+            }
         }
-    }
-
-    private fun isPositionCorrect(timeline: List<Track>, track: Track, position: Int): Boolean {
-        if (position < 0 || position > timeline.size) return false
-
-        val before = if (position > 0) timeline.getOrNull(position - 1) else null
-        val after = if (position < timeline.size) timeline.getOrNull(position) else null
-
-        return (before == null || before.releaseYear <= track.releaseYear) &&
-                (after == null || after.releaseYear >= track.releaseYear)
     }
 
     private fun playMusic(trackId: String) {
         viewModelScope.launch {
-            try {
-                playMusicUseCase(trackId)
-            } catch (e: Exception) {
-                println("Error while playing: ${e.message}")
-            }
+            runCatching { playMusicUseCase(trackId) }
         }
     }
 }
