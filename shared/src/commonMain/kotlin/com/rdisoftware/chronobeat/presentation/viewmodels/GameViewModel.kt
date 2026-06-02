@@ -79,7 +79,7 @@ class GameViewModel(
     private var cachedTracks: MutableList<Track> = mutableListOf()
 
     init {
-        loadRealMusicAndInitGame()
+        loadSavedGameOrStartNew()
 
         viewModelScope.launch {
             activeGameRepository.observeGame().collect { dto ->
@@ -316,9 +316,23 @@ class GameViewModel(
 
         delay(2000)
 
+
         if (winnerId != null) {
-            _state.update { it.copy(currentPhase = GamePhase.GAME_OVER) }
+            val updatedDto = currentDto.copy(
+                collectedCardIdsByTeamId = newCollectedCards,
+                currentTrackId = currentDto.currentTrackId,
+                winnerTeamId = winnerId,
+                currentTeamId = currentDto.currentTeamId
+            )
+
+            saveGameProgressUseCase(updatedDto)
+
+            _state.update {
+                it.copy(currentPhase = GamePhase.GAME_OVER)
+            }
+
             return
+
         }
 
         var nextTeamId = currentDto.currentTeamId
