@@ -107,11 +107,10 @@ fun GameScreen(
         }
     }
     LaunchedEffect(Unit) {
-        println("az értéke a loadnak: ${shouldLoadSave}")
         if (shouldLoadSave) {
-            viewModel.loadSavedGameOrStartNew()
+            //TODO: load existing game from json file
         } else {
-            viewModel.loadRealMusicAndInitGame()
+            //TODO: load a new game from scratch
         }
     }
 

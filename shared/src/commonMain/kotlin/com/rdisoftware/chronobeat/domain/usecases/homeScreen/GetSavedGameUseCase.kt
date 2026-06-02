@@ -7,5 +7,5 @@ import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 class GetSavedGameUseCase(
     private val activeGameRepository: ActiveGameRepository
 ) {
-    suspend operator fun invoke(): GameDto? = activeGameRepository.getSavedGame()
+    suspend operator fun invoke(): GameDto? = activeGameRepository.getGame()
 }

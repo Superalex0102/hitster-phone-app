@@ -18,9 +18,10 @@ class MusicRepositoryImpl(
     private val spotifyPlayer: SpotifyPlayerController
 ) : MusicRepository {
     private suspend fun ensureValidToken() {
-        if (!hasValidToken()) {
-            throw RuntimeException("No valid token")
+        if (hasValidToken()) {
+            return
         }
+        authenticate()
     }
 
     override suspend fun getUserPlaylistsSummary(): List<PlaylistSummary> {

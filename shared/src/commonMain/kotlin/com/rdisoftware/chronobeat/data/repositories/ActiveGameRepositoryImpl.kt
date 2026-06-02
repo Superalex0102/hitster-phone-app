@@ -30,10 +30,6 @@ class ActiveGameRepositoryImpl(
     }
 
     override suspend fun getGame(): GameDto? {
-        return _game.value
-    }
-
-    override suspend fun getSavedGame(): GameDto? {
         val savedGameJson = settings.getStringOrNull("SAVED_GAME")
         if (savedGameJson != null) {
             return try {
