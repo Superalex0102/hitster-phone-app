@@ -79,9 +79,11 @@ class GameViewModel(
     private var cachedTracks: MutableList<Track> = mutableListOf()
 
     init {
+        loadSavedGameOrStartNew()
+
         viewModelScope.launch {
             activeGameRepository.observeGame().collect { dto ->
-                if (dto != null && cachedTracks.isNotEmpty()) {
+                if (dto != null) {
                     try {
                         val mappedGame = mapDtoToGame(dto)
                         _state.update { oldState ->
