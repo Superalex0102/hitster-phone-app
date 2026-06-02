@@ -79,7 +79,7 @@ class GameViewModel(
     private var cachedTracks: MutableList<Track> = mutableListOf()
 
     init {
-        loadSavedGameOrStartNew()
+        loadRealMusicAndInitGame()
 
         viewModelScope.launch {
             activeGameRepository.observeGame().collect { dto ->
