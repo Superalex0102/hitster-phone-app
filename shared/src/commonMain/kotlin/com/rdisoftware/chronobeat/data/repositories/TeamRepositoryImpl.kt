@@ -3,6 +3,7 @@ package com.rdisoftware.chronobeat.data.repositories
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
+import com.rdisoftware.chronobeat.presentation.constants.GameConstants.SAVED_TEAMS
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -18,7 +19,7 @@ class TeamRepositoryImpl(
     private val mutex = Mutex()
 
     init {
-        val savedTeamJson = settings.getStringOrNull("SAVED_TEAMS")
+        val savedTeamJson = settings.getStringOrNull(SAVED_TEAMS)
         if (savedTeamJson != null) {
             try {
                 val teamList = Json.decodeFromString<List<Team>>(savedTeamJson)
@@ -30,7 +31,7 @@ class TeamRepositoryImpl(
 
     private fun persistTeams() {
         val jsonString = Json.encodeToString(_teams.values.toList())
-        settings.putString("SAVED_TEAMS", jsonString)
+        settings.putString(SAVED_TEAMS, jsonString)
     }
 
     override suspend fun getTeams(): List<Team> {
@@ -76,7 +77,7 @@ class TeamRepositoryImpl(
     override suspend fun clearAllTeam() {
         mutex.withLock {
             _teams.clear()
-            settings.remove("SAVED_TEAMS")
+            settings.remove(SAVED_TEAMS)
         }
     }
 }

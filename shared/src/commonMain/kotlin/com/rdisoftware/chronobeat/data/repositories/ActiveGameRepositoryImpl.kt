@@ -2,6 +2,7 @@ package com.rdisoftware.chronobeat.data.repositories
 
 import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
+import com.rdisoftware.chronobeat.presentation.constants.GameConstants.SAVED_GAME
 import com.russhwolf.settings.Settings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,7 @@ class ActiveGameRepositoryImpl(
     }
 
     init {
-        val saveGameJson = settings.getStringOrNull("SAVED_GAME")
+        val saveGameJson = settings.getStringOrNull(SAVED_GAME)
         if (saveGameJson != null) {
             _game.value = try {
                 customJson.decodeFromString<GameDto>(saveGameJson)
@@ -30,7 +31,7 @@ class ActiveGameRepositoryImpl(
     }
 
     override suspend fun getGame(): GameDto? {
-        val savedGameJson = settings.getStringOrNull("SAVED_GAME")
+        val savedGameJson = settings.getStringOrNull(SAVED_GAME)
         if (savedGameJson != null) {
             return try {
                 val deserializedGame = customJson.decodeFromString<GameDto>(savedGameJson)
@@ -46,12 +47,12 @@ class ActiveGameRepositoryImpl(
     override suspend fun saveGame(game: GameDto) {
         _game.value = game
         val jsonString = customJson.encodeToString(game)
-        settings.putString("SAVED_GAME", jsonString)
+        settings.putString(SAVED_GAME, jsonString)
     }
 
     override suspend fun clearGame() {
         _game.value = null
-        settings.remove("SAVED_GAME")
+        settings.remove(SAVED_GAME)
     }
 
     override fun observeGame(): Flow<GameDto?> {

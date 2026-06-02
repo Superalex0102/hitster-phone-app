@@ -2,6 +2,7 @@ package com.rdisoftware.chronobeat.data.repositories
 
 import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
+import com.russhwolf.settings.Settings
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -18,10 +19,11 @@ import kotlin.uuid.Uuid
 class ActiveGameRepositoryTest {
 
     private lateinit var repository: ActiveGameRepository
+    private lateinit var settings: Settings
 
     @BeforeTest
     fun setup() {
-        repository = ActiveGameRepositoryImpl()
+        repository = ActiveGameRepositoryImpl(settings)
     }
     private fun createDummyGameDto(): GameDto {
         val dummyTeamId = Uuid.random()
