@@ -11,4 +11,5 @@ interface TeamRepository {
     suspend fun createTeam(teamName: String, color: TeamColor): Team
     suspend fun updateTeamName(team: Team): Team
     suspend fun deleteTeam(teamId: Uuid)
+    suspend fun clearAllTeam()
 }

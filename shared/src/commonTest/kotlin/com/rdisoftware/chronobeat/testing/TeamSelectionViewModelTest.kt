@@ -46,6 +46,11 @@ class TeamSelectionViewModelTest {
             override suspend fun deleteTeam(teamId: Uuid) {
                 list.removeAll { it.id == teamId }
             }
+
+            override suspend fun clearAllTeam() {
+                TODO("Not yet implemented")
+            }
+
             override suspend fun updateTeamName(team: Team): Team {
                 val index = list.indexOfFirst { it.id == team.id }
                 if (index != -1) list[index] = team

@@ -4,6 +4,8 @@ import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
+import kotlinx.serialization.Serializable
+@Serializable
 @OptIn(ExperimentalUuidApi::class)
 data class Team (
     val id: Uuid,

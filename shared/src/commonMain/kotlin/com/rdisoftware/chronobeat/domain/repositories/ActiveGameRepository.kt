@@ -7,6 +7,5 @@ interface ActiveGameRepository {
     suspend fun getGame(): GameDto?
     suspend fun saveGame(game: GameDto)
     suspend fun clearGame()
-
     fun observeGame(): Flow<GameDto?>
 }
