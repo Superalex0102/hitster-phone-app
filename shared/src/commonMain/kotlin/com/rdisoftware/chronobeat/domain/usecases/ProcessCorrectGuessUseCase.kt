@@ -1,26 +1,29 @@
 package com.rdisoftware.chronobeat.domain.usecases
 
-import com.rdisoftware.chronobeat.data.remote.dto.GameDto
+import com.rdisoftware.chronobeat.domain.models.Game
+import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.presentation.constants.GameConstants
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
-@OptIn(ExperimentalUuidApi::class)
 class ProcessCorrectGuessUseCase {
-    operator fun invoke(currentDto: GameDto, trackId: String, position: Int): Pair<Map<Uuid, List<String>>, Uuid?> {
-        val currentTeamId = currentDto.currentTeamId
-        val currentTrackIds = currentDto.collectedCardIdsByTeamId[currentTeamId] ?: emptyList()
+    @OptIn(ExperimentalUuidApi::class)
+    operator fun invoke(game: Game, track: Track, position: Int): Game {
+        val currentTeam = game.currentTeam
+        val currentTimeline = game.collectedCardsByTeam[currentTeam] ?: emptyList()
 
-        val updatedTrackIds = currentTrackIds.toMutableList().apply {
-            add(position, trackId)
+        val updatedTimeline = currentTimeline.toMutableList().apply {
+            add(position, track)
         }
 
-        val newCollectedCards = currentDto.collectedCardIdsByTeamId.toMutableMap().apply {
-            put(currentTeamId, updatedTrackIds)
+        val newCollectedCards = game.collectedCardsByTeam.toMutableMap().apply {
+            put(currentTeam, updatedTimeline)
         }
 
-        val winnerId = if (updatedTrackIds.size >= GameConstants.CARDS_TO_WIN) currentTeamId else null
+        val winner = if (updatedTimeline.size >= GameConstants.CARDS_TO_WIN) currentTeam else null
 
-        return Pair(newCollectedCards, winnerId)
+        return game.copy(
+            collectedCardsByTeam = newCollectedCards,
+            winnerTeam = winner
+        )
     }
 }

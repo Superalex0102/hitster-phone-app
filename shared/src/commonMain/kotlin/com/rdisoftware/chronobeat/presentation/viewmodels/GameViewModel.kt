@@ -2,14 +2,12 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Game
 import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.models.Track
-import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
-import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import com.rdisoftware.chronobeat.domain.usecases.*
+import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,28 +40,20 @@ data class GameState(
 class GameViewModel(
     private val getPlayableTrackUseCase: GetPlayableTrackUseCase,
     private val setupInitialGameUseCase: SetupInitialGameUseCase,
-    private val loadGameSessionUseCase: LoadGameSessionUseCase,
     private val checkGuessPositionUseCase: CheckGuessPositionUseCase,
     private val processCorrectGuessUseCase: ProcessCorrectGuessUseCase,
     private val advanceTurnUseCase: AdvanceTurnUseCase,
     private val playMusicUseCase: PlayMusicUseCase,
     private val getGameUseCase: GetGameUseCase,
     private val saveGameUseCase: SaveGameUseCase,
-    private val getChronobeatPlaylistsUseCase: GetChronobeatPlaylistsUseCase
+    private val getChronobeatPlaylistsUseCase: GetChronobeatPlaylistsUseCase,
+    private val getTeamsUseCase: GetTeamsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(GameState())
     val state = _state.asStateFlow()
 
-    private val allTeams = listOf(
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000001"), "Team 1", TeamColor.entries.getOrElse(0) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000002"), "Team 2", TeamColor.entries.getOrElse(1) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000003"), "Team 3", TeamColor.entries.getOrElse(2) { TeamColor.entries.first() }),
-        Team(Uuid.parse("00000000-0000-0000-0000-000000000004"), "Team 4", TeamColor.entries.getOrElse(3) { TeamColor.entries.first() })
-    )
-
     private var trackIdPool: MutableList<String> = mutableListOf()
-    private val globalTrackCache = mutableMapOf<String, Track>()
 
     init {
         loadAndInitializeEngine()
@@ -79,24 +69,23 @@ class GameViewModel(
                 val playlist = playlists.first()
                 trackIdPool = playlist.trackIds.shuffled().toMutableList()
 
-                val activeDto = getGameUseCase()
-                val finalDto = if (activeDto != null && activeDto.playlistId == playlist.id) {
-                    val loaded = loadGameSessionUseCase(activeDto)
-                    globalTrackCache.putAll(loaded)
-                    activeDto
-                } else {
-                    setupInitialGameUseCase(playlist.id, allTeams, trackIdPool)
+                var activeGame = getGameUseCase()
+
+                if (activeGame == null || activeGame.playlistId != playlist.id) {
+                    val allTeams = getTeamsUseCase()
+                    if (allTeams.isEmpty()) {
+                        println("GameViewModel: Nincsenek csapatok!")
+                        return@launch
+                    }
+
+                    activeGame = setupInitialGameUseCase(playlist.id, allTeams, trackIdPool)
                 }
 
-                if (finalDto != null) {
-                    val freshLoaded = loadGameSessionUseCase(finalDto)
-                    globalTrackCache.putAll(freshLoaded)
-
-                    val initialGame = mapDtoToGame(finalDto)
+                if (activeGame != null) {
                     _state.update {
                         it.copy(
-                            game = initialGame,
-                            currentTrack = initialGame.currentTrack,
+                            game = activeGame,
+                            currentTrack = activeGame.currentTrack,
                             currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP
                         )
                     }
@@ -105,29 +94,6 @@ class GameViewModel(
                 println("GameViewModel: Initialization fail: ${e.message}")
             }
         }
-    }
-
-    private fun mapDtoToGame(dto: GameDto): Game {
-        val teams = dto.teamIds.map { id -> allTeams.first { it.id == id } }
-        val currentTeam = allTeams.first { it.id == dto.currentTeamId }
-        val currentTrack = globalTrackCache[dto.currentTrackId] ?: Track(dto.currentTrackId, "Unknown","Unknown", emptyList(), 0, false)
-        val winnerTeam = dto.winnerTeamId?.let { id -> allTeams.find { it.id == id } }
-
-        val collectedCards = dto.collectedCardIdsByTeamId.map { (teamId, trackIds) ->
-            val team = allTeams.first { it.id == teamId }
-            val tracks = trackIds.mapNotNull { globalTrackCache[it] }
-            team to tracks
-        }.toMap()
-
-        return Game(
-            id = dto.id,
-            teams = teams,
-            currentTeam = currentTeam,
-            currentTrack = currentTrack,
-            collectedCardsByTeam = collectedCards,
-            playlistId = dto.playlistId,
-            winnerTeam = winnerTeam
-        )
     }
 
     fun onPopupAcknowledgePressed() {
@@ -141,9 +107,9 @@ class GameViewModel(
 
         viewModelScope.launch {
             val currentState = _state.value
+            val currentGame = currentState.game ?: return@launch
             val currentTrack = currentState.currentTrack ?: return@launch
             val timeline = currentState.timeline
-            val currentDto = getGameUseCase() ?: return@launch
 
             val isCorrect = checkGuessPositionUseCase(timeline, currentTrack, position)
 
@@ -156,43 +122,26 @@ class GameViewModel(
 
             delay(2000)
 
-            var nextTrackId = currentDto.currentTrackId
-            var winnerId: Uuid? = null
-            var newCollectedCards = currentDto.collectedCardIdsByTeamId
-            var nextTeamId = currentDto.currentTeamId
+            var updatedGame = currentGame
 
             if (isCorrect) {
-                val result = processCorrectGuessUseCase(currentDto, currentTrack.id, position)
-                newCollectedCards = result.first
-                winnerId = result.second
+                updatedGame = processCorrectGuessUseCase(updatedGame, currentTrack, position)
             }
 
-            if (winnerId == null) {
+            if (updatedGame.winnerTeam == null) {
                 val nextTrack = getPlayableTrackUseCase(trackIdPool)
-                if (nextTrack != null) {
-                    globalTrackCache[nextTrack.id] = nextTrack
-                    nextTrackId = nextTrack.id
-                }
-                nextTeamId = Uuid.parse(advanceTurnUseCase(currentDto))
+                updatedGame = advanceTurnUseCase(updatedGame, nextTrack)
             }
 
-            val updatedDto = currentDto.copy(
-                collectedCardIdsByTeamId = newCollectedCards,
-                currentTrackId = nextTrackId,
-                winnerTeamId = winnerId,
-                currentTeamId = nextTeamId
-            )
+            saveGameUseCase(updatedGame)
 
-            saveGameUseCase(updatedDto)
-
-            if (winnerId != null) {
-                _state.update { it.copy(currentPhase = GamePhase.GAME_OVER) }
+            if (updatedGame.winnerTeam != null) {
+                _state.update { it.copy(game = updatedGame, currentPhase = GamePhase.GAME_OVER) }
             } else {
-                val nextGameModel = mapDtoToGame(updatedDto)
                 _state.update {
                     it.copy(
-                        game = nextGameModel,
-                        currentTrack = nextGameModel.currentTrack,
+                        game = updatedGame,
+                        currentTrack = updatedGame.currentTrack,
                         isGuessCorrect = null,
                         currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP
                     )

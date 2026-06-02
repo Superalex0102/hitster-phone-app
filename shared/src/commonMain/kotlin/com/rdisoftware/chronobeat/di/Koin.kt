@@ -12,7 +12,6 @@ import com.rdisoftware.chronobeat.domain.usecases.CheckGuessPositionUseCase
 import com.rdisoftware.chronobeat.domain.usecases.GetChronobeatPlaylistsUseCase
 import com.rdisoftware.chronobeat.domain.usecases.GetGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.GetPlayableTrackUseCase
-import com.rdisoftware.chronobeat.domain.usecases.LoadGameSessionUseCase
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
 import com.rdisoftware.chronobeat.domain.usecases.ProcessCorrectGuessUseCase
 import com.rdisoftware.chronobeat.domain.usecases.SaveGameUseCase
@@ -53,7 +52,6 @@ val sharedModule = module {
     factory { GameViewModel(
         getPlayableTrackUseCase = get(),
         setupInitialGameUseCase = get(),
-        loadGameSessionUseCase = get(),
         checkGuessPositionUseCase = get(),
         processCorrectGuessUseCase = get(),
         advanceTurnUseCase = get(),
@@ -61,6 +59,7 @@ val sharedModule = module {
         getGameUseCase = get(),
         saveGameUseCase = get(),
         getChronobeatPlaylistsUseCase = get(),
+        getTeamsUseCase = get(),
     ) }
     factory { TeamSelectionViewModel(
         addTeamUseCase = get(),
@@ -77,7 +76,6 @@ val sharedModule = module {
         getPlayableTrackUseCase = get(),
         activeGameRepository = get()
     ) }
-    factory { LoadGameSessionUseCase(musicRepository = get()) }
     factory { CheckGuessPositionUseCase() }
     factory { ProcessCorrectGuessUseCase() }
     factory { AdvanceTurnUseCase() }
@@ -85,7 +83,11 @@ val sharedModule = module {
     factory { DeleteTeamUseCase(teamRepository = get()) }
     factory { UpdateTeamUseCase(teamRepository = get()) }
     factory { GetTeamsUseCase(teamRepository = get()) }
-    factory { GetGameUseCase(activeGameRepository = get()) }
+    factory { GetGameUseCase(
+        activeGameRepository = get(),
+        musicRepository = get(),
+        getTeamsUseCase = get(),
+    ) }
     factory { SaveGameUseCase(activeGameRepository = get()) }
     factory { GetChronobeatPlaylistsUseCase(musicRepository = get()) }
 
