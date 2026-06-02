@@ -2,6 +2,7 @@ package com.rdisoftware.chronobeat.testing
 
 import FakeMusicRepository
 import com.rdisoftware.chronobeat.data.repositories.ActiveGameRepositoryImpl
+import com.rdisoftware.chronobeat.data.repositories.TeamRepositoryImpl
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
@@ -44,6 +45,7 @@ class GameViewModelTest {
     fun setup() {
         val settings = MapSettings()
         Dispatchers.setMain(testDispatcher)
+        teamRepository = TeamRepositoryImpl(settings)
         activeGameRepository = ActiveGameRepositoryImpl(settings)
         fakeMusicRepository = FakeMusicRepository()
         val playMusicUseCase = PlayMusicUseCase(fakeMusicRepository)
