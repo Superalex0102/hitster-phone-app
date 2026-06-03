@@ -33,10 +33,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +60,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.os.registerForAllProfilingResults
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.models.Track
@@ -99,11 +107,53 @@ import kotlin.random.Random
 fun GameScreen(
     viewModel: GameViewModel = koinViewModel(),
     onGameFinishedClicked: () -> Unit,
+    onLeaderBoardClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    var isInitialStartup by rememberSaveable { mutableStateOf(true) }
+    var isReturningFromLeaderboard by rememberSaveable { mutableStateOf(false) }
+    var showResultOverlay by rememberSaveable { mutableStateOf(false) }
+
+    var displayedTeam by remember { mutableStateOf(state.currentTeam) }
+    var displayedTimeline by remember { mutableStateOf(state.timeline) }
+    var displayedCardCount by remember { mutableStateOf(state.currentCardCount) }
+    var displayedTrack by remember { mutableStateOf(state.currentTrack) }
+    var displayedIsCorrect by remember { mutableStateOf(state.isGuessCorrect) }
+
+    LaunchedEffect(state.currentTeam, state.timeline, state.currentCardCount, state.isGuessCorrect, showResultOverlay) {
+        if(!showResultOverlay) {
+            displayedTrack = state.currentTrack
+            displayedTimeline = state.timeline
+            displayedTeam = state.currentTeam
+            displayedCardCount = state.currentCardCount
+            displayedIsCorrect = state.isGuessCorrect
+        }
+    }
+
     LaunchedEffect(state.currentPhase) {
-        if (state.currentPhase == GamePhase.GAME_OVER) {
-            onGameFinishedClicked()
+        when (state.currentPhase) {
+            GamePhase.GAME_OVER -> {
+                onGameFinishedClicked()
+            }
+            GamePhase.SHOW_RESULT -> {
+                showResultOverlay = true
+            }
+            GamePhase.GUESSING -> {
+                showResultOverlay = false
+            }
+            GamePhase.SHOW_NEXT_TEAM_POPUP -> {
+                if (isInitialStartup) {
+                    isInitialStartup = false
+                    viewModel.onPopupAcknowledgePressed()
+                } else if (isReturningFromLeaderboard){
+                    isReturningFromLeaderboard = false
+                    viewModel.onPopupAcknowledgePressed()
+                } else {
+                    isReturningFromLeaderboard = true
+                    onLeaderBoardClicked()
+                }
+            }
+            else -> {}
         }
     }
 
@@ -130,15 +180,15 @@ fun GameScreen(
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
                 GameHeader(
-                    currentTeam = state.currentTeam,
-                    cardCount = state.currentCardCount,
+                    currentTeam = displayedTeam,
+                    cardCount = displayedCardCount,
                     isAnimating = state.currentPhase == GamePhase.GUESSING
                 )
 
                 GameSurface(
-                    timeline = state.timeline,
-                    currentTrack = state.currentTrack,
-                    teamColor = state.currentTeam?.color,
+                    timeline = displayedTimeline,
+                    currentTrack = displayedTrack,
+                    teamColor = displayedTeam?.color,
                     onGuessPressed = { position -> viewModel.onGuessPressed(position) },
                     isGuessingPhase = state.currentPhase == GamePhase.GUESSING
                 )
@@ -155,51 +205,8 @@ fun GameScreen(
                 }
             }
 
-            if (state.currentPhase == GamePhase.SHOW_NEXT_TEAM_POPUP) {
-                NextTeamPopupOverlay(
-                    teamName = state.currentTeam?.name ?: "",
-                    onOkClicked = { viewModel.onPopupAcknowledgePressed() }
-                )
-            }
-
-            if (state.currentPhase == GamePhase.SHOW_RESULT) {
-                ResultOverlay(isCorrect = state.isGuessCorrect)
-            }
-        }
-    }
-}
-
-@Composable
-fun NextTeamPopupOverlay(
-    teamName: String,
-    onOkClicked: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.7f)),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            backgroundColor = Color(AppColors.GAME_GRAY),
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "$teamName következik!",
-                    fontSize = 24.sp,
-                    fontFamily = robotoMonoBold,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
-                Button(onClick = onOkClicked) {
-                    Text("OK, Mehet!")
-                }
+            if (showResultOverlay) {
+                ResultOverlay(isCorrect = displayedIsCorrect)
             }
         }
     }

@@ -51,7 +51,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun GameSummaryScreen(
     viewModel: GameSummaryViewModel = koinViewModel(),
     onHomeClicked: () -> Unit,
-    onPlayAgainClicked: () -> Unit
+    onPlayAgainClicked: () -> Unit,
+    onShowLeaderBoardClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -112,6 +113,17 @@ fun GameSummaryScreen(
                     resourceId = true,
                     onClick = {
                         onPlayAgainClicked()
+                    }
+                )
+
+                GradientButton(
+                    text = "SHOW LEADERBOARD",
+                    enabled = true,
+                    size = ButtonSize.SMALL,
+                    testTag = GameSummaryScreen.PLAY_AGAIN_BUTTON,
+                    resourceId = true,
+                    onClick = {
+                        onShowLeaderBoardClicked()
                     }
                 )
             }
