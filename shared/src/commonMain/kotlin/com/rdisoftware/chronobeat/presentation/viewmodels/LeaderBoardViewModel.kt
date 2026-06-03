@@ -2,6 +2,8 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rdisoftware.chronobeat.domain.models.Game
+import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.usecases.game.GetGameUseCase
 import com.rdisoftware.chronobeat.presentation.enums.LeaderBoardMode
 import kotlinx.coroutines.channels.Channel
@@ -15,7 +17,8 @@ import kotlinx.coroutines.launch
 
 
 data class LeaderBoardUiState(
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val pointsByTeam: Map<Team, Int> = emptyMap()
 )
 
 sealed interface LeaderBoardEvent {
@@ -35,6 +38,10 @@ class LeaderBoardViewModel(
     private val _effect = Channel<LeaderBoardEffect>()
     val effect = _effect.receiveAsFlow()
 
+    init{
+        getPointsByTeam()
+    }
+
     fun onEvent(event: LeaderBoardEvent) {
         when (event) {
             LeaderBoardEvent.OnContinueOrCloseButtonClick -> handleContinueOrCloseButtonClick()
@@ -53,6 +60,18 @@ class LeaderBoardViewModel(
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }
+        }
+    }
+
+    private fun getPointsByTeam() {
+        viewModelScope.launch {
+            val currentGame = getGameUseCase()
+            val newPoints = currentGame?.collectedCardsByTeam?.mapValues { it.value.size } ?: emptyMap()
+            val orderedPoints = newPoints.toList().sortedByDescending { it.second }.toMap()
+            _state.update {
+                it.copy(pointsByTeam = orderedPoints)
+            }
+
         }
     }
 }

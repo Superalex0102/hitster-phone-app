@@ -1,6 +1,7 @@
 package com.rdisoftware.chronobeat.presentation.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,18 +42,28 @@ fun LeaderBoardScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Button(
-            onClick = { viewModel.onEvent(LeaderBoardEvent.OnContinueOrCloseButtonClick) },
-            enabled = !state.isLoading
-        ) {
-            if (state.isLoading) {
-                CircularProgressIndicator()
-            } else {
-                when (mode) {
-                    LeaderBoardMode.FROM_GAME_SCREEN -> Text("Continue")
-                    LeaderBoardMode.FROM_GAMESUMMARY_SCREEN -> Text("Close")
+        //TODO: THIS IS JUST A TEMPLATE TO SHOW HOW TO USE THE VIEWMODEL, REPLACE WITH ACTUAL UI
+        Column {
+            //This is the team points
+            state.pointsByTeam.forEach { team ->
+                Text(text = "${team.key.name}: ${team.value} points")
+            }
+
+            //This is the button to continue or close depends on the environment
+            Button(
+                onClick = { viewModel.onEvent(LeaderBoardEvent.OnContinueOrCloseButtonClick) },
+                enabled = !state.isLoading
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator()
+                } else {
+                    when (mode) {
+                        LeaderBoardMode.FROM_GAME_SCREEN -> Text("Continue")
+                        LeaderBoardMode.FROM_GAMESUMMARY_SCREEN -> Text("Close")
+                    }
                 }
             }
         }
+
     }
 }
