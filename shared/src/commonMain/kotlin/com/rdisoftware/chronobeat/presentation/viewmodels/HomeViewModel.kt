@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rdisoftware.chronobeat.domain.usecases.game.GetGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.RestartGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.music.AuthResult
 import com.rdisoftware.chronobeat.domain.usecases.music.CheckSpotifyAuthUseCase
 import com.rdisoftware.chronobeat.domain.usecases.music.SpotifyAuthenticationUseCase
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.StringResource
+import kotlin.coroutines.coroutineContext
 
 @Stable
 data class HomeUiState(
@@ -34,14 +36,14 @@ sealed interface HomeEvent {
     data object OnSignInClick : HomeEvent
     data object OnResumeDiscard : HomeEvent
 
-    data class OnLocalGameClick(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
     data class OnResumeConfirm(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
 }
 
 class HomeViewModel(
     private val getGameUseCase: GetGameUseCase,
     private val checkSpotifyAuthUseCase: CheckSpotifyAuthUseCase,
-    private val spotifyAuthenticationUseCase: SpotifyAuthenticationUseCase
+    private val spotifyAuthenticationUseCase: SpotifyAuthenticationUseCase,
+    private val restartGameUseCase: RestartGameUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -71,10 +73,6 @@ class HomeViewModel(
                 _state.update {
                     it.copy(showLoginPopup = false)
                 }
-            }
-
-            is HomeEvent.OnLocalGameClick -> {
-                event.navigate(false)
             }
 
             is HomeEvent.OnResumeConfirm -> {
@@ -138,11 +136,16 @@ class HomeViewModel(
             }
         }
     }
-
     private suspend fun checkResumeGame() {
         val savedGame = getGameUseCase()
         if (savedGame != null) {
             _state.update { it.copy(showResumePopup = true) }
+        }
+    }
+
+    fun resetGame() {
+        viewModelScope.launch {
+            restartGameUseCase()
         }
     }
 }

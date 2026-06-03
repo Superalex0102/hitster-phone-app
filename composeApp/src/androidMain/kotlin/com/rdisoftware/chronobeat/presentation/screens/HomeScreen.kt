@@ -48,6 +48,7 @@ import com.rdisoftware.chronobeat.presentation.viewmodels.HomeEvent
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeUiState
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
 import com.rdisoftware.chronobeat.theme.AppColors
+import kotlinx.coroutines.coroutineScope
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -122,6 +123,7 @@ fun HomeScreen(
                         testTag = HomeScreen.LOCAL_GAME_BUTTON,
                         resourceId = true,
                         onClick = {
+                            viewModel.resetGame()
                             onLocalGameClicked(false)
                         }
                     )

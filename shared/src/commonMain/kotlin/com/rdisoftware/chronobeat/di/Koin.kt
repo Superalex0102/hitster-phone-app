@@ -56,7 +56,8 @@ val sharedModule = module {
     factory { HomeViewModel(
         getGameUseCase = get(),
         checkSpotifyAuthUseCase = get(),
-        spotifyAuthenticationUseCase = get()
+        spotifyAuthenticationUseCase = get(),
+        restartGameUseCase = get()
     ) }
     factory { GameViewModel(
         getPlayableTrackUseCase = get(),
