@@ -97,7 +97,6 @@ import kotlin.random.Random
 
 @Composable
 fun GameScreen(
-    shouldLoadSave: Boolean,
     viewModel: GameViewModel = koinViewModel(),
     onGameFinishedClicked: () -> Unit,
 ) {
@@ -105,13 +104,6 @@ fun GameScreen(
     LaunchedEffect(state.currentPhase) {
         if (state.currentPhase == GamePhase.GAME_OVER) {
             onGameFinishedClicked()
-        }
-    }
-    LaunchedEffect(Unit) {
-        if (shouldLoadSave) {
-            //TODO: load existing game from json file
-        } else {
-            //TODO: load a new game from scratch
         }
     }
 
