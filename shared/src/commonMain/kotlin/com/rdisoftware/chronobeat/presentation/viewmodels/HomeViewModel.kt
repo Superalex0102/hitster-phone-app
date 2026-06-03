@@ -3,10 +3,10 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rdisoftware.chronobeat.domain.usecases.GetGameUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.AuthResult
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.CheckSpotifyAuthUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SpotifyAuthenticationUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.GetGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.AuthResult
+import com.rdisoftware.chronobeat.domain.usecases.music.CheckSpotifyAuthUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.SpotifyAuthenticationUseCase
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.error_message
 import com.rdisoftware.chronobeat.shared.resources.sing_in_to_spotify

@@ -2,11 +2,17 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Game
-import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.models.Track
-import com.rdisoftware.chronobeat.domain.usecases.*
+import com.rdisoftware.chronobeat.domain.usecases.game.AdvanceTurnUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.CheckGuessPositionUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.GetGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.ProcessCorrectGuessUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.SaveGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.SetupInitialGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.GetChronobeatPlaylistsUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.GetPlayableTrackUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.PlayMusicUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +20,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 
 enum class GamePhase {
     LOADING,

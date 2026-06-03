@@ -1,10 +1,6 @@
-package com.rdisoftware.chronobeat.domain.usecases.homeScreen
+package com.rdisoftware.chronobeat.domain.usecases.music
 
-import com.rdisoftware.chronobeat.data.repositories.MusicRepositoryImpl
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
-import com.rdisoftware.chronobeat.shared.resources.Res
-import com.rdisoftware.chronobeat.shared.resources.sing_in_to_spotify
-import org.jetbrains.compose.resources.StringResource
 
 sealed interface AuthResult {
 

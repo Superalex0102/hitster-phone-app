@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.domain.usecases
+package com.rdisoftware.chronobeat.domain.usecases.game
 
 import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.models.Game

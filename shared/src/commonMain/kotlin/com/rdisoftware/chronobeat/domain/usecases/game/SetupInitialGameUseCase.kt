@@ -1,10 +1,11 @@
-package com.rdisoftware.chronobeat.domain.usecases
+package com.rdisoftware.chronobeat.domain.usecases.game
 
 import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.models.Game
 import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
+import com.rdisoftware.chronobeat.domain.usecases.music.GetPlayableTrackUseCase
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
