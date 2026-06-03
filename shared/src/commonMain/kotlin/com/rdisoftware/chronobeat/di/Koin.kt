@@ -17,9 +17,7 @@ import com.rdisoftware.chronobeat.domain.usecases.ProcessCorrectGuessUseCase
 import com.rdisoftware.chronobeat.domain.usecases.SaveGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.SetupInitialGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.CheckSpotifyAuthUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.RestartGameUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SaveGameProgressUseCase
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SpotifyAuthenticationUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
@@ -56,10 +54,9 @@ val sharedModule = module {
 
     //ViewModels
     factory { HomeViewModel(
-        getSavedGameUseCase = get(),
+        getGameUseCase = get(),
         checkSpotifyAuthUseCase = get(),
         spotifyAuthenticationUseCase = get()
-
     ) }
     factory { GameViewModel(
         getPlayableTrackUseCase = get(),
