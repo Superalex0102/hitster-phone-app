@@ -3,18 +3,27 @@ package com.rdisoftware.chronobeat.testing
 import FakeMusicRepository
 import com.rdisoftware.chronobeat.data.repositories.ActiveGameRepositoryImpl
 import com.rdisoftware.chronobeat.data.repositories.TeamRepositoryImpl
+import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
+import com.rdisoftware.chronobeat.domain.usecases.AdvanceTurnUseCase
+import com.rdisoftware.chronobeat.domain.usecases.CheckGuessPositionUseCase
+import com.rdisoftware.chronobeat.domain.usecases.GetChronobeatPlaylistsUseCase
+import com.rdisoftware.chronobeat.domain.usecases.GetGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.GetPlayableTrackUseCase
 import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.ProcessCorrectGuessUseCase
+import com.rdisoftware.chronobeat.domain.usecases.SaveGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.SetupInitialGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.RestartGameUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SaveGameProgressUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
+import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import com.russhwolf.settings.MapSettings
-import com.russhwolf.settings.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -45,16 +54,47 @@ class GameViewModelTest {
     fun setup() {
         val settings = MapSettings()
         Dispatchers.setMain(testDispatcher)
+
         teamRepository = TeamRepositoryImpl(settings)
         activeGameRepository = ActiveGameRepositoryImpl(settings)
         fakeMusicRepository = FakeMusicRepository()
+
         val playMusicUseCase = PlayMusicUseCase(fakeMusicRepository)
-        val getSavedGameUseCase = GetSavedGameUseCase(activeGameRepository)
-        val restartGameUseCase = RestartGameUseCase(activeGameRepository,teamRepository)
-        val saveGameProgressUseCase = SaveGameProgressUseCase(activeGameRepository)
+        val getTeamsUseCase = GetTeamsUseCase(teamRepository)
+        val getGameUseCase = GetGameUseCase(
+            activeGameRepository,
+            fakeMusicRepository,
+            getTeamsUseCase
+        )
+        val saveGameUseCase = SaveGameUseCase(activeGameRepository)
+        val getPlayableTrackUseCase = GetPlayableTrackUseCase(fakeMusicRepository)
+        val setupInitialGameUseCase = SetupInitialGameUseCase(
+            getPlayableTrackUseCase,
+            activeGameRepository
+        )
+        val checkGuessPositionUseCase = CheckGuessPositionUseCase()
+        val processCorrectGuessUseCase = ProcessCorrectGuessUseCase()
+        val advanceTurnUseCase = AdvanceTurnUseCase()
+        val getChronobeatPlaylistsUseCase = GetChronobeatPlaylistsUseCase(fakeMusicRepository)
+        val addTeamUseCase = AddTeamUseCase(teamRepository)
 
+        runBlocking {
+            addTeamUseCase(teamName = "TEST1", color = TeamColor.PLUM)
+            addTeamUseCase(teamName = "TEST2", color = TeamColor.CRIMSON)
+        }
 
-        viewModel = GameViewModel(activeGameRepository, fakeMusicRepository, playMusicUseCase, getSavedGameUseCase,saveGameProgressUseCase,restartGameUseCase)
+        viewModel = GameViewModel(
+            getPlayableTrackUseCase,
+            setupInitialGameUseCase,
+            checkGuessPositionUseCase,
+            processCorrectGuessUseCase,
+            advanceTurnUseCase,
+            playMusicUseCase,
+            getGameUseCase,
+            saveGameUseCase,
+            getChronobeatPlaylistsUseCase,
+            getTeamsUseCase
+        )
     }
 
     @AfterTest
@@ -65,10 +105,9 @@ class GameViewModelTest {
     // --- Init ---
 
     @Test
-    fun `init - game and tracks are loaded`() = testScope.runTest {
+    fun `init - game is loaded`() = testScope.runTest {
         advanceUntilIdle()
         assertNotNull(viewModel.state.value.game)
-        assertTrue(viewModel.state.value.tracks.isNotEmpty())
     }
 
     @Test
@@ -106,7 +145,6 @@ class GameViewModelTest {
         advanceUntilIdle()
         val state = viewModel.state.value
         assertEquals(state.game!!.teams.first(), state.currentTeam)
-        // Új fázis miatt ellenőrizzük, hogy Popup-pal indulunk-e
         assertEquals(GamePhase.SHOW_NEXT_TEAM_POPUP, state.currentPhase)
     }
 
@@ -237,7 +275,7 @@ class GameViewModelTest {
     @Test
     fun `game is not won initially`() = testScope.runTest {
         advanceUntilIdle()
-        assertFalse(viewModel.state.value.isGameWon)
+        assertTrue(viewModel.state.value.currentPhase != GamePhase.GAME_OVER)
     }
 
     @Test
@@ -245,7 +283,7 @@ class GameViewModelTest {
         advanceUntilIdle()
 
         var guessCount = 0
-        while (!viewModel.state.value.isGameWon && guessCount < 100) {
+        while (viewModel.state.value.currentPhase != GamePhase.GAME_OVER && guessCount < 100) {
             viewModel.onPopupAcknowledgePressed()
 
             val state = viewModel.state.value
@@ -257,7 +295,7 @@ class GameViewModelTest {
             guessCount++
         }
 
-        assertTrue(viewModel.state.value.isGameWon)
+        assertTrue(viewModel.state.value.currentPhase == GamePhase.GAME_OVER)
         assertEquals(GamePhase.GAME_OVER, viewModel.state.value.currentPhase)
     }
 
