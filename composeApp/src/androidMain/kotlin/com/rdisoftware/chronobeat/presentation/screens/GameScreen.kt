@@ -29,11 +29,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,10 +58,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.os.registerForAllProfilingResults
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.models.Track
@@ -95,6 +89,7 @@ import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLightItalic
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoMedium
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
+import com.rdisoftware.chronobeat.presentation.viewmodels.GameSnapshot
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -114,19 +109,17 @@ fun GameScreen(
     var isReturningFromLeaderboard by rememberSaveable { mutableStateOf(false) }
     var showResultOverlay by rememberSaveable { mutableStateOf(false) }
 
-    var displayedTeam by remember { mutableStateOf(state.currentTeam) }
-    var displayedTimeline by remember { mutableStateOf(state.timeline) }
-    var displayedCardCount by remember { mutableStateOf(state.currentCardCount) }
-    var displayedTrack by remember { mutableStateOf(state.currentTrack) }
-    var displayedIsCorrect by remember { mutableStateOf(state.isGuessCorrect) }
+    var snapshot by remember { mutableStateOf(GameSnapshot()) }
 
     LaunchedEffect(state.currentTeam, state.timeline, state.currentCardCount, state.isGuessCorrect, showResultOverlay) {
         if(!showResultOverlay) {
-            displayedTrack = state.currentTrack
-            displayedTimeline = state.timeline
-            displayedTeam = state.currentTeam
-            displayedCardCount = state.currentCardCount
-            displayedIsCorrect = state.isGuessCorrect
+            snapshot = GameSnapshot(
+                team = state.currentTeam,
+                timeline = state.timeline,
+                cardCount = state.currentCardCount,
+                track = state.currentTrack,
+                isCorrect = state.isGuessCorrect
+            )
         }
     }
 
@@ -180,15 +173,15 @@ fun GameScreen(
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
                 GameHeader(
-                    currentTeam = displayedTeam,
-                    cardCount = displayedCardCount,
+                    currentTeam = snapshot.team,
+                    cardCount = snapshot.cardCount,
                     isAnimating = state.currentPhase == GamePhase.GUESSING
                 )
 
                 GameSurface(
-                    timeline = displayedTimeline,
-                    currentTrack = displayedTrack,
-                    teamColor = displayedTeam?.color,
+                    timeline = snapshot.timeline,
+                    currentTrack = snapshot.track,
+                    teamColor = snapshot.team?.color,
                     onGuessPressed = { position -> viewModel.onGuessPressed(position) },
                     isGuessingPhase = state.currentPhase == GamePhase.GUESSING
                 )
@@ -206,7 +199,7 @@ fun GameScreen(
             }
 
             if (showResultOverlay) {
-                ResultOverlay(isCorrect = displayedIsCorrect)
+                ResultOverlay(isCorrect = snapshot.isCorrect)
             }
         }
     }
