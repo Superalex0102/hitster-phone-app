@@ -3,9 +3,9 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rdisoftware.chronobeat.domain.usecases.GetGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.AuthResult
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.CheckSpotifyAuthUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SpotifyAuthenticationUseCase
 import com.rdisoftware.chronobeat.shared.resources.Res
 import com.rdisoftware.chronobeat.shared.resources.error_message
@@ -32,14 +32,14 @@ sealed interface HomeEvent {
     data object OnOnlineGameClick : HomeEvent
     data object OnLoginPopupDismiss : HomeEvent
     data object OnSignInClick : HomeEvent
+    data object OnResumeDiscard : HomeEvent
 
     data class OnLocalGameClick(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
     data class OnResumeConfirm(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
-    data class OnResumeDiscard(val navigate: (shouldLoadGame: Boolean) -> Unit) : HomeEvent
 }
 
 class HomeViewModel(
-    private val getSavedGameUseCase: GetSavedGameUseCase,
+    private val getGameUseCase: GetGameUseCase,
     private val checkSpotifyAuthUseCase: CheckSpotifyAuthUseCase,
     private val spotifyAuthenticationUseCase: SpotifyAuthenticationUseCase
 ) : ViewModel() {
@@ -84,7 +84,6 @@ class HomeViewModel(
 
             is HomeEvent.OnResumeDiscard -> {
                 _state.update { it.copy(showResumePopup = false) }
-                event.navigate(false)
             }
 
             HomeEvent.OnSignInClick -> {
@@ -141,7 +140,7 @@ class HomeViewModel(
     }
 
     private suspend fun checkResumeGame() {
-        val savedGame = getSavedGameUseCase()
+        val savedGame = getGameUseCase()
         if (savedGame != null) {
             _state.update { it.copy(showResumePopup = true) }
         }

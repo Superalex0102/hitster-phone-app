@@ -87,7 +87,7 @@ fun HomeScreen(
             if (state.showResumePopup) {
                 SimpleResumeGamePopup(
                     onConfirm = { viewModel.onEvent(HomeEvent.OnResumeConfirm(navigate = onLocalGameClicked)) },
-                    onDiscard = { viewModel.onEvent(HomeEvent.OnResumeDiscard(navigate = onLocalGameClicked)) })
+                    onDiscard = { viewModel.onEvent(HomeEvent.OnResumeDiscard) })
             }
 
 
