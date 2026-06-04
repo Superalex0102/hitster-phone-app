@@ -212,7 +212,7 @@ fun CustomToggle(
     Row(
         modifier = Modifier
             .height(36.dp)
-            .widthIn(min = 64.dp)
+            .width(72.dp)
             .background(
                 color = if (checked) {
                     Color(AppColors.GAME_GRAY)
@@ -245,7 +245,7 @@ fun CustomToggle(
     ) {
         Box(
             modifier = Modifier
-                .height(24.dp)
+                .size(24.dp)
                 .background(
                     color = if (checked) {
                         Color(AppColors.BLACK)
@@ -253,8 +253,7 @@ fun CustomToggle(
                         Color(AppColors.CHECK_BOX_GRAY)
                     },
                     shape = androidx.compose.foundation.shape.CircleShape
-                )
-                .padding(horizontal = 10.dp),
+                ),
             contentAlignment = Alignment.Center
         ) {
 
