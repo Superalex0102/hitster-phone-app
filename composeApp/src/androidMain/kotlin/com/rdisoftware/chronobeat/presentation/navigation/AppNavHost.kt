@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
+import com.rdisoftware.chronobeat.presentation.screens.SettingsScreen
 import com.rdisoftware.chronobeat.presentation.screens.TeamSelectionScreen
 
 @Composable
@@ -26,7 +27,8 @@ fun AppNavHost() {
                     } else {
                         navController.navigate(TeamSelectionRoute)
                     }
-                }
+                },
+                onSettingsClicked = { navController.navigate(SettingsRoute) }
             )
         }
 
@@ -62,6 +64,13 @@ fun AppNavHost() {
                     }
                 }
             )
+        }
+
+        composable<SettingsRoute> {
+            SettingsScreen(
+                onSaveClicked = {
+                    navController.navigate(HomeRoute)
+                })
         }
     }
 }

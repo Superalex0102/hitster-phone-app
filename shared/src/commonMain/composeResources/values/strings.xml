@@ -26,4 +26,14 @@
     <string name="sign_in">Sign in</string>
     <string name="content_disc_error">Error</string>
     <string name="button_hint">Double tap to activate</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="notifications">Notifications</string>
+    <string name="supported_languages">Supported languages</string>
+    <string name="hungarian">Hungarian</string>
+    <string name="english">English</string>
+    <string name="german">German</string>
+    <string name="save">Save</string>
+    <string name="active_toggle">Active toggle</string>
+    <string name="inactive_toggle">Inactive toggle</string>
+    <string name="selected_element_icon">Selected element icon</string>
 </resources>

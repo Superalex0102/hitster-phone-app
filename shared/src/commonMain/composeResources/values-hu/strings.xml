@@ -28,4 +28,11 @@
     <string name="sign_in">Bejelentkezés</string>
     <string name="content_disc_error">Hiba</string>
     <string name="button_hint">Kattints kétszer az aktiváláshoz</string>
+    <string name="dark_mode">Sötét mód</string>
+    <string name="notifications">Értesítések</string>
+    <string name="supported_languages">Támogatott nyelvek</string>
+    <string name="hungarian">Magyar</string>
+    <string name="english">Angol</string>
+    <string name="german">Német</string>
+    <string name="save">Mentés</string>
 </resources>
