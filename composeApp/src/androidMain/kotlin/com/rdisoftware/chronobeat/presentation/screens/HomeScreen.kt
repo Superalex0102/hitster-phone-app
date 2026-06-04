@@ -55,7 +55,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    onLocalGameClicked: (shouldLoadSave: Boolean) -> Unit
+    onLocalGameClicked: (shouldLoadSave: Boolean) -> Unit,
+    onSettingsClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -93,7 +94,7 @@ fun HomeScreen(
 
             SettingsButton(
                 onClick = {
-                    viewModel.onEvent(event = HomeEvent.OnSettingsClick)
+                    onSettingsClicked()
                 }
             ) //TODO: Settings on click action
 

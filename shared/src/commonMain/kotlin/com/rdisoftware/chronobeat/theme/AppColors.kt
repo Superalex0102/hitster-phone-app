@@ -12,4 +12,5 @@ object AppColors {
     const val WHITE = 0xFFFFFFFF
     const val RED = 0xFFF44336
     const val DEFAULT_BLUE = 0xFF0000FF
+    const val CHECK_BOX_GRAY = 0xFF9F9F9F
 }
