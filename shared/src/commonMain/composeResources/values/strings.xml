@@ -36,4 +36,8 @@
     <string name="active_toggle">Active toggle</string>
     <string name="inactive_toggle">Inactive toggle</string>
     <string name="selected_element_icon">Selected element icon</string>
+    <string name="content_disc_arrow">Timeline arrow</string>
+    <string name="content_disc_music_player">Music player icon</string>
+    <string name="content_disc_game_card">Game card</string>
+    <string name="content_disc_guess_button">Guess</string>
 </resources>
