@@ -75,71 +75,29 @@ fun SettingsScreen(
 
                 Spacer(Modifier.height(24.dp))
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(Res.string.dark_mode),
-                        fontSize = 32.sp,
-                        color = Color(AppColors.WHITE),
-                        fontFamily = robotoMonoBold,
-                        modifier = Modifier
-                            .testTag(SettingsScreen.DARK_MODE_TEXT)
-                            .semantics {
-                                testTagsAsResourceId = true
-                            }
-                    )
-
-                    CustomToggle(
-                        checked = darkMode,
-                        testTag = SettingsScreen.DARK_MODE_TOGGLE,
-                        resourceId = true,
-                        onCheckedChange = { darkMode = it }
-                    )
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    color = Color(AppColors.WHITE).copy(0.5f)
+                ToggleSettings(
+                    text = stringResource(Res.string.dark_mode),
+                    textTestTag = SettingsScreen.DARK_MODE_TEXT,
+                    textResourceId = true,
+                    checked = darkMode,
+                    checkBoxTestTag = SettingsScreen.DARK_MODE_TOGGLE,
+                    checkboxResourceId = true,
+                    onToggleChange = { darkMode = it }
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 20.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(Res.string.notifications),
-                        fontSize = 32.sp,
-                        color = Color(AppColors.WHITE),
-                        fontFamily = robotoMonoBold,
-                        modifier = Modifier
-                            .testTag(SettingsScreen.NOTIFICATIONS_TEXT)
-                            .semantics {
-                                testTagsAsResourceId = true
-                            }
-                    )
+                CustomDivider()
 
-                    CustomToggle(
-                        checked = notificationEnabled,
-                        onCheckedChange = { notificationEnabled = it },
-                        testTag = SettingsScreen.NOTIFICATIONS_TOGGLE,
-                        resourceId = true
-                    )
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    color = Color(AppColors.WHITE).copy(0.5f)
+                ToggleSettings(
+                    text = stringResource(Res.string.notifications),
+                    textTestTag = SettingsScreen.NOTIFICATIONS_TEXT,
+                    textResourceId = true,
+                    checked = notificationEnabled,
+                    checkBoxTestTag = SettingsScreen.DARK_MODE_TOGGLE,
+                    checkboxResourceId = true,
+                    onToggleChange = { notificationEnabled = it }
                 )
+
+                CustomDivider()
 
                 Text(
                     text = stringResource(Res.string.supported_languages),
@@ -156,11 +114,7 @@ fun SettingsScreen(
 
                 )
 
-                HorizontalDivider(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    color = Color(AppColors.WHITE).copy(0.5f)
-                )
+                CustomDivider()
 
                 Column(
                     modifier = Modifier
@@ -314,4 +268,52 @@ fun LanguageItem(
             )
         }
     }
+}
+
+@Composable
+fun CustomDivider() {
+    HorizontalDivider(
+        modifier = Modifier
+            .fillMaxWidth(),
+        color = Color(AppColors.WHITE).copy(0.5f)
+    )
+}
+
+@Composable
+fun ToggleSettings(
+    text: String,
+    textTestTag: String,
+    textResourceId: Boolean,
+    checked: Boolean,
+    checkBoxTestTag: String,
+    checkboxResourceId: Boolean,
+    onToggleChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 20.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = text,
+            fontSize = 32.sp,
+            color = Color(AppColors.WHITE),
+            fontFamily = robotoMonoBold,
+            modifier = Modifier
+                .testTag(textTestTag)
+                .semantics {
+                    testTagsAsResourceId = textResourceId
+                }
+        )
+
+        CustomToggle(
+            checked = checked,
+            testTag = checkBoxTestTag,
+            resourceId = checkboxResourceId,
+            onCheckedChange = { onToggleChange(it) }
+        )
+    }
+
 }
