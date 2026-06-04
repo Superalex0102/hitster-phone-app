@@ -16,6 +16,9 @@ object GameRoute //TODO: Might need data class instead of object to pass paramet
 object GameSummaryRoute //TODO: Might need data class instead of object to pass parameters
 
 @Serializable
+object SettingsRoute //TODO: Might need data class instead of object to pass parameters
+
+@Serializable
 data class LeaderBoardRoute(
     val mode: LeaderBoardMode
 )

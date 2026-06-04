@@ -9,6 +9,7 @@ import com.rdisoftware.chronobeat.presentation.enums.LeaderBoardMode
 import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
+import com.rdisoftware.chronobeat.presentation.screens.SettingsScreen
 import com.rdisoftware.chronobeat.presentation.screens.TeamSelectionScreen
 import com.rdisoftware.chronobeat.presentation.screens.LeaderBoardScreen
 
@@ -28,7 +29,8 @@ fun AppNavHost() {
                     } else {
                         navController.navigate(TeamSelectionRoute)
                     }
-                }
+                },
+                onSettingsClicked = { navController.navigate(SettingsRoute) }
             )
         }
 
@@ -80,6 +82,13 @@ fun AppNavHost() {
                     navController.popBackStack()
                 }
             )
+        }
+
+        composable<SettingsRoute> {
+            SettingsScreen(
+                onSaveClicked = {
+                    navController.navigate(HomeRoute)
+                })
         }
     }
 }

@@ -56,4 +56,17 @@ object AccessibilityIds {
         const val ERROR_ICON = "error_icon"
         const val ERROR_TEXT = "error_text"
     }
+
+    object SettingsScreen {
+        const val SETTINGS_TITLE = "settings_title"
+        const val DARK_MODE_TOGGLE = "dark_mode_toggle"
+        const val DARK_MODE_TEXT = "dark_mode_text"
+        const val NOTIFICATIONS_TOGGLE = "notifications_toggle"
+        const val NOTIFICATIONS_TEXT = "notifications_text"
+        const val SUPPORTED_LANGUAGES_TEXT = "supported_languages_text"
+        const val HUNGARIAN_TEXT = "hungarian_text"
+        const val ENGLISH_TEXT = "english_text"
+        const val GERMAN_TEXT = "german_text"
+        const val SAVE_BUTTON = "save_button"
+    }
 }
