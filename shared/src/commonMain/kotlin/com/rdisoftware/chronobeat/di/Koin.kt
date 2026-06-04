@@ -7,12 +7,18 @@ import com.rdisoftware.chronobeat.data.repositories.TeamRepositoryImpl
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
-import com.rdisoftware.chronobeat.domain.usecases.PlayMusicUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.CheckSpotifyAuthUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.GetSavedGameUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.RestartGameUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SaveGameProgressUseCase
-import com.rdisoftware.chronobeat.domain.usecases.homeScreen.SpotifyAuthenticationUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.AdvanceTurnUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.CheckGuessPositionUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.GetChronobeatPlaylistsUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.GetGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.GetPlayableTrackUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.PlayMusicUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.ProcessCorrectGuessUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.SaveGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.SetupInitialGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.CheckSpotifyAuthUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.RestartGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.music.SpotifyAuthenticationUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
@@ -48,18 +54,22 @@ val sharedModule = module {
 
     //ViewModels
     factory { HomeViewModel(
-        getSavedGameUseCase = get(),
+        getGameUseCase = get(),
         checkSpotifyAuthUseCase = get(),
-        spotifyAuthenticationUseCase = get()
-
+        spotifyAuthenticationUseCase = get(),
+        restartGameUseCase = get()
     ) }
     factory { GameViewModel(
+        getPlayableTrackUseCase = get(),
+        setupInitialGameUseCase = get(),
+        checkGuessPositionUseCase = get(),
+        processCorrectGuessUseCase = get(),
+        advanceTurnUseCase = get(),
         playMusicUseCase = get(),
-        getSavedGameUseCase = get(),
-        saveGameProgressUseCase = get(),
-        resetGameUseCase = get(),
-        activeGameRepository = get(),
-        musicRepository = get(),
+        getGameUseCase = get(),
+        saveGameUseCase = get(),
+        getChronobeatPlaylistsUseCase = get(),
+        getTeamsUseCase = get(),
     ) }
     factory { TeamSelectionViewModel(
         addTeamUseCase = get(),
@@ -70,15 +80,26 @@ val sharedModule = module {
     factory { GameSummaryViewModel() }
 
     //UseCases
-    factory { PlayMusicUseCase(
-        musicRepository = get()
-    ) }
-    factory { GetSavedGameUseCase(
+    factory { PlayMusicUseCase(musicRepository = get()) }
+    factory { GetPlayableTrackUseCase(musicRepository = get()) }
+    factory { SetupInitialGameUseCase(
+        getPlayableTrackUseCase = get(),
         activeGameRepository = get()
     ) }
-    factory { SaveGameProgressUseCase(
-        activeGameRepository = get()
+    factory { CheckGuessPositionUseCase() }
+    factory { ProcessCorrectGuessUseCase() }
+    factory { AdvanceTurnUseCase() }
+    factory { AddTeamUseCase(teamRepository = get()) }
+    factory { DeleteTeamUseCase(teamRepository = get()) }
+    factory { UpdateTeamUseCase(teamRepository = get()) }
+    factory { GetTeamsUseCase(teamRepository = get()) }
+    factory { GetGameUseCase(
+        activeGameRepository = get(),
+        musicRepository = get(),
+        getTeamsUseCase = get(),
     ) }
+    factory { SaveGameUseCase(activeGameRepository = get()) }
+    factory { GetChronobeatPlaylistsUseCase(musicRepository = get()) }
     factory { RestartGameUseCase(
         activeGameRepository = get(),
         teamRepository = get()
@@ -88,14 +109,9 @@ val sharedModule = module {
     ) }
 
     factory { SpotifyAuthenticationUseCase(
-            musicRepository = get()
-        )
+        musicRepository = get()
+    )
     }
-
-    factory { AddTeamUseCase(teamRepository = get()) }
-    factory { DeleteTeamUseCase(teamRepository = get()) }
-    factory { UpdateTeamUseCase(teamRepository = get()) }
-    factory { GetTeamsUseCase(teamRepository = get()) }
 
     //Repositories
     single<TeamRepository> { TeamRepositoryImpl(settings = get()) }

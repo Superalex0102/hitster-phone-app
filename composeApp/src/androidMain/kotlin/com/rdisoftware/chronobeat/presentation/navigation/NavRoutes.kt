@@ -9,7 +9,7 @@ object HomeRoute //TODO: Might need data class instead of object to pass paramet
 object TeamSelectionRoute //TODO: Might need data class instead of object to pass parameters
 
 @Serializable
-data class GameRoute(val shouldLoadSave: Boolean = true) //TODO: Might need data class instead of object to pass parameters
+object GameRoute //TODO: Might need data class instead of object to pass parameters
 
 @Serializable
 object GameSummaryRoute //TODO: Might need data class instead of object to pass parameters

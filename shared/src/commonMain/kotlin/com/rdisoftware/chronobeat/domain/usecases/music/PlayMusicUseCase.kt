@@ -1,4 +1,4 @@
-package com.rdisoftware.chronobeat.domain.usecases
+package com.rdisoftware.chronobeat.domain.usecases.music
 
 import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 

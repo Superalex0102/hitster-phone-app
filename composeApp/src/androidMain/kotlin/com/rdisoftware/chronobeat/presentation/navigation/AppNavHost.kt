@@ -23,7 +23,7 @@ fun AppNavHost() {
             HomeScreen(
                 onLocalGameClicked = { shouldLoadSave ->
                     if (shouldLoadSave) {
-                        navController.navigate(GameRoute(shouldLoadSave = true))
+                        navController.navigate(GameRoute)
                     } else {
                         navController.navigate(TeamSelectionRoute)
                     }
@@ -35,7 +35,7 @@ fun AppNavHost() {
         composable<TeamSelectionRoute> {
             TeamSelectionScreen(
                 onTeamsSelectedClicked = {
-                    navController.navigate(GameRoute(shouldLoadSave = false))
+                    navController.navigate(GameRoute)
                 }
             )
         }
@@ -44,7 +44,6 @@ fun AppNavHost() {
             val route = backStackEntry.toRoute<GameRoute>()
 
             GameScreen(
-                shouldLoadSave = route.shouldLoadSave,
                 onGameFinishedClicked = {
                     navController.navigate(GameSummaryRoute)
                 }

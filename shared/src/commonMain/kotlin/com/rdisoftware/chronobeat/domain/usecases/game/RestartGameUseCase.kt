@@ -1,6 +1,5 @@
-package com.rdisoftware.chronobeat.domain.usecases.homeScreen
+package com.rdisoftware.chronobeat.domain.usecases.game
 
-import com.rdisoftware.chronobeat.data.repositories.ActiveGameRepositoryImpl
 import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
 
