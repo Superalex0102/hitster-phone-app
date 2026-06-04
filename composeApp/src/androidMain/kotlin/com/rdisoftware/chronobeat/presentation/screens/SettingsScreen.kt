@@ -111,7 +111,6 @@ fun SettingsScreen(
                         .semantics {
                             testTagsAsResourceId = true
                         }
-
                 )
 
                 CustomDivider()
@@ -315,5 +314,4 @@ fun ToggleSettings(
             onCheckedChange = { onToggleChange(it) }
         )
     }
-
 }
