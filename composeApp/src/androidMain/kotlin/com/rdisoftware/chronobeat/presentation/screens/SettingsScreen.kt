@@ -198,7 +198,7 @@ fun CustomToggle(
     ) {
         Box(
             modifier = Modifier
-                .size(24.dp)
+                .size(if (checked) 26.dp else 23.dp)
                 .background(
                     color = if (checked) {
                         Color(AppColors.BLACK)
@@ -222,7 +222,7 @@ fun CustomToggle(
                 } else {
                     Color(AppColors.BLACK)
                 },
-                modifier = Modifier.size(12.dp)
+                modifier = Modifier.size(16.dp)
             )
 
         }
