@@ -21,6 +21,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.presentation.constans.LanguageConstants
@@ -49,107 +51,115 @@ fun SettingsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
 
         val dimensions =
-            if (screenWidth >= 600.dp) TabletHomeDimensions
-            else PhoneHomeDimensions
+            if (screenWidth >= 600.dp) TabletSettingsDimensions
+            else PhoneSettingsDimensions
 
         CompositionLocalProvider(
-            HomeLocalDimensions provides dimensions,
+            SettingsLocalDimensions provides dimensions,
             LocalBaseDimensions provides dimensions.base
         ) {
 
             GradientBackground()
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 12.dp)
-                    .padding(horizontal = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.TopCenter
             ) {
-
-                ScreenTitle(
-                    text = stringResource(Res.string.settings),
-                    testTag = SettingsScreen.SETTINGS_TITLE,
-                    resourceId = true
-                )
-
-                Spacer(Modifier.height(24.dp))
-
-                ToggleSettings(
-                    text = stringResource(Res.string.dark_mode),
-                    textTestTag = SettingsScreen.DARK_MODE_TEXT,
-                    textResourceId = true,
-                    checked = darkMode,
-                    checkBoxTestTag = SettingsScreen.DARK_MODE_TOGGLE,
-                    checkboxResourceId = true,
-                    onToggleChange = { darkMode = it }
-                )
-
-                CustomDivider()
-
-                ToggleSettings(
-                    text = stringResource(Res.string.notifications),
-                    textTestTag = SettingsScreen.NOTIFICATIONS_TEXT,
-                    textResourceId = true,
-                    checked = notificationEnabled,
-                    checkBoxTestTag = SettingsScreen.DARK_MODE_TOGGLE,
-                    checkboxResourceId = true,
-                    onToggleChange = { notificationEnabled = it }
-                )
-
-                CustomDivider()
-
-                Text(
-                    text = stringResource(Res.string.supported_languages),
-                    fontSize = 30.sp,
-                    color = Color(AppColors.WHITE),
-                    fontFamily = robotoMonoBold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 20.dp, bottom = 20.dp)
-                        .testTag(SettingsScreen.SUPPORTED_LANGUAGES_TEXT)
-                        .semantics {
-                            testTagsAsResourceId = true
-                        }
-                )
-
-                CustomDivider()
 
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .align(Alignment.CenterHorizontally)
+                        .widthIn(max = settingsDimens.base.maxContentWidth)
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    LanguageConstants.all.forEach { language ->
-                        LanguageItem(
-                            text = stringResource(language.label),
-                            selected = selectedLanguage == language,
-                            testTag = language.testTag,
-                            resourceId = true,
-                            onClick = { selectedLanguage = language }
-                        )
 
-                        HorizontalDivider(color = Color(AppColors.WHITE).copy(0.5f))
+                    ScreenTitle(
+                        text = stringResource(Res.string.settings),
+                        testTag = SettingsScreen.SETTINGS_TITLE,
+                        resourceId = true
+                    )
+
+                    Spacer(Modifier.height(settingsDimens.smallSpacer))
+
+                    ToggleSettings(
+                        text = stringResource(Res.string.dark_mode),
+                        textTestTag = SettingsScreen.DARK_MODE_TEXT,
+                        textResourceId = true,
+                        checked = darkMode,
+                        checkBoxTestTag = SettingsScreen.DARK_MODE_TOGGLE,
+                        checkboxResourceId = true,
+                        onToggleChange = { darkMode = it }
+                    )
+
+                    CustomDivider()
+
+                    ToggleSettings(
+                        text = stringResource(Res.string.notifications),
+                        textTestTag = SettingsScreen.NOTIFICATIONS_TEXT,
+                        textResourceId = true,
+                        checked = notificationEnabled,
+                        checkBoxTestTag = SettingsScreen.DARK_MODE_TOGGLE,
+                        checkboxResourceId = true,
+                        onToggleChange = { notificationEnabled = it }
+                    )
+
+                    CustomDivider()
+
+                    SupportLanguageText()
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(settingsDimens.supportedLanguageWidth)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        CustomDivider()
                     }
+
+                    Spacer(modifier = Modifier.height(settingsDimens.tinySpacer))
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(settingsDimens.languageListWidth)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        LanguageConstants.all.forEach { language ->
+                            LanguageItem(
+                                text = stringResource(language.label),
+                                selected = selectedLanguage == language,
+                                testTag = language.testTag,
+                                resourceId = true,
+                                onClick = { selectedLanguage = language }
+                            )
+
+                            HorizontalDivider(color = Color(AppColors.WHITE).copy(0.5f))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(settingsDimens.mediumSpacer))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(settingsDimens.gradientButtonWidth),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        GradientButton(
+                            text = stringResource(Res.string.save),
+                            enabled = true,
+                            size = ButtonSize.SMALL,
+                            testTag = SettingsScreen.SAVE_BUTTON,
+                            resourceId = true,
+                            onClick = { onSaveClicked() }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(settingsDimens.bottomSpacer))
+
+                    BottomText(
+                        text = stringResource(Res.string.powered_by),
+                        name = stringResource(Res.string.bottom_app_name)
+                    )
                 }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                GradientButton(
-                    text = stringResource(Res.string.save),
-                    enabled = true,
-                    size = ButtonSize.SMALL,
-                    testTag = SettingsScreen.SAVE_BUTTON,
-                    resourceId = true,
-                    onClick = { onSaveClicked() }
-                )
-
-                Spacer(modifier = Modifier.height(48.dp))
-
-                BottomText(
-                    text = stringResource(Res.string.powered_by),
-                    name = stringResource(Res.string.bottom_app_name)
-                )
             }
         }
     }
@@ -164,8 +174,8 @@ fun CustomToggle(
 ) {
     Row(
         modifier = Modifier
-            .height(36.dp)
-            .width(72.dp)
+            .height(settingsDimens.toggleHeight)
+            .width(settingsDimens.toggleWidth)
             .background(
                 color = if (checked) {
                     Color(AppColors.GAME_GRAY)
@@ -198,7 +208,7 @@ fun CustomToggle(
     ) {
         Box(
             modifier = Modifier
-                .size(if (checked) 26.dp else 23.dp)
+                .size(if (checked) settingsDimens.toggleThumbSizeChecked else settingsDimens.toggleThumbSizeUnChecked)
                 .background(
                     color = if (checked) {
                         Color(AppColors.BLACK)
@@ -222,9 +232,8 @@ fun CustomToggle(
                 } else {
                     Color(AppColors.BLACK)
                 },
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(settingsDimens.toggleIconSize)
             )
-
         }
     }
 }
@@ -252,15 +261,16 @@ fun LanguageItem(
     ) {
         Text(
             text = text,
-            fontSize = 24.sp,
+            fontSize = settingsDimens.settingSmallFontSize,
             color = Color(AppColors.WHITE),
             fontFamily = robotoMonoRegular
         )
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(settingsDimens.tinySpacer))
 
         if (selected) {
             Icon(
+                modifier = Modifier.size(settingsDimens.languageItemIcon),
                 imageVector = Icons.Outlined.Check,
                 contentDescription = stringResource(Res.string.selected_element_icon),
                 tint = Color(AppColors.WHITE)
@@ -297,7 +307,7 @@ fun ToggleSettings(
     ) {
         Text(
             text = text,
-            fontSize = 32.sp,
+            fontSize = settingsDimens.settingMediumFontSize,
             color = Color(AppColors.WHITE),
             fontFamily = robotoMonoBold,
             modifier = Modifier
@@ -314,4 +324,22 @@ fun ToggleSettings(
             onCheckedChange = { onToggleChange(it) }
         )
     }
+}
+
+@Composable
+fun SupportLanguageText() {
+    Text(
+        text = stringResource(Res.string.supported_languages),
+        fontSize = settingsDimens.settingHeaderFontSize,
+        color = Color(AppColors.WHITE),
+        fontFamily = robotoMonoBold,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp, bottom = 20.dp)
+            .testTag(SettingsScreen.SUPPORTED_LANGUAGES_TEXT)
+            .semantics {
+                testTagsAsResourceId = true
+            }
+    )
 }
