@@ -11,6 +11,7 @@ import com.rdisoftware.chronobeat.domain.usecases.game.AdvanceTurnUseCase
 import com.rdisoftware.chronobeat.domain.usecases.game.CheckGuessPositionUseCase
 import com.rdisoftware.chronobeat.domain.usecases.music.GetChronobeatPlaylistsUseCase
 import com.rdisoftware.chronobeat.domain.usecases.game.GetGameUseCase
+import com.rdisoftware.chronobeat.domain.usecases.game.GetWinnerTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.music.GetPlayableTrackUseCase
 import com.rdisoftware.chronobeat.domain.usecases.music.PlayMusicUseCase
 import com.rdisoftware.chronobeat.domain.usecases.game.ProcessCorrectGuessUseCase
@@ -77,7 +78,9 @@ val sharedModule = module {
         updateTeamUseCase = get(),
         getTeamsUseCase = get()
     ) }
-    factory { GameSummaryViewModel() }
+    factory { GameSummaryViewModel(
+        getWinnerTeamUseCase = get()
+    ) }
 
     //UseCases
     factory { PlayMusicUseCase(musicRepository = get()) }
@@ -112,6 +115,9 @@ val sharedModule = module {
         musicRepository = get()
     )
     }
+    factory { GetWinnerTeamUseCase(
+        getGameUseCase = get()
+    ) }
 
     //Repositories
     single<TeamRepository> { TeamRepositoryImpl(settings = get()) }
