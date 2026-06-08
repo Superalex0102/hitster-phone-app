@@ -50,6 +50,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.TeamSelectionScreen
 import com.rdisoftware.chronobeat.presentation.dimensions.LocalBaseDimensions
@@ -99,68 +100,87 @@ fun TeamSelectionScreen(
         TeamSelectionLocalDimensions provides dimensions,
         LocalBaseDimensions provides dimensions.base
     ) {
-        GradientBackground()
+        Box(modifier = Modifier.fillMaxSize()) {
+            GradientBackground()
 
-        LogoText()
+            LogoText()
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentWidth()
-                .widthIn(max = teamSelDimens.base.maxContentWidth)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            ScreenTitle(
-                text = stringResource(Res.string.team_selection_title),
-                testTag = TeamSelectionScreen.TEAM_SELECTION_TITLE,
-                resourceId = true
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                TeamInputField(
-                    value = state.inputName,
-                    onValueChange = { viewModel.onNameChanged(it) },
-                    onAddTeam = {
-                        if (state.isEditing) viewModel.confirmEdit()
-                        else viewModel.addTeam()
-                    }
-                )
-            }
-
-            InfoText()
-
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .wrapContentWidth()
+                    .widthIn(max = teamSelDimens.base.maxContentWidth)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TeamList(
-                    teams = state.teams,
-                    onDelete = { viewModel.deleteTeam(it) },
-                    onEdit = { viewModel.startEdit(it) },
-                    modifier = Modifier.fillMaxSize()
+                ScreenTitle(
+                    text = stringResource(Res.string.team_selection_title),
+                    testTag = TeamSelectionScreen.TEAM_SELECTION_TITLE,
+                    resourceId = true
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TeamInputField(
+                        value = state.inputName,
+                        onValueChange = { viewModel.onNameChanged(it) },
+                        onAddTeam = {
+                            if (state.isEditing) viewModel.confirmEdit()
+                            else viewModel.addTeam()
+                        }
+                    )
+                }
+
+                InfoText()
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    TeamList(
+                        teams = state.teams,
+                        onDelete = { viewModel.deleteTeam(it) },
+                        onEdit = { viewModel.startEdit(it) },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                GradientButton(
+                    text = stringResource(Res.string.start),
+                    enabled = state.canStartGame,
+                    size = ButtonSize.SMALL,
+                    testTag = TeamSelectionScreen.START_GAME_BUTTON,
+                    resourceId = true,
+                    onClick = { onTeamsSelectedClicked() }
+                )
+
+                Spacer(modifier = Modifier.weight(0.15f))
+
+                BottomText(
+                    stringResource(Res.string.powered_by),
+                    stringResource(Res.string.bottom_app_name)
                 )
             }
 
-            GradientButton(
-                text = stringResource(Res.string.start),
-                enabled = state.canStartGame,
-                size = ButtonSize.SMALL,
-                testTag = TeamSelectionScreen.START_GAME_BUTTON,
-                resourceId = true,
-                onClick = { onTeamsSelectedClicked() }
-            )
-
-            Spacer(modifier = Modifier.weight(0.15f))
-
-            BottomText(
-                stringResource(Res.string.powered_by),
-                stringResource(Res.string.bottom_app_name)
-            )
+            state.error?.let { error ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .background(Color.Red.copy(alpha = 0.8f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = error,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+            }
         }
     }
 }

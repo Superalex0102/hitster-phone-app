@@ -165,6 +165,23 @@ fun GameScreen(
             if (state.currentPhase == GamePhase.SHOW_RESULT) {
                 ResultOverlay(isCorrect = state.isGuessCorrect)
             }
+
+            state.error?.let { error ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .background(Color.Red.copy(alpha = 0.8f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = error,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+            }
         }
     }
 }

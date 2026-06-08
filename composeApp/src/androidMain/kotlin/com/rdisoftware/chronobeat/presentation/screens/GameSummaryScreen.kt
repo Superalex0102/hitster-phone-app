@@ -1,8 +1,11 @@
 package com.rdisoftware.chronobeat.presentation.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -62,58 +65,76 @@ fun GameSummaryScreen(
         GameSummaryLocalDimensions provides dimensions,
         LocalBaseDimensions provides dimensions.base
     ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            GradientBackground()
 
-        GradientBackground()
-
-        LogoText()
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .widthIn(max = gameSumDimens.base.maxContentWidth),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            ScreenTitle(
-                text = stringResource(Res.string.game_summary_title),
-                testTag = GameSummaryScreen.GAME_SUMMARY_TITLE,
-                resourceId = true
-            )
-
-            TrophyImage()
-
-        DisplayWinner(
-            winnerTeam = state.gameWinner?.name ?: ""
-        )
+            LogoText()
 
             Column(
                 modifier = Modifier
-                    .widthIn(max = gameSumDimens.columnWidth)
-                    .padding(top = 16.dp),
+                    .fillMaxWidth()
+                    .widthIn(max = gameSumDimens.base.maxContentWidth),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(gameSumDimens.spaceByPadding)
-
             ) {
-                GradientButton(
-                    text = stringResource(Res.string.home),
-                    enabled = true,
-                    size = ButtonSize.SMALL,
-                    testTag = GameSummaryScreen.HOME_BUTTON,
-                    resourceId = true,
-                    onClick = {
-                        onHomeClicked()
-                    }
+                ScreenTitle(
+                    text = stringResource(Res.string.game_summary_title),
+                    testTag = GameSummaryScreen.GAME_SUMMARY_TITLE,
+                    resourceId = true
                 )
 
-                GradientButton(
-                    text = stringResource(Res.string.play_again),
-                    enabled = true,
-                    size = ButtonSize.SMALL,
-                    testTag = GameSummaryScreen.PLAY_AGAIN_BUTTON,
-                    resourceId = true,
-                    onClick = {
-                        onPlayAgainClicked()
-                    }
+                TrophyImage()
+
+                DisplayWinner(
+                    winnerTeam = state.gameWinner?.name ?: ""
                 )
+
+                Column(
+                    modifier = Modifier
+                        .widthIn(max = gameSumDimens.columnWidth)
+                        .padding(top = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(gameSumDimens.spaceByPadding)
+
+                ) {
+                    GradientButton(
+                        text = stringResource(Res.string.home),
+                        enabled = true,
+                        size = ButtonSize.SMALL,
+                        testTag = GameSummaryScreen.HOME_BUTTON,
+                        resourceId = true,
+                        onClick = {
+                            onHomeClicked()
+                        }
+                    )
+
+                    GradientButton(
+                        text = stringResource(Res.string.play_again),
+                        enabled = true,
+                        size = ButtonSize.SMALL,
+                        testTag = GameSummaryScreen.PLAY_AGAIN_BUTTON,
+                        resourceId = true,
+                        onClick = {
+                            onPlayAgainClicked()
+                        }
+                    )
+                }
+            }
+
+            state.error?.let { error ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .background(Color.Red.copy(alpha = 0.8f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = error,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
     }
