@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.domain.usecases.game.ClearGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
@@ -35,7 +36,8 @@ class TeamSelectionViewModel(
     private val addTeamUseCase: AddTeamUseCase,
     private val deleteTeamUseCase: DeleteTeamUseCase,
     private val updateTeamUseCase: UpdateTeamUseCase,
-    private val getTeamsUseCase: GetTeamsUseCase
+    private val getTeamsUseCase: GetTeamsUseCase,
+    private val clearGameUseCase: ClearGameUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TeamSelectionState())
@@ -97,6 +99,12 @@ class TeamSelectionViewModel(
         _state.update { it.copy(editingTeam = null, inputName = "") }
     }
 
+    fun clearGame(){
+        viewModelScope.launch {
+            clearGameUseCase()
+        }
+    }
+
     private fun loadTeams() {
         viewModelScope.launch {
             val updatedTeams = getTeamsUseCase()
@@ -110,4 +118,6 @@ class TeamSelectionViewModel(
             }
         }
     }
+
+
 }
