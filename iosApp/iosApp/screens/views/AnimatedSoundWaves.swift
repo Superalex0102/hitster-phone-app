@@ -12,7 +12,7 @@ struct AnimatedSoundWaves: View {
     @StateObject private var strings = StringProvider.shared
     let R = Res.string.shared
     var isAnimating: Bool
-    var barColor: Color = .white
+    var barColor: Color = Color(hex: AppColors.shared.WHITE)
     
     var body: some View {
         HStack(alignment: .center, spacing: 3) {
@@ -42,17 +42,11 @@ fileprivate struct SoundWaveBar: View {
                     
                     while !Task.isCancelled {
                         let randomMaxHeight = CGFloat.random(in: 20...40)
-                        withAnimation(.easeInOut(duration: 0.4)) {
-                            currentHeight = randomMaxHeight
-                        }
-                        try? await Task.sleep(nanoseconds: 400 * 1_000_000)
+                        await animation(delayMs: 400, currentHeight: randomMaxHeight)
 
                         if Task.isCancelled { break }
                         
-                        withAnimation(.easeInOut(duration: 0.4)) {
-                            currentHeight = 6.0
-                        }
-                        try? await Task.sleep(nanoseconds: 400 * 1_000_000)
+                        await animation(delayMs: 400, currentHeight: 6.0)
                     }
                 } else {
                     withAnimation(.easeOut(duration: 0.3)) {
@@ -60,6 +54,14 @@ fileprivate struct SoundWaveBar: View {
                     }
                 }
             }
+    }
+    
+    private func animation(delayMs: UInt64, currentHeight: CGFloat) async {
+        withAnimation(.easeInOut(duration: 0.4)) {
+            self.currentHeight = currentHeight
+        }
+        
+        try? await Task.sleep(nanoseconds: delayMs * 1_000_000)
     }
 }
 

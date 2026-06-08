@@ -30,7 +30,6 @@ struct GameCardView: View {
             Text(model.releaseYear)
                 .font(.robotoMonoBold(64))
                 .foregroundStyle(Color(hex: AppColors.shared.BLACK))
-                .frame(alignment: .center)
                 .accessibilityIdentifier(AccessibilityIds.GameScreen.shared.GAME_CARD_YEAR)
             
             Spacer()
@@ -58,5 +57,12 @@ struct GameCardView: View {
 }
 
 #Preview {
-    GameCardView(model: GameCardItemModel(mainArtist: "The Chainsmokers", featArtist: ["Dzsudlo", "Alma"], releaseYear: "2020", title: "ParisParisParisParisParisParis"))
+    GameCardView(
+        model: GameCardItemModel(
+            mainArtist: "The Chainsmokers",
+            featArtist: ["Dzsudlo", "Alma"],
+            releaseYear: "2020",
+            title: "ParisParisParisParisParisParis"
+        )
+    )
 }
