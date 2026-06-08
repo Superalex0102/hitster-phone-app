@@ -34,7 +34,8 @@ data class GameState(
     val game: Game? = null,
     val currentTrack: Track? = null,
     val isGuessCorrect: Boolean? = null,
-    val currentPhase: GamePhase = GamePhase.LOADING
+    val currentPhase: GamePhase = GamePhase.LOADING,
+    val error: String? = null
 ) {
     val currentTeam = game?.currentTeam
     val timeline: List<Track> = game?.collectedCardsByTeam?.get(currentTeam) ?: emptyList()
@@ -69,7 +70,10 @@ class GameViewModel(
             _state.update { it.copy(currentPhase = GamePhase.LOADING) }
             try {
                 val playlists = getChronobeatPlaylistsUseCase()
-                if (playlists.isEmpty()) return@launch
+                if (playlists.isEmpty()) {
+                    _state.update { it.copy(error = "No playlists available", currentPhase = GamePhase.GAME_OVER) }
+                    return@launch
+                }
 
                 val playlist = playlists.first()
                 trackIdPool = playlist.trackIds.shuffled().toMutableList()
@@ -79,7 +83,7 @@ class GameViewModel(
                 if (activeGame == null || activeGame.playlistId != playlist.id) {
                     val allTeams = getTeamsUseCase()
                     if (allTeams.isEmpty()) {
-                        println("GameViewModel: Nincsenek csapatok!")
+                        _state.update { it.copy(error = "No teams configured", currentPhase = GamePhase.GAME_OVER) }
                         return@launch
                     }
 
@@ -91,12 +95,13 @@ class GameViewModel(
                         it.copy(
                             game = activeGame,
                             currentTrack = activeGame.currentTrack,
-                            currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP
+                            currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP,
+                            error = null
                         )
                     }
                 }
             } catch (e: Exception) {
-                println("GameViewModel: Initialization fail: ${e.message}")
+                _state.update { it.copy(error = "Failed to initialize game: ${e.message}", currentPhase = GamePhase.GAME_OVER) }
             }
         }
     }
@@ -111,53 +116,66 @@ class GameViewModel(
         if (_state.value.currentPhase != GamePhase.GUESSING) return
 
         viewModelScope.launch {
-            val currentState = _state.value
-            val currentGame = currentState.game ?: return@launch
-            val currentTrack = currentState.currentTrack ?: return@launch
-            val timeline = currentState.timeline
+            try {
+                val currentState = _state.value
+                val currentGame = currentState.game ?: return@launch
+                val currentTrack = currentState.currentTrack ?: return@launch
+                val timeline = currentState.timeline
 
-            val isCorrect = checkGuessPositionUseCase(timeline, currentTrack, position)
+                val isCorrect = checkGuessPositionUseCase(timeline, currentTrack, position)
 
-            _state.update {
-                it.copy(
-                    isGuessCorrect = isCorrect,
-                    currentPhase = GamePhase.SHOW_RESULT
-                )
-            }
-
-            delay(2000)
-
-            var updatedGame = currentGame
-
-            if (isCorrect) {
-                updatedGame = processCorrectGuessUseCase(updatedGame, currentTrack, position)
-            }
-
-            if (updatedGame.winnerTeam == null) {
-                val nextTrack = getPlayableTrackUseCase(trackIdPool)
-                updatedGame = advanceTurnUseCase(updatedGame, nextTrack)
-            }
-
-            saveGameUseCase(updatedGame)
-
-            if (updatedGame.winnerTeam != null) {
-                _state.update { it.copy(game = updatedGame, currentPhase = GamePhase.GAME_OVER) }
-            } else {
                 _state.update {
                     it.copy(
-                        game = updatedGame,
-                        currentTrack = updatedGame.currentTrack,
-                        isGuessCorrect = null,
-                        currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP
+                        isGuessCorrect = isCorrect,
+                        currentPhase = GamePhase.SHOW_RESULT
                     )
                 }
+
+                delay(2000)
+
+                var updatedGame = currentGame
+
+                if (isCorrect) {
+                    updatedGame = processCorrectGuessUseCase(updatedGame, currentTrack, position)
+                }
+
+                if (updatedGame.winnerTeam == null) {
+                    val nextTrack = getPlayableTrackUseCase(trackIdPool)
+                    updatedGame = advanceTurnUseCase(updatedGame, nextTrack)
+                }
+
+                saveGameUseCase(updatedGame)
+
+                if (updatedGame.winnerTeam != null) {
+                    _state.update { it.copy(game = updatedGame, currentPhase = GamePhase.GAME_OVER) }
+                } else {
+                    _state.update {
+                        it.copy(
+                            game = updatedGame,
+                            currentTrack = updatedGame.currentTrack,
+                            isGuessCorrect = null,
+                            currentPhase = GamePhase.SHOW_NEXT_TEAM_POPUP,
+                            error = null
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to process guess: ${e.message}") }
             }
         }
     }
 
     private fun playMusic(trackId: String) {
         viewModelScope.launch {
-            runCatching { playMusicUseCase(trackId) }
+            try {
+                playMusicUseCase(trackId)
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to play music: ${e.message}") }
+            }
         }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 }

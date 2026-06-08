@@ -12,7 +12,8 @@ import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 data class GameSummaryUiState(
-    val gameWinner: Team? = null
+    val gameWinner: Team? = null,
+    val error: String? = null
 )
 
 class GameSummaryViewModel(
@@ -36,14 +37,22 @@ class GameSummaryViewModel(
 
     private fun getWinnerTeam() {
         viewModelScope.launch {
-            //TODO: getWinnerTeamUseCase which provides a team the gameWinner UiState can be updated with.
-            updateWinnerTeam(team = testTeam)
+            try {
+                //TODO: getWinnerTeamUseCase which provides a team the gameWinner UiState can be updated with.
+                updateWinnerTeam(team = testTeam)
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to get winner: ${e.message}") }
+            }
         }
     }
 
     private fun updateWinnerTeam(team: Team?) {
         _state.update {
-            it.copy(gameWinner = team)
+            it.copy(gameWinner = team, error = null)
         }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 }

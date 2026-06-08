@@ -25,7 +25,8 @@ data class HomeUiState(
     val isOnlineEnabled: Boolean = false,
     val showLoginPopup: Boolean = false,
     val showResumePopup: Boolean = false,
-    val loginMessage: StringResource? = null
+    val loginMessage: StringResource? = null,
+    val error: String? = null
 )
 
 sealed interface HomeEvent {
@@ -90,7 +91,7 @@ class HomeViewModel(
                         spotifyAuthenticationUseCase()
                         _state.update { it.copy(showLoginPopup = false) }
                     } catch (e: Exception) {
-                        println("Login failed: ${e.message}")
+                        _state.update { it.copy(error = "Login failed: ${e.message}") }
                     }
                     checkResumeGame()
                 }
@@ -100,52 +101,68 @@ class HomeViewModel(
 
     fun checkSpotifyAuthentication() {
         viewModelScope.launch {
-            when (checkSpotifyAuthUseCase()) {
-                AuthResult.Authenticated -> {
-                    _state.update {
-                        it.copy(
-                            showLoginPopup = false,
-                            isLocalEnabled = true,
-                            loginMessage = null
-                        )
+            try {
+                when (checkSpotifyAuthUseCase()) {
+                    AuthResult.Authenticated -> {
+                        _state.update {
+                            it.copy(
+                                showLoginPopup = false,
+                                isLocalEnabled = true,
+                                loginMessage = null,
+                                error = null
+                            )
+                        }
+                        checkResumeGame()
                     }
-                    checkResumeGame()
-                }
 
-                AuthResult.RequiresLogin -> {
-                    _state.update {
-                        it.copy(
-                            showLoginPopup = true,
-                            isLocalEnabled = true,
-                            loginMessage = Res.string.sing_in_to_spotify
-                        )
+                    AuthResult.RequiresLogin -> {
+                        _state.update {
+                            it.copy(
+                                showLoginPopup = true,
+                                isLocalEnabled = true,
+                                loginMessage = Res.string.sing_in_to_spotify
+                            )
+                        }
+                    }
 
+                    AuthResult.Error -> {
+                        _state.update {
+                            it.copy(
+                                showLoginPopup = true,
+                                isLocalEnabled = false,
+                                loginMessage = Res.string.error_message
+                            )
+                        }
                     }
                 }
-
-                AuthResult.Error -> {
-                    _state.update {
-                        it.copy(
-                            showLoginPopup = true,
-                            isLocalEnabled = false,
-                            loginMessage = Res.string.error_message
-                        )
-                    }
-                }
-
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Auth check failed: ${e.message}") }
             }
         }
     }
+
     private suspend fun checkResumeGame() {
-        val savedGame = getGameUseCase()
-        if (savedGame != null) {
-            _state.update { it.copy(showResumePopup = true) }
+        try {
+            val savedGame = getGameUseCase()
+            if (savedGame != null) {
+                _state.update { it.copy(showResumePopup = true) }
+            }
+        } catch (e: Exception) {
+            _state.update { it.copy(error = "Failed to check saved game: ${e.message}") }
         }
     }
 
     fun resetGame() {
         viewModelScope.launch {
-            restartGameUseCase()
+            try {
+                restartGameUseCase()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to reset game: ${e.message}") }
+            }
         }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 }
