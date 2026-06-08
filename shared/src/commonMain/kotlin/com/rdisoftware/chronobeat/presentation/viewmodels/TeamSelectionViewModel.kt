@@ -25,7 +25,8 @@ data class TeamSelectionState(
 ) {
     val canStartGame: Boolean = teams.size >= TeamSelectionConstants.MIN_TEAMS
 
-    val canAddTeam: Boolean = teams.size < TeamSelectionConstants.MAX_TEAMS && inputName.isNotBlank() && inputName.length <= TeamSelectionConstants.MAX_NAME_LENGTH
+    val canAddTeam: Boolean =
+        teams.size < TeamSelectionConstants.MAX_TEAMS && inputName.isNotBlank() && inputName.length <= TeamSelectionConstants.MAX_NAME_LENGTH
 
     val isMaxReached: Boolean = teams.size >= TeamSelectionConstants.MAX_TEAMS
     val isEditing: Boolean = editingTeam != null
@@ -86,10 +87,12 @@ class TeamSelectionViewModel(
     }
 
     fun startEdit(team: Team) {
-        _state.update { it.copy(
-            editingTeam = team,
-            inputName = team.name
-        )}
+        _state.update {
+            it.copy(
+                editingTeam = team,
+                inputName = team.name
+            )
+        }
     }
 
     fun confirmEdit() {
@@ -99,7 +102,7 @@ class TeamSelectionViewModel(
         _state.update { it.copy(editingTeam = null, inputName = "") }
     }
 
-    fun clearGame(){
+    fun clearGame() {
         viewModelScope.launch {
             clearGameUseCase()
         }
@@ -118,6 +121,4 @@ class TeamSelectionViewModel(
             }
         }
     }
-
-
 }
