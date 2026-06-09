@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct GameCardItemModel: Identifiable {
-    let id = UUID()
+struct GameCardItemModel {
+    let id: String
     let mainArtist: String
     let featArtist: [String]
-    let releaseYear: String
+    let releaseYear: Int32
     let title: String
 }

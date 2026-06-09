@@ -15,33 +15,45 @@ struct GameCardView: View {
     
     var body: some View {
         VStack(alignment: .center) {
+            Spacer()
             Text(model.mainArtist)
-                .lineLimit(2, reservesSpace: true)
+                .lineLimit(2, reservesSpace: false)
                 .font(.robotoMonoBold(28))
+                .padding(0)
                 .foregroundStyle(Color(hex: AppColors.shared.BLACK))
                 .multilineTextAlignment(.center)
                 .accessibilityIdentifier(AccessibilityIds.GameScreen.shared.GAME_CARD_ARTIST)
+            if !model.featArtist.isEmpty {
+                Text(model.featArtist.joined(separator: ", "))
+                    .lineLimit(1)
+                    .font(.robotoMonoLightItalic(12))
+                    .padding(0)
+                    .foregroundStyle(Color(hex: AppColors.shared.BLACK))
+                    .multilineTextAlignment(.center)
+                    .accessibilityIdentifier(AccessibilityIds.GameScreen.shared.GAME_CARD_CONTRIBUTOR)
+            }
             
-            Text(model.featArtist.joined(separator: ", "))
-                .font(.robotoMonoLightItalic(12))
-                .foregroundStyle(Color(hex: AppColors.shared.BLACK))
-                .accessibilityIdentifier(AccessibilityIds.GameScreen.shared.GAME_CARD_CONTRIBUTOR)
+            Spacer()
             
-            Text(model.releaseYear)
+            Text(String(model.releaseYear))
                 .font(.robotoMonoBold(64))
+                .padding(-10)
                 .foregroundStyle(Color(hex: AppColors.shared.BLACK))
                 .accessibilityIdentifier(AccessibilityIds.GameScreen.shared.GAME_CARD_YEAR)
             
             Spacer()
             
             Text(model.title)
+                .lineLimit(2, reservesSpace: false)
                 .font(.robotoMonoLightItalic(20))
+                .padding(0)
                 .foregroundStyle(Color(hex: AppColors.shared.BLACK))
-                .lineLimit(2, reservesSpace: true)
                 .multilineTextAlignment(.center)
                 .accessibilityIdentifier(AccessibilityIds.GameScreen.shared.GAME_CARD_TITLE)
+            
+            Spacer()
         }
-        .frame(maxWidth: 250, maxHeight: 240)
+        .frame(width: 250, height: 240)
         .padding(.all, 8)
         .background(Color(hex: AppColors.shared.GAME_GRAY))
         .clipShape(
@@ -59,9 +71,10 @@ struct GameCardView: View {
 #Preview {
     GameCardView(
         model: GameCardItemModel(
+            id: "1",
             mainArtist: "The Chainsmokers",
             featArtist: ["Dzsudlo", "Alma"],
-            releaseYear: "2020",
+            releaseYear: 2020,
             title: "ParisParisParisParisParisParis"
         )
     )

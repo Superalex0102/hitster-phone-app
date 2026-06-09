@@ -21,7 +21,7 @@ struct TeamInputView: View {
                 prompt: Text(strings.get(R.ts_input_placeholder))
                     .foregroundColor(.white.opacity(0.6))
             )
-            .font(.kdam(size: 20))
+            .font(.kdamThmorProRegular(20))
             .multilineTextAlignment(.center)
             .foregroundColor(.white)
             .padding()

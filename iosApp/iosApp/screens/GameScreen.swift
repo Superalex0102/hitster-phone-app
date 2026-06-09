@@ -12,14 +12,10 @@ struct GameScreen: View {
     @StateObject private var strings = StringProvider.shared
     let R = Res.string.shared
     
-    // MARK: - Fake data for testing
-    let cards: [GameCardItemModel] = [
-        .init(mainArtist: "The Chainsmokers", featArtist: ["Dzsudlo", "Desh"], releaseYear: "2020", title: "Paris"),
-        .init(mainArtist: "The", featArtist: [], releaseYear: "2000", title: "ParisParisParisParisParis"),
-        .init(mainArtist: "The Chainsmokers", featArtist: ["Dzsudlo"], releaseYear: "2020", title: "ParisParisParisParisParisParis"),
-        .init(mainArtist: "The", featArtist: [], releaseYear: "2020", title: "Paris"),
-        .init(mainArtist: "The Chainsmokers", featArtist: [], releaseYear: "2020", title: "Paris")
-    ]
+    let mockMusicData: [Track] = MockMusicData.shared.songs
+    var musicList: [GameCardItemModel] {
+        mockMusicData.map(MusicDataConverter.fromTrackToGameCardItem)
+    }
 
     var body: some View {
         ZStack {
@@ -30,12 +26,12 @@ struct GameScreen: View {
                 ScrollView {
                     LazyVStack(spacing: 40) {
                         //Placeholder iteration with fake data
-                        ForEach(0...cards.count, id: \.self) { index in
+                        ForEach(0...musicList.count, id: \.self) { index in
                             
                             guessButton
                             
-                            if index < cards.count {
-                                GameCardView(model: cards[index])
+                            if index < musicList.count {
+                                GameCardView(model: musicList[index])
                             }
                         }
                     }
