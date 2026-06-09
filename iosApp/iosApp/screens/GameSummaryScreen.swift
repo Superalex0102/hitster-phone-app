@@ -32,7 +32,7 @@ struct GameSummaryScreen: View {
                 // Logo / Header
                 VStack(spacing: 4) {
                     Text(strings.get(R.title))
-                        .font(.kdam(size: 20))
+                        .font(.kdamThmorProRegular(20))
                         .foregroundColor(Color(hex: AppColors.shared.WHITE).opacity(0.8))
 
                     Rectangle()
@@ -45,7 +45,7 @@ struct GameSummaryScreen: View {
 
                 // Title
                 Text(strings.get(R.game_summary_title))
-                    .font(.kdam(size: 40))
+                    .font(.kdamThmorProRegular(40))
                     .foregroundColor(Color(hex: AppColors.shared.WHITE))
 
                 Spacer().frame(height: 30)
@@ -61,11 +61,11 @@ struct GameSummaryScreen: View {
                 // Winner text
                 VStack(spacing: 6) {
                     Text(winnerTeam.name)
-                        .font(.kdam(size: 30))
+                        .font(.kdamThmorProRegular(30))
                         .foregroundColor(.white)
 
                     Text(strings.get(R.won_the_game))
-                        .font(.kdam(size: 30))
+                        .font(.kdamThmorProRegular(30))
                         .foregroundColor(Color(hex: AppColors.shared.WHITE).opacity(0.9))
                 }
 
@@ -98,12 +98,6 @@ struct GameSummaryScreen: View {
             }
             .padding(.horizontal, 32)
         }
-    }
-}
-
-extension Font {
-    static func kdam(size: CGFloat) -> Font {
-        .custom("KdamThmorPro-Regular", size: size)
     }
 }
 

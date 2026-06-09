@@ -154,7 +154,10 @@ fun TeamSelectionScreen(
                     size = ButtonSize.SMALL,
                     testTag = TeamSelectionScreen.START_GAME_BUTTON,
                     resourceId = true,
-                    onClick = { onTeamsSelectedClicked() }
+                    onClick = {
+                        viewModel.clearGame()
+                        onTeamsSelectedClicked()
+                    }
                 )
 
                 Spacer(modifier = Modifier.weight(0.15f))

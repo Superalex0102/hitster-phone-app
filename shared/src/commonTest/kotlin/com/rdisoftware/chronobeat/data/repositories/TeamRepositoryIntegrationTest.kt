@@ -1,13 +1,13 @@
 package com.rdisoftware.chronobeat.data.repositories
 
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
+import com.rdisoftware.chronobeat.domain.usecases.game.ClearGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.UpdateTeamUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 import com.russhwolf.settings.MapSettings
-import com.russhwolf.settings.Settings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -37,11 +37,13 @@ class TeamRepositoryIntegrationTest {
 
         val settings = MapSettings()
         val repository = TeamRepositoryImpl(settings)
+        val activeGameRepository = ActiveGameRepositoryImpl(settings)
         viewModel = TeamSelectionViewModel(
             addTeamUseCase    = AddTeamUseCase(repository),
             deleteTeamUseCase = DeleteTeamUseCase(repository),
             updateTeamUseCase = UpdateTeamUseCase(repository),
-            getTeamsUseCase   = GetTeamsUseCase(repository)
+            getTeamsUseCase   = GetTeamsUseCase(repository),
+            clearGameUseCase = ClearGameUseCase(activeGameRepository)
         )
     }
 

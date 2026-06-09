@@ -16,11 +16,11 @@ struct BottomText: View {
         Group {
             Text(strings.get(R.powered_by))
                 .foregroundStyle(Color(hex: AppColors.shared.BOTTOM_GRAY))
-                .font(AppFont.robotoMonoLight(16))
+                .font(.robotoMonoLight(16))
             +
             Text(strings.get(R.bottom_app_name))
                 .foregroundStyle(Color(hex: AppColors.shared.BOTTOM_GRAY))
-                .font(AppFont.robotoMonoBold(16))
+                .font(.robotoMonoBold(16))
         }
         .accessibilityIdentifier(AccessibilityIds.Common.shared.BOTTOM_TEXT)
         .accessibilityAddTraits(.isStaticText)
