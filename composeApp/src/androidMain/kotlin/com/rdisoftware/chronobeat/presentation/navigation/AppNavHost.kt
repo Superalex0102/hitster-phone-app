@@ -5,13 +5,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.rdisoftware.chronobeat.domain.usecases.game.ClearGameUseCase
 import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
 import com.rdisoftware.chronobeat.presentation.screens.SettingsScreen
 import com.rdisoftware.chronobeat.presentation.screens.TeamSelectionScreen
-import org.koin.compose.koinInject
 
 @Composable
 fun AppNavHost() {

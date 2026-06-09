@@ -25,13 +25,10 @@ class GameSummaryViewModel(
 
     private fun getWinnerTeam() {
         viewModelScope.launch {
-            updateWinnerTeam(team = getWinnerTeamUseCase())
-        }
-    }
-
-    private fun updateWinnerTeam(team: Team?) {
-        _state.update {
-            it.copy(gameWinner = team)
+            val winnerTeam = getWinnerTeamUseCase()
+            _state.update {
+                it.copy(gameWinner = winnerTeam)
+            }
         }
     }
 }
