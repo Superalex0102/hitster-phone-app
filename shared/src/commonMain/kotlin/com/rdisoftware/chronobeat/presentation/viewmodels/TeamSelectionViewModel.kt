@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.domain.usecases.game.ClearGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
@@ -24,7 +25,8 @@ data class TeamSelectionState(
 ) {
     val canStartGame: Boolean = teams.size >= TeamSelectionConstants.MIN_TEAMS
 
-    val canAddTeam: Boolean = teams.size < TeamSelectionConstants.MAX_TEAMS && inputName.isNotBlank() && inputName.length <= TeamSelectionConstants.MAX_NAME_LENGTH
+    val canAddTeam: Boolean =
+        teams.size < TeamSelectionConstants.MAX_TEAMS && inputName.isNotBlank() && inputName.length <= TeamSelectionConstants.MAX_NAME_LENGTH
 
     val isMaxReached: Boolean = teams.size >= TeamSelectionConstants.MAX_TEAMS
     val isEditing: Boolean = editingTeam != null
@@ -35,7 +37,8 @@ class TeamSelectionViewModel(
     private val addTeamUseCase: AddTeamUseCase,
     private val deleteTeamUseCase: DeleteTeamUseCase,
     private val updateTeamUseCase: UpdateTeamUseCase,
-    private val getTeamsUseCase: GetTeamsUseCase
+    private val getTeamsUseCase: GetTeamsUseCase,
+    private val clearGameUseCase: ClearGameUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TeamSelectionState())
@@ -84,10 +87,12 @@ class TeamSelectionViewModel(
     }
 
     fun startEdit(team: Team) {
-        _state.update { it.copy(
-            editingTeam = team,
-            inputName = team.name
-        )}
+        _state.update {
+            it.copy(
+                editingTeam = team,
+                inputName = team.name
+            )
+        }
     }
 
     fun confirmEdit() {
@@ -95,6 +100,12 @@ class TeamSelectionViewModel(
         val editing = currentState.editingTeam ?: return
         updateTeam(editing.copy(name = currentState.inputName.trim()))
         _state.update { it.copy(editingTeam = null, inputName = "") }
+    }
+
+    fun clearGame() {
+        viewModelScope.launch {
+            clearGameUseCase()
+        }
     }
 
     private fun loadTeams() {
