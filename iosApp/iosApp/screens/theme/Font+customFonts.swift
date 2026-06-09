@@ -1,5 +1,5 @@
 //
-//  AppFont.swift
+//  Font+customFonts.swift
 //  iosApp
 //
 //  Created by Balazs Tibor Hollery on 2026. 05. 14..
@@ -7,8 +7,7 @@
 
 import SwiftUI
 
-struct AppFont {
-    
+extension Font {
     static func kdamThmorProRegular(_ size: CGFloat) -> Font {
         .custom(AppFontName.kdamThmorProRegular.rawValue, size: size)
     }

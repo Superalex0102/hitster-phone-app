@@ -54,7 +54,7 @@ struct HomeScreen: View {
     private var mainTitle: some View {
         Text(strings.get(R.title))
             .foregroundStyle(Color(hex: AppColors.shared.WHITE))
-            .font(AppFont.kdamThmorProRegular(48))
+            .font(.kdamThmorProRegular(48))
             .padding(.top, 16)
             .accessibilityIdentifier(AccessibilityIds.HomeScreen.shared.CHRONOBEAT_TITLE)
             .accessibilityAddTraits(.isStaticText)

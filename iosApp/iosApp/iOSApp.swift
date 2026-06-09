@@ -11,10 +11,11 @@ struct iOSApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .onOpenURL { url in
-                    spotifyController.handleAuth(url: url)
-                }
+//            ContentView()
+//                .onOpenURL { url in
+//                    spotifyController.handleAuth(url: url)
+//                }
+            GameScreen()
         }
     }
 }

@@ -27,7 +27,7 @@ struct TeamSelectionScreen: View {
                 // Logo / Header
                 VStack(spacing: 4) {
                     Text(strings.get(R.title))
-                        .font(.kdam(size: 20))
+                        .font(.kdamThmorProRegular(20))
                         .foregroundColor(Color(hex: AppColors.shared.WHITE).opacity(0.8))
 
                     Rectangle()
@@ -39,7 +39,7 @@ struct TeamSelectionScreen: View {
 
                 // Title
                 Text(strings.get(R.team_selection_title))
-                    .font(.kdam(size: 40))
+                    .font(.kdamThmorProRegular(40))
                     .multilineTextAlignment(.center)
                     .foregroundColor(Color(hex: AppColors.shared.WHITE))
 
@@ -57,7 +57,7 @@ struct TeamSelectionScreen: View {
                         .foregroundColor(.gray)
 
                     Text(strings.get(R.ts_info_text))
-                        .font(.kdam(size: 15))
+                        .font(.kdamThmorProRegular(15))
                         .foregroundColor(.white.opacity(0.7))
                 }
                 .padding(.bottom, 25)
@@ -71,7 +71,7 @@ struct TeamSelectionScreen: View {
                         )
                     }
                 }
-                .font(.kdam(size: 20))
+                .font(.kdamThmorProRegular(20))
                 .padding(.horizontal)
 
                 Spacer()

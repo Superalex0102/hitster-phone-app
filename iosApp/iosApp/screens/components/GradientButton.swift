@@ -51,7 +51,7 @@ struct GradientButton: View {
         }) {
             Text(model.title)
                 .foregroundStyle(Color(hex: AppColors.shared.WHITE))
-                .font(AppFont.robotoMonoBold(model.size.fontSize))
+                .font(.robotoMonoBold(model.size.fontSize))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(
                     LinearGradient(
