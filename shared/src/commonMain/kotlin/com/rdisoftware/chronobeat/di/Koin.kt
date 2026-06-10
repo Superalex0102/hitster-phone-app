@@ -25,9 +25,11 @@ import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.UpdateTeamUseCase
+import com.rdisoftware.chronobeat.presentation.enums.LeaderBoardMode
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameSummaryViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.HomeViewModel
+import com.rdisoftware.chronobeat.presentation.viewmodels.LeaderBoardViewModel
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 import com.russhwolf.settings.Settings
 import io.ktor.client.HttpClient
@@ -83,6 +85,7 @@ val sharedModule = module {
     factory { GameSummaryViewModel(
         getWinnerTeamUseCase = get()
     ) }
+    factory { LeaderBoardViewModel(getGameUseCase = get()) }
 
     //UseCases
     factory { PlayMusicUseCase(musicRepository = get()) }

@@ -3,6 +3,7 @@ package com.rdisoftware.chronobeat.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rdisoftware.chronobeat.domain.models.Game
+import com.rdisoftware.chronobeat.domain.models.Team
 import com.rdisoftware.chronobeat.domain.models.Track
 import com.rdisoftware.chronobeat.domain.usecases.game.AdvanceTurnUseCase
 import com.rdisoftware.chronobeat.domain.usecases.game.CheckGuessPositionUseCase
@@ -21,6 +22,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 
+data class GameSnapshot(
+    val team: Team? = null,
+    val timeline: List<Track> = emptyList(),
+    val cardCount: Int = 0,
+    val track: Track? = null,
+    val isCorrect: Boolean? = null
+)
 enum class GamePhase {
     LOADING,
     SHOW_NEXT_TEAM_POPUP,

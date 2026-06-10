@@ -5,11 +5,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.rdisoftware.chronobeat.presentation.enums.LeaderBoardMode
 import com.rdisoftware.chronobeat.presentation.screens.GameScreen
 import com.rdisoftware.chronobeat.presentation.screens.GameSummaryScreen
 import com.rdisoftware.chronobeat.presentation.screens.HomeScreen
 import com.rdisoftware.chronobeat.presentation.screens.SettingsScreen
 import com.rdisoftware.chronobeat.presentation.screens.TeamSelectionScreen
+import com.rdisoftware.chronobeat.presentation.screens.LeaderBoardScreen
 
 @Composable
 fun AppNavHost() {
@@ -46,6 +48,9 @@ fun AppNavHost() {
             GameScreen(
                 onGameFinishedClicked = {
                     navController.navigate(GameSummaryRoute)
+                },
+                onLeaderBoardClicked = {
+                    navController.navigate(LeaderBoardRoute(mode = LeaderBoardMode.FROM_GAME_SCREEN))
                 }
             )
         }
@@ -61,6 +66,20 @@ fun AppNavHost() {
                     navController.navigate(TeamSelectionRoute) {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onShowLeaderBoardClicked = {
+                    navController.navigate(LeaderBoardRoute(mode = LeaderBoardMode.FROM_GAMESUMMARY_SCREEN))
+                }
+            )
+        }
+
+        composable<LeaderBoardRoute> { backStackEntry ->
+            val route = backStackEntry.toRoute<LeaderBoardRoute>()
+
+            LeaderBoardScreen(
+                mode = route.mode,
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }

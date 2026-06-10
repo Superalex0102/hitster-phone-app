@@ -138,7 +138,7 @@ class HomeViewModel(
     }
     private suspend fun checkResumeGame() {
         val savedGame = getGameUseCase()
-        if (savedGame != null) {
+        if (savedGame != null && savedGame.winnerTeam == null) {
             _state.update { it.copy(showResumePopup = true) }
         }
     }

@@ -29,14 +29,16 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,6 +89,7 @@ import com.rdisoftware.chronobeat.presentation.theme.robotoMonoLightItalic
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoMedium
 import com.rdisoftware.chronobeat.presentation.theme.robotoMonoRegular
 import com.rdisoftware.chronobeat.presentation.viewmodels.GamePhase
+import com.rdisoftware.chronobeat.presentation.viewmodels.GameSnapshot
 import com.rdisoftware.chronobeat.presentation.viewmodels.GameViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -99,11 +102,51 @@ import kotlin.random.Random
 fun GameScreen(
     viewModel: GameViewModel = koinViewModel(),
     onGameFinishedClicked: () -> Unit,
+    onLeaderBoardClicked: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    var isInitialStartup by rememberSaveable { mutableStateOf(true) }
+    var isReturningFromLeaderboard by rememberSaveable { mutableStateOf(false) }
+    var showResultOverlay by rememberSaveable { mutableStateOf(false) }
+
+    var snapshot by remember { mutableStateOf(GameSnapshot()) }
+
+    LaunchedEffect(state.currentTeam, state.timeline, state.currentCardCount, state.isGuessCorrect, showResultOverlay) {
+        if(!showResultOverlay) {
+            snapshot = GameSnapshot(
+                team = state.currentTeam,
+                timeline = state.timeline,
+                cardCount = state.currentCardCount,
+                track = state.currentTrack,
+                isCorrect = state.isGuessCorrect
+            )
+        }
+    }
+
     LaunchedEffect(state.currentPhase) {
-        if (state.currentPhase == GamePhase.GAME_OVER) {
-            onGameFinishedClicked()
+        when (state.currentPhase) {
+            GamePhase.GAME_OVER -> {
+                onGameFinishedClicked()
+            }
+            GamePhase.SHOW_RESULT -> {
+                showResultOverlay = true
+            }
+            GamePhase.GUESSING -> {
+                showResultOverlay = false
+            }
+            GamePhase.SHOW_NEXT_TEAM_POPUP -> {
+                if (isInitialStartup) {
+                    isInitialStartup = false
+                    viewModel.onPopupAcknowledgePressed()
+                } else if (isReturningFromLeaderboard){
+                    isReturningFromLeaderboard = false
+                    viewModel.onPopupAcknowledgePressed()
+                } else {
+                    isReturningFromLeaderboard = true
+                    onLeaderBoardClicked()
+                }
+            }
+            else -> {}
         }
     }
 
@@ -130,15 +173,15 @@ fun GameScreen(
                 verticalArrangement = Arrangement.spacedBy(32.dp)
             ) {
                 GameHeader(
-                    currentTeam = state.currentTeam,
-                    cardCount = state.currentCardCount,
+                    currentTeam = snapshot.team,
+                    cardCount = snapshot.cardCount,
                     isAnimating = state.currentPhase == GamePhase.GUESSING
                 )
 
                 GameSurface(
-                    timeline = state.timeline,
-                    currentTrack = state.currentTrack,
-                    teamColor = state.currentTeam?.color,
+                    timeline = snapshot.timeline,
+                    currentTrack = snapshot.track,
+                    teamColor = snapshot.team?.color,
                     onGuessPressed = { position -> viewModel.onGuessPressed(position) },
                     isGuessingPhase = state.currentPhase == GamePhase.GUESSING
                 )
@@ -155,51 +198,8 @@ fun GameScreen(
                 }
             }
 
-            if (state.currentPhase == GamePhase.SHOW_NEXT_TEAM_POPUP) {
-                NextTeamPopupOverlay(
-                    teamName = state.currentTeam?.name ?: "",
-                    onOkClicked = { viewModel.onPopupAcknowledgePressed() }
-                )
-            }
-
-            if (state.currentPhase == GamePhase.SHOW_RESULT) {
-                ResultOverlay(isCorrect = state.isGuessCorrect)
-            }
-        }
-    }
-}
-
-@Composable
-fun NextTeamPopupOverlay(
-    teamName: String,
-    onOkClicked: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.7f)),
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            backgroundColor = Color(AppColors.GAME_GRAY),
-            modifier = Modifier.padding(32.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "$teamName következik!",
-                    fontSize = 24.sp,
-                    fontFamily = robotoMonoBold,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
-                )
-                Button(onClick = onOkClicked) {
-                    Text("OK, Mehet!")
-                }
+            if (showResultOverlay) {
+                ResultOverlay(isCorrect = snapshot.isCorrect)
             }
         }
     }
