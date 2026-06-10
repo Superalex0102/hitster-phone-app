@@ -3,6 +3,7 @@ package com.rdisoftware.chronobeat.data.repositories
 import FakeMusicRepository
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.domain.repositories.FakeTeamRepository
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
 import com.rdisoftware.chronobeat.domain.usecases.game.*
 import com.rdisoftware.chronobeat.domain.usecases.music.*
@@ -140,13 +141,13 @@ class ActiveGameRepositoryIntegrationTest {
 
         viewModel.onGuessPressed(1)
 
-        advanceTimeBy(1)
+        runCurrent()
 
         assertEquals(GamePhase.SHOW_RESULT, viewModel.state.value.currentPhase)
         assertNotNull(viewModel.state.value.isGuessCorrect)
 
         advanceTimeBy(2000)
-        advanceUntilIdle()
+        runCurrent()
 
         val state = viewModel.state.value
         assertEquals(GamePhase.SHOW_NEXT_TEAM_POPUP, state.currentPhase)
@@ -167,13 +168,13 @@ class ActiveGameRepositoryIntegrationTest {
 
         viewModel.onGuessPressed(-1)
 
-        advanceTimeBy(1)
+        runCurrent()
 
         assertEquals(GamePhase.SHOW_RESULT, viewModel.state.value.currentPhase)
         assertEquals(false, viewModel.state.value.isGuessCorrect)
 
         advanceTimeBy(2000)
-        advanceUntilIdle()
+        runCurrent()
 
         val state = viewModel.state.value
         assertEquals(GamePhase.SHOW_NEXT_TEAM_POPUP, state.currentPhase)
@@ -220,9 +221,9 @@ class ActiveGameRepositoryIntegrationTest {
 
             viewModel.onGuessPressed(correctPosition)
 
-            advanceTimeBy(1)
+            runCurrent()
             advanceTimeBy(2000)
-            advanceUntilIdle()
+            runCurrent()
 
             if (viewModel.state.value.currentPhase == GamePhase.GAME_OVER) break
 
@@ -233,51 +234,14 @@ class ActiveGameRepositoryIntegrationTest {
             advanceUntilIdle()
 
             viewModel.onGuessPressed(-1)
-            advanceTimeBy(1)
+            runCurrent()
 
             advanceTimeBy(2000)
-            advanceUntilIdle()
+            runCurrent()
         }
 
         val finalState = viewModel.state.value
         assertEquals(GamePhase.GAME_OVER, finalState.currentPhase)
         assertEquals(team1.id, finalState.game?.winnerTeam?.id)
-    }
-}
-
-// =============================================================================
-// FAKES
-// =============================================================================
-
-@OptIn(ExperimentalUuidApi::class)
-class FakeTeamRepository(var teams: MutableList<Team> = mutableListOf()) : TeamRepository {
-
-    override suspend fun getTeams(): List<Team> = teams
-
-    override suspend fun createTeam(teamName: String, color: TeamColor): Team {
-        val newTeam = Team(
-            id = Uuid.random(),
-            name = teamName,
-            color = color
-        )
-        teams.add(newTeam)
-        return newTeam
-    }
-
-    override suspend fun updateTeamName(team: Team): Team {
-        val index = teams.indexOfFirst { it.id == team.id }
-        if (index != -1) {
-            teams[index] = team
-            return team
-        }
-        return team
-    }
-
-    override suspend fun deleteTeam(teamId: Uuid) {
-        teams.removeAll { it.id == teamId }
-    }
-
-    override suspend fun clearAllTeam() {
-        teams.clear()
     }
 }
