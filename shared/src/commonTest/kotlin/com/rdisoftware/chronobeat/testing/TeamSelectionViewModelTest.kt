@@ -1,8 +1,11 @@
 package com.rdisoftware.chronobeat.testing
 
+import com.rdisoftware.chronobeat.data.remote.dto.GameDto
 import com.rdisoftware.chronobeat.domain.enums.TeamColor
 import com.rdisoftware.chronobeat.domain.models.Team
+import com.rdisoftware.chronobeat.domain.repositories.ActiveGameRepository
 import com.rdisoftware.chronobeat.domain.repositories.TeamRepository
+import com.rdisoftware.chronobeat.domain.usecases.game.ClearGameUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.AddTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.DeleteTeamUseCase
 import com.rdisoftware.chronobeat.domain.usecases.team.GetTeamsUseCase
@@ -10,6 +13,8 @@ import com.rdisoftware.chronobeat.domain.usecases.team.UpdateTeamUseCase
 import com.rdisoftware.chronobeat.presentation.viewmodels.TeamSelectionViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -30,9 +35,13 @@ import kotlin.uuid.Uuid
 )
 class TeamSelectionViewModelTest {
     lateinit var viewModel: TeamSelectionViewModel
+    lateinit var fakeActiveGameRepository: FakeActiveGameRepository
+
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        fakeActiveGameRepository = FakeActiveGameRepository()
 
         val fakeRepository = object : TeamRepository {
             val list = mutableListOf<Team>()
@@ -43,6 +52,7 @@ class TeamSelectionViewModelTest {
                 list.add(team)
                 return team
             }
+
             override suspend fun deleteTeam(teamId: Uuid) {
                 list.removeAll { it.id == teamId }
             }
@@ -62,12 +72,14 @@ class TeamSelectionViewModelTest {
         val addTeamUseCase = AddTeamUseCase(fakeRepository)
         val deleteTeamUseCase = DeleteTeamUseCase(fakeRepository)
         val updateTeamUseCase = UpdateTeamUseCase(fakeRepository)
+        val clearGameUseCase = ClearGameUseCase(fakeActiveGameRepository)
 
         viewModel = TeamSelectionViewModel(
             addTeamUseCase = addTeamUseCase,
             deleteTeamUseCase = deleteTeamUseCase,
             updateTeamUseCase = updateTeamUseCase,
-            getTeamsUseCase = getTeamsUseCase
+            getTeamsUseCase = getTeamsUseCase,
+            clearGameUseCase = clearGameUseCase
         )
     }
 
@@ -141,7 +153,7 @@ class TeamSelectionViewModelTest {
     fun `deleteTeam should delete existing team`() = runTest {
         addTeam("Team 1")
         advanceUntilIdle()
-        viewModel.deleteTeam(teamId =  viewModel.state.value.teams.first().id)
+        viewModel.deleteTeam(teamId = viewModel.state.value.teams.first().id)
 
         assertTrue(
             actual = viewModel.state.value.teams.isEmpty(),
@@ -196,7 +208,8 @@ class TeamSelectionViewModelTest {
         viewModel.onNameChanged("Team 5")
         viewModel.confirmEdit()
 
-        assertEquals(expected = "Team 5",
+        assertEquals(
+            expected = "Team 5",
             actual = viewModel.state.value.teams.first().name,
             message = "confirmEdit should update team name when input is within max length"
         )
@@ -227,7 +240,7 @@ class TeamSelectionViewModelTest {
         viewModel.updateTeam(updatedTeam)
 
         assertEquals(
-            expected ="Updated team",
+            expected = "Updated team",
             actual = viewModel.state.value.teams.first().name,
             message = "updateTeam should replace the team's name with the updated value"
         )
@@ -241,8 +254,36 @@ class TeamSelectionViewModelTest {
 
         assertEquals(
             expected = newColor,
-             actual = viewModel.state.value.selectedColor,
+            actual = viewModel.state.value.selectedColor,
             message = "onColorChanged should update selectedColor"
         )
+    }
+
+    @Test
+    fun `clearGame should call repository clearGame`() = runTest {
+        viewModel.clearGame()
+        advanceUntilIdle()
+
+        assertTrue(
+            actual = fakeActiveGameRepository.cleared,
+            message = "clearGame should call repository clearGame()"
+        )
+    }
+}
+
+class FakeActiveGameRepository : ActiveGameRepository {
+
+    var cleared = false
+
+    override suspend fun getGame(): GameDto? = null
+
+    override suspend fun saveGame(game: GameDto) {}
+
+    override suspend fun clearGame() {
+        cleared = true
+    }
+
+    override fun observeGame(): Flow<GameDto?> {
+        return MutableStateFlow(null)
     }
 }

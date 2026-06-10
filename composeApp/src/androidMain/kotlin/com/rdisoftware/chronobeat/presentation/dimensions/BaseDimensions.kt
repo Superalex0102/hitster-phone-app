@@ -34,7 +34,7 @@ val TabletBaseDimensions = BaseDimensions(
     titleFontSize = 80.sp,
     logoTextFontSize = 32.sp,
     bottomTextFontSize = 24.sp,
-    smallButtonFontSize = 40.sp,
+    smallButtonFontSize = 42.sp,
     largeButtonFontSize = 52.sp,
     maxContentWidth = 700.dp,
     contentWidthFraction = 0.7f,
@@ -48,8 +48,3 @@ val LocalBaseDimensions = staticCompositionLocalOf<BaseDimensions> {
 val baseDimens: BaseDimensions
     @Composable
     get() = LocalBaseDimensions.current
-
-
-
-
-

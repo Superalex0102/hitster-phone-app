@@ -1,10 +1,15 @@
 <resources>
-    <string name="local_game">Local</string>
-    <string name="online_game">Online</string>
+    <!--Common-->
     <string name="powered_by">powered by </string>
     <string name="bottom_app_name">ChronoBeat</string>
+    <string name="button_hint">Double tap to activate</string>
+    <!--HomeScreen-->
+    <string name="local_game">Local</string>
+    <string name="online_game">Online</string>
     <string name="title">CHRONOBEAT</string>
     <string name="settings">Settings</string>
+    <string name="content_disc_error">Error</string>
+    <!--TeamSelectionScreen-->
     <string name="team_selection_title">Team\nSelection</string>
     <string name="ts_input_placeholder">Enter team name</string>
     <string name="ts_info_text">Game requires 2-4 teams to start</string>
@@ -13,19 +18,25 @@
     <string name="content_disc_edit">Edit</string>
     <string name="content_disc_delete">Delete</string>
     <string name="content_disc_add_team">Add team</string>
+    <!--GameScreen-->
     <string name="arrow_oldest_text">Oldest</string>
     <string name="arrow_latest_text">Latest</string>
+    <string name="content_disc_arrow">Timeline arrow</string>
+    <string name="content_disc_music_player">Music player icon</string>
+    <string name="content_disc_game_card">Game card</string>
+    <string name="content_disc_guess_button">Guess</string>
+    <!--GameSummaryScreen-->
     <string name="game_summary_title">Congratulations!</string>
     <string name="content_disc_trophy_logo">Trophy logo</string>
     <string name="home">Home</string>
     <string name="play_again">Play Again</string>
     <string name="team_name">Team 1</string>
     <string name="won_the_game">won the game</string>
+    <!--SignInPopUp-->
     <string name="sing_in_to_spotify">Sign in to Spotify to continue</string>
     <string name="error_message">Sign-in failed. Please try again.</string>
     <string name="sign_in">Sign in</string>
-    <string name="content_disc_error">Error</string>
-    <string name="button_hint">Double tap to activate</string>
+    <!--SettingsScreen-->
     <string name="dark_mode">Dark mode</string>
     <string name="notifications">Notifications</string>
     <string name="supported_languages">Supported languages</string>
