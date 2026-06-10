@@ -37,8 +37,7 @@ struct SettingsScreen: View {
 
         ZStack {
 
-            Color.black
-                .ignoresSafeArea()
+            MainBackground()
 
             VStack(spacing: 30) {
 
@@ -46,7 +45,7 @@ struct SettingsScreen: View {
 
                 Text(strings.get(R.settings))
                     .font(.kdam(size: 48))
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(hex: AppColors.shared.WHITE))
 
                 VStack(spacing: 0) {
 
@@ -57,7 +56,7 @@ struct SettingsScreen: View {
                     .padding(.horizontal, 32)
 
                     Divider()
-                        .background(Color(hex: 0xFF474747))
+                        .background(Color(hex: AppColors.shared.DIVIDER_GRAY))
                         .padding(.horizontal)
 
 
@@ -68,7 +67,7 @@ struct SettingsScreen: View {
                     .padding(.horizontal, 32)
 
                     Divider()
-                        .background(Color(hex: 0xFF474747))
+                        .background(Color(hex: AppColors.shared.DIVIDER_GRAY))
                         .padding(.horizontal)
 
                 }
@@ -76,11 +75,11 @@ struct SettingsScreen: View {
                 VStack(spacing: 20) {
                     Text(strings.get(R.supported_languages))
                         .font(AppFont.robotoMonoBold(32))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(hex: AppColors.shared.WHITE))
                         .multilineTextAlignment(.center)
 
                     Divider()
-                        .background(Color(hex: 0xFF474747))
+                        .background(Color(hex: AppColors.shared.DIVIDER_GRAY))
                         .padding(.horizontal)
 
                     VStack(spacing: 0) {
@@ -97,13 +96,13 @@ struct SettingsScreen: View {
 
                                     Text(language)
                                         .font(AppFont.robotoMonoBold(24))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(hex: AppColors.shared.WHITE))
                                         .frame(maxWidth: .infinity, alignment: .center)
 
                                     HStack {
                                         Spacer()
                                         Image(systemName: "checkmark")
-                                            .foregroundColor(.white)
+                                            .foregroundColor(Color(hex: AppColors.shared.WHITE))
                                             .opacity(selectedLanguage == language ? 1 : 0)
                                     }
                                     .frame(width: 250)
@@ -113,7 +112,7 @@ struct SettingsScreen: View {
                             }
 
                             Divider()
-                                .background(Color(hex: 0xFF474747))
+                                .background(Color(hex: AppColors.shared.DIVIDER_GRAY))
                                 .padding(.horizontal, 40)
                         }
                     }
@@ -121,32 +120,15 @@ struct SettingsScreen: View {
 
                 Spacer()
 
-                Button {
-
-                    dismiss()
-
-                } label: {
-
-                    Text(strings.get(R.save))
-                        .font(AppFont.robotoMonoBold(32))
-                        .foregroundColor(.white)
-                        .frame(width: 220, height: 64)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color.gray.opacity(0.5),
-                                    Color.black
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .overlay(
-                            Capsule()
-                                .stroke(Color.white, lineWidth: 2)
-                        )
-                        .clipShape(Capsule())
-                }
+                GradientButton(model: GradientButtonModel(
+                    title: strings.get(R.save),
+                    disabled: false,
+                    size: .large,
+                    accessibilityId: AccessibilityIds.SettingsScreen.shared.SAVE_BUTTON,
+                    action: {
+                        dismiss()
+                    }
+                ))
 
                 Spacer()
 
@@ -170,7 +152,7 @@ struct SettingsScreen: View {
 
             Text(title)
                 .font(AppFont.robotoMonoBold(32))
-                .foregroundColor(.white)
+                .foregroundColor(Color(hex: AppColors.shared.WHITE))
 
             Spacer()
 
@@ -181,21 +163,24 @@ struct SettingsScreen: View {
             } label: {
                 ZStack(alignment: isOn.wrappedValue ? .trailing : .leading) {
                     Capsule()
-                        .fill(isOn.wrappedValue ? Color.white : Color.white.opacity(0.12))
-                        .frame(width: 72, height: 40)
+                        .fill(isOn.wrappedValue ? Color(hex: AppColors.shared.WHITE) : Color(hex: AppColors.shared.WHITE).opacity(0.12))
+                        .frame(width: 60, height: 34)
                         .overlay(
                             Capsule()
-                                .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                                .stroke(Color(hex: AppColors.shared.WHITE).opacity(0.7), lineWidth: 1)
                         )
 
                     ZStack {
                         Circle()
-                            .fill(isOn.wrappedValue ? Color.black : Color.gray)
-                            .frame(width: 30, height: 30)
+                            .fill(isOn.wrappedValue ? Color(hex: AppColors.shared.BLACK) : Color(hex: AppColors.shared.DARK_GRAY))
+                            .frame(
+                                width: isOn.wrappedValue ? 26 : 23,
+                                height: isOn.wrappedValue ? 26 : 23
+                            )
 
                         Image(systemName: isOn.wrappedValue ? "checkmark" : "xmark")
                             .font(.system(size: 14, weight: .bold))
-                            .foregroundColor(isOn.wrappedValue ? .white : .black)
+                            .foregroundColor(isOn.wrappedValue ? Color(hex: AppColors.shared.WHITE) : Color(hex: AppColors.shared.BLACK))
                     }
                     .padding(.horizontal, 4)
                 }
