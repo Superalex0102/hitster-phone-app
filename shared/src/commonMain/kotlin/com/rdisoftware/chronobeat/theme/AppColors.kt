@@ -8,6 +8,8 @@ object AppColors {
     const val GAME_GRAY = 0xFFD9D9D9
     const val DARK_GRAY = 0xFF6B6B6B
     const val BOTTOM_GRAY = 0xFFA2A2A2
+
+    const val DIVIDER_GRAY = 0xFF474747
     const val BLACK = 0xFF000000
     const val WHITE = 0xFFFFFFFF
     const val RED = 0xFFF44336
