@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class GameSummaryUiState(
-    val gameWinner: Team? = null
+    val gameWinner: Team? = null,
+    val error: String? = null
 )
 
 class GameSummaryViewModel(
@@ -25,10 +26,18 @@ class GameSummaryViewModel(
 
     private fun getWinnerTeam() {
         viewModelScope.launch {
-            val winnerTeam = getWinnerTeamUseCase()
-            _state.update {
-                it.copy(gameWinner = winnerTeam)
+            try {
+                val winnerTeam = getWinnerTeamUseCase()
+                _state.update {
+                    it.copy(gameWinner = winnerTeam)
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to get winner: ${e.message}") }
             }
         }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 }

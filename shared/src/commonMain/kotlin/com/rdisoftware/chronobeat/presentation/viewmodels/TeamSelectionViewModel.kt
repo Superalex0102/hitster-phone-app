@@ -21,7 +21,8 @@ data class TeamSelectionState(
     val teams: List<Team> = emptyList(),
     val inputName: String = "",
     val selectedColor: TeamColor = TeamColor.entries.first(),
-    val editingTeam: Team? = null
+    val editingTeam: Team? = null,
+    val error: String? = null
 ) {
     val canStartGame: Boolean = teams.size >= TeamSelectionConstants.MIN_TEAMS
 
@@ -60,29 +61,41 @@ class TeamSelectionViewModel(
 
     fun addTeam() {
         viewModelScope.launch {
-            val currentState = _state.value
-            if (currentState.canAddTeam) {
-                val name = currentState.inputName.trim()
-                val color = currentState.selectedColor
+            try {
+                val currentState = _state.value
+                if (currentState.canAddTeam) {
+                    val name = currentState.inputName.trim()
+                    val color = currentState.selectedColor
 
-                addTeamUseCase(name, color)
-                _state.update { it.copy(inputName = "") }
-                loadTeams()
+                    addTeamUseCase(name, color)
+                    _state.update { it.copy(inputName = "", error = null) }
+                    loadTeams()
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to add team: ${e.message}") }
             }
         }
     }
 
     fun deleteTeam(teamId: Uuid) {
         viewModelScope.launch {
-            deleteTeamUseCase(teamId)
-            loadTeams()
+            try {
+                deleteTeamUseCase(teamId)
+                loadTeams()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to delete team: ${e.message}") }
+            }
         }
     }
 
     fun updateTeam(updatedTeam: Team) {
         viewModelScope.launch {
-            updateTeamUseCase(updatedTeam)
-            loadTeams()
+            try {
+                updateTeamUseCase(updatedTeam)
+                loadTeams()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to update team: ${e.message}") }
+            }
         }
     }
 
@@ -110,15 +123,24 @@ class TeamSelectionViewModel(
 
     private fun loadTeams() {
         viewModelScope.launch {
-            val updatedTeams = getTeamsUseCase()
-            _state.update { oldState ->
-                oldState.copy(
-                    teams = updatedTeams,
-                    selectedColor = TeamColor.entries.firstOrNull { color ->
-                        updatedTeams.none { it.color == color }
-                    } ?: TeamColor.entries.first()
-                )
+            try {
+                val updatedTeams = getTeamsUseCase()
+                _state.update { oldState ->
+                    oldState.copy(
+                        teams = updatedTeams,
+                        selectedColor = TeamColor.entries.firstOrNull { color ->
+                            updatedTeams.none { it.color == color }
+                        } ?: TeamColor.entries.first(),
+                        error = null
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = "Failed to load teams: ${e.message}") }
             }
         }
+    }
+
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -198,8 +199,68 @@ fun GameScreen(
                 }
             }
 
-            if (showResultOverlay) {
-                ResultOverlay(isCorrect = snapshot.isCorrect)
+            if (state.currentPhase == GamePhase.SHOW_NEXT_TEAM_POPUP) {
+                NextTeamPopupOverlay(
+                    teamName = state.currentTeam?.name ?: "",
+                    onOkClicked = { viewModel.onPopupAcknowledgePressed() }
+                )
+            }
+
+            if (state.currentPhase == GamePhase.SHOW_RESULT) {
+                ResultOverlay(isCorrect = state.isGuessCorrect)
+            }
+
+            state.error?.let { error ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .background(Color.Red.copy(alpha = 0.8f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = error,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun NextTeamPopupOverlay(
+    teamName: String,
+    onOkClicked: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.7f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            backgroundColor = Color(AppColors.GAME_GRAY),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = "$teamName következik!",
+                    fontSize = 24.sp,
+                    fontFamily = robotoMonoBold,
+                    color = Color.Black,
+                    textAlign = TextAlign.Center
+                )
+                Button(onClick = onOkClicked) {
+                    Text("OK, Mehet!")
+                }
             }
         }
     }

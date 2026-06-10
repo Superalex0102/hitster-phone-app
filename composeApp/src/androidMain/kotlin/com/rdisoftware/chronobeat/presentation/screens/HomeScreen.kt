@@ -1,6 +1,7 @@
 package com.rdisoftware.chronobeat.presentation.screens
 
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import com.rdisoftware.chronobeat.presentation.constants.AccessibilityIds.HomeScreen
@@ -92,6 +94,22 @@ fun HomeScreen(
                     onDiscard = { viewModel.onEvent(HomeEvent.OnResumeDiscard) })
             }
 
+            state.error?.let { error ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.TopCenter)
+                        .background(Color.Red.copy(alpha = 0.8f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = error,
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                }
+            }
 
             SettingsButton(
                 onClick = {
