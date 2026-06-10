@@ -5,6 +5,8 @@ import com.rdisoftware.chronobeat.domain.repositories.MusicRepository
 
 class FakeMusicRepository : MusicRepository {
 
+    var lastPlayedTrackId: String? = null
+
     private val fakeTrackIds = (1..50).map { "fake_track_$it" }
 
     override suspend fun getChronobeatPlaylists(): List<Playlist> {
@@ -40,7 +42,7 @@ class FakeMusicRepository : MusicRepository {
     }
 
     override suspend fun playMusic(trackId: String) {
-
+        lastPlayedTrackId = trackId
     }
 
     override suspend fun resumeMusic() {
